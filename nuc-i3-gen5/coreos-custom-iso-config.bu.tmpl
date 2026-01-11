@@ -37,7 +37,7 @@ systemd:
         [Service]
         Type=oneshot
         RemainAfterExit=yes
-        ExecStart=/usr/bin/rpm-ostree install -y --allow-inactive neovim htop
+        ExecStart=/usr/bin/rpm-ostree install -y --allow-inactive neovim htop python3
         ExecStart=/bin/touch /var/lib/%N.stamp
         ExecStart=/bin/systemctl --no-block reboot
 
