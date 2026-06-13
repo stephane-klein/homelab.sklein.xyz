@@ -29,7 +29,7 @@ CoreOS custom iso builded in: images/fedora-coreos-for-nuc-i3-gen5.iso
 Next, plug USB key on workstation and execute:
 
 ```sh
-$ ./nuc-i3-gen5/write-to-usb-interactive.sh
+$ ./write-to-usb-interactive.sh
 === Fedora USB Writer ===
 ISO: images/fedora-coreos-for-nuc-i3-gen5.iso
 
