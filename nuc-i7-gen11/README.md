@@ -10,6 +10,12 @@ Hardware specifications:
 
 Product sheet on LDLC Website: https://www.ldlc.com/fiche/PB00405633.html
 
+## Encrypted disk
+
+The SSD is encrypted with LUKS. The decryption key is stored in the NUC's TPM2, allowing automatic boot without manual passphrase entry.
+
+**Limitations**: this setup is not secure against physical server theft — an attacker can extract the LUKS key from TPM2 by booting from another disk with the same firmware and kernel. More details in [this note](https://notes.sklein.xyz/2025-11-01_1203/zen/).
+
 ## NanoKVM
 
 A [NanoKVM](https://wiki.sipeed.com/hardware/en/kvm/NanoKVM/quick_start.html) is plugged into NUC's USB and HDMI ports.
