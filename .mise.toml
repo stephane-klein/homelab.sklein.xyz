@@ -1,2 +1,9 @@
+[env]
+_.file = ".secret"
+
 [tools]
 gomplate="3.11.5"
+
+[tasks.setup-secret]
+description = "Generate .secret from scripts/generate-secret.sh via gopass"
+run = "bash scripts/generate-secret.sh > .secret"

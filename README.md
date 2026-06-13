@@ -39,11 +39,12 @@ $ mise install
 $ cp .secret.skel .secret
 ```
 
-Fill the `.secret` file with the secret from my Bitwarden vault.
+For Stéphane Klein (gopass user), generate `.secret` directly from the Gopass store:
 
-```sh
-$ direnv allow
+```bash
+$ mise run setup-secret
 ```
+
 
 ### Server provisionning
 
