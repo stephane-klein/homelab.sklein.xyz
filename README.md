@@ -45,7 +45,6 @@ For Stéphane Klein (gopass user), generate `.secret` directly from the Gopass s
 $ mise run setup-secret
 ```
 
-
 ### Server provisionning
 
 Go to:
