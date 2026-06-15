@@ -60,7 +60,8 @@ if [ "${KEY_TYPE:-one-time}" = "one-time" ]; then
   "expires_in": 604800,
   "auto_groups": [],
   "usage_limit": 1,
-  "ephemeral": false
+  "ephemeral": false,
+  "allow_extra_dns_labels": true
 }
 EOF
 )
@@ -71,7 +72,9 @@ else
   "type": "reusable",
   "expires_in": 604800,
   "auto_groups": [],
-  "ephemeral": false
+  "usage_limit": 0,
+  "ephemeral": false,
+  "allow_extra_dns_labels": true
 }
 EOF
 )

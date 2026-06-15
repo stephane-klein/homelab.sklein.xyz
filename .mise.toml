@@ -3,6 +3,7 @@ _.file = ".secret"
 
 [tools]
 gomplate="3.11.5"
+"github:mitsuhiko/minijinja" = "2.20.0"
 
 [tasks.setup-secret]
 description = "Generate .secret from scripts/generate-secret.sh via gopass"

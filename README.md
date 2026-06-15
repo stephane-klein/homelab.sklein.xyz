@@ -52,3 +52,31 @@ Go to:
 
 - [`./nuc-i3-gen5/README.md`](./nuc-i3-gen5/)
 - [`./nuc-i7-gen11/README.md`](./nuc-i7-gen11/)
+
+## Private CA for internal services
+
+A private Certificate Authority is used to issue trusted TLS certificates for internal
+services (Cockpit, etc.). This avoids browser warnings for self-signed certificates.
+
+### Create the CA (once)
+
+```sh
+$ ./scripts/setup-ca.sh
+  Generating CA key...
+  Generating CA certificate...
+  CA created: certs/ca/ca.crt
+
+To trust this CA on Fedora:
+  sudo cp certs/ca/ca.crt /etc/pki/ca-trust/source/anchors/homelab-ca.crt
+  sudo update-ca-trust
+```
+
+### Trust the CA on your workstation (Fedora)
+
+```sh
+$ sudo cp certs/ca/ca.crt /etc/pki/ca-trust/source/anchors/homelab-ca.crt
+$ sudo update-ca-trust
+```
+
+The CA is now trusted system-wide, including Firefox (uses the system trust store)
+and Chromium/Chrome.

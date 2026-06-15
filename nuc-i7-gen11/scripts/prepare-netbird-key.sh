@@ -3,12 +3,12 @@ set -euo pipefail
 
 cd "$(dirname "$0")/../"
 
-SECRET_FILE=".secret"
+SECRET_FILE="../.secret"
 
 usage() {
   echo "Usage: $0 [options] [key-type]" >&2
   echo "Options:" >&2
-  echo "  --secret-file PATH   Path to secret file to update (default: .secret)" >&2
+  echo "  --secret-file PATH   Path to secret file to update (default: ../.secret)" >&2
   echo "  --help               Show this help" >&2
   echo "" >&2
   echo "Arguments:" >&2
@@ -60,7 +60,8 @@ if [ "${KEY_TYPE:-one-time}" = "one-time" ]; then
   "expires_in": 604800,
   "auto_groups": [],
   "usage_limit": 1,
-  "ephemeral": false
+  "ephemeral": false,
+  "allow_extra_dns_labels": true
 }
 EOF
 )
@@ -71,7 +72,9 @@ else
   "type": "reusable",
   "expires_in": 604800,
   "auto_groups": [],
-  "ephemeral": false
+  "usage_limit": 0,
+  "ephemeral": false,
+  "allow_extra_dns_labels": true
 }
 EOF
 )

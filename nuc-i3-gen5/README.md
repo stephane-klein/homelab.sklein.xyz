@@ -77,7 +77,7 @@ State: idle
 AutomaticUpdatesDriver: Zincati
   DriverState: active; periodically polling for updates (last checked Tue 2025-11-11 19:40:52 UTC)
 Deployments:
-● ostree-image-signed:docker://quay.io/fedora/fedora-coreos:stable
+●   ostree-image-signed:docker://quay.io/fedora/fedora-coreos:stable
                    Digest: sha256:1693b47dfccebdde19e81c3d0a0392010f0ec67e827f096d1b3f8aec662eb5cf
                   Version: 42.20251012.3.0 (2025-10-25T02:24:05Z)
           LayeredPackages: htop neovim
@@ -85,4 +85,37 @@ Deployments:
   ostree-image-signed:docker://quay.io/fedora/fedora-coreos:stable
                    Digest: sha256:1693b47dfccebdde19e81c3d0a0392010f0ec67e827f096d1b3f8aec662eb5cf
                   Version: 42.20251012.3.0 (2025-10-25T02:24:05Z)
+```
+
+## Post-installation: Cockpit web console
+
+Install [Cockpit](https://cockpit-project.org/) on the server (accessible only via the Netbird VPN):
+
+```sh
+$ ./scripts/install-cockpit.sh
+=== Cockpit Installation for nuc-i3-gen5.homelab.stephane-klein.info ===
+
+--- Phase 1: Installation and configuration ---
+--- Phase 2: Post-reboot configuration ---
+  Waiting for host to come back up...
+  Host is back online.
+  Configuring firewall...
+--- Phase 3: Netbird DNS configuration ---
+  Looking up peer...
+  Zone found: <zone-id>
+  Creating DNS A record...
+  Record created: <record-id>
+
+=== Done ===
+  Access Cockpit at: https://cockpit.nuc-i3-gen5.homelab.stephane-klein.info:9090
+```
+
+Prerequisites:
+- `mise` must be installed (see [`../README.md`](../README.md))
+- `minijinja-cli` is automatically installed by `mise` (defined in `.mise.toml`)
+- `NETBIRD_API_TOKEN` must be present in `.secret` (loaded by `mise`)
+- The server must be online and reachable via SSH on the Netbird VPN
+
+For fresh provisioned machines (via `create-custom-iso.sh`), Cockpit is already included
+in the Butane template — no manual script needed.
 ```

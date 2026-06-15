@@ -89,7 +89,7 @@ State: idle
 AutomaticUpdatesDriver: Zincati
   DriverState: active; periodically polling for updates (last checked Tue 2025-11-11 20:16:37 UTC)
 Deployments:
-● ostree-image-signed:docker://quay.io/fedora/fedora-coreos:stable
+●   ostree-image-signed:docker://quay.io/fedora/fedora-coreos:stable
                    Digest: sha256:1693b47dfccebdde19e81c3d0a0392010f0ec67e827f096d1b3f8aec662eb5cf
                   Version: 42.20251012.3.0 (2025-10-25T02:24:05Z)
           LayeredPackages: htop neovim
@@ -97,4 +97,48 @@ Deployments:
   ostree-image-signed:docker://quay.io/fedora/fedora-coreos:stable
                    Digest: sha256:1693b47dfccebdde19e81c3d0a0392010f0ec67e827f096d1b3f8aec662eb5cf
                   Version: 42.20251012.3.0 (2025-10-25T02:24:05Z)
+```
+
+## Post-installation: Cockpit web console
+
+Install [Cockpit](https://cockpit-project.org/) on the server (accessible only via the Netbird VPN):
+
+```sh
+$ ./scripts/install-cockpit.sh
+=== Cockpit Installation for nuc-i7-gen11.homelab.stephane-klein.info ===
+
+--- Phase 1: Installation and configuration ---
+  cockpit already requested, skipping
+  No reboot needed.
+
+--- Phase 3: TLS certificate ---
+  Generating signed certificate for cockpit.nuc-i7-gen11.homelab.stephane-klein.info...
+  Certificate already exists: certs/ca/cockpit.nuc-i7-gen11.homelab.stephane-klein.info.crt
+  Deploying to nuc-i7-gen11.homelab.stephane-klein.info...
+cockpit.nuc-i7-gen11.homelab.stephane-klein.info.crt                                                                                                                                                          100% 1749   669.7KB/s   00:00
+cockpit.nuc-i7-gen11.homelab.stephane-klein.info.key                                                                                                                                                          100% 1704   638.5KB/s   00:00
+  Certificate deployed.
+
+--- Phase 3: Netbird DNS configuration ---
+  Cleaning up old DNS routes...
+  Getting groups...
+  Creating DNS zone for 'nuc-i7-gen11.homelab.stephane-klein.info'...
+  Zone found: d8o651rl0ubs738g8akg
+  Checking if CNAME record already exists...
+  Updating existing CNAME record...
+  CNAME record updated.
+
+=== Done ===
+  Access Cockpit at: https://cockpit.nuc-i7-gen11.homelab.stephane-klein.info:9090
+  (only reachable via Netbird VPN)
+```
+
+Prerequisites:
+- `mise` must be installed (see [`../README.md`](../README.md))
+- `minijinja-cli` is automatically installed by `mise` (defined in `.mise.toml`)
+- `NETBIRD_API_TOKEN` must be present in `.secret` (loaded by `mise`)
+- The server must be online and reachable via SSH on the Netbird VPN
+
+For fresh provisioned machines (via `create-custom-iso.sh`), Cockpit is already included
+in the Butane template — no manual script needed.
 ```

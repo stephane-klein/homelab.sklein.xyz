@@ -37,7 +37,7 @@ systemd:
         [Service]
         Type=oneshot
         RemainAfterExit=yes
-        ExecStart=/usr/bin/rpm-ostree install -y --allow-inactive neovim htop python3 netbird
+        ExecStart=/usr/bin/rpm-ostree install -y --allow-inactive neovim htop python3 netbird cockpit
         ExecStart=/bin/touch /var/lib/%N.stamp
         ExecStart=/usr/bin/systemctl enable netbird-setup.service
         ExecStart=/bin/systemctl --no-block reboot
@@ -62,6 +62,27 @@ systemd:
         ExecStartPre=/usr/bin/systemctl enable --now netbird
         ExecStart=/usr/bin/netbird up --setup-key {{ .Env.NUC_I7_GEN11_NETBIRD_SETUP_KEY }}
         ExecStart=/bin/touch /var/lib/netbird-setup.stamp
+
+        [Install]
+        WantedBy=multi-user.target
+
+    - name: cockpit.socket
+      enabled: true
+
+    - name: cockpit-configure.service
+      enabled: true
+      contents: |
+        [Unit]
+        Description=Configure cockpit socket to listen on Netbird IP only
+        After=netbird.service
+        Requires=netbird.service
+        ConditionPathExists=!/var/lib/cockpit-configure.stamp
+
+        [Service]
+        Type=oneshot
+        RemainAfterExit=yes
+        ExecStart=/bin/bash -c 'NETBIRD_IP=$(ip -4 addr show wt0 | grep -oP "(?<=inet\s)\d+(\.\d+){3}"); if [ -n "$NETBIRD_IP" ]; then mkdir -p /etc/systemd/system/cockpit.socket.d && printf "[Socket]\nListenStream=\nListenStream=%s:9090\n" "$NETBIRD_IP" > /etc/systemd/system/cockpit.socket.d/listen.conf && systemctl daemon-reload; fi; rm -f /etc/cockpit/ws-certs.d/0-self-signed-*.cert && sscg --hostname cockpit.$(hostname -f) --hostname $(hostname -f) && systemctl enable --now cockpit.socket || true'
+        ExecStart=/bin/touch /var/lib/cockpit-configure.stamp
 
         [Install]
         WantedBy=multi-user.target
@@ -146,6 +167,14 @@ storage:
           gpgcheck=1
           gpgkey=https://pkgs.netbird.io/yum/repodata/repomd.xml.key
           repo_gpgcheck=1
+
+    - path: /etc/cockpit/cockpit.conf
+      mode: 0644
+      contents:
+        inline: |
+          [WebService]
+          Origins = https://cockpit.nuc-i7-gen11.homelab.stephane-klein.info:9090
+
   links:
     - path: /etc/localtime
       target: ../usr/share/zoneinfo/Europe/Paris
