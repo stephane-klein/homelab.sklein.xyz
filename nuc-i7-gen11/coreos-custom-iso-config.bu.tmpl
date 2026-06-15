@@ -37,9 +37,31 @@ systemd:
         [Service]
         Type=oneshot
         RemainAfterExit=yes
-        ExecStart=/usr/bin/rpm-ostree install -y --allow-inactive neovim htop python3
+        ExecStart=/usr/bin/rpm-ostree install -y --allow-inactive neovim htop python3 netbird
         ExecStart=/bin/touch /var/lib/%N.stamp
+        ExecStart=/usr/bin/systemctl enable netbird-setup.service
         ExecStart=/bin/systemctl --no-block reboot
+
+        [Install]
+        WantedBy=multi-user.target
+
+    - name: netbird-setup.service
+      enabled: false
+      contents: |
+        [Unit]
+        Description=Configure Netbird with setup key
+        Wants=network-online.target
+        After=network-online.target
+        Before=zincati.service
+        ConditionPathExists=!/var/lib/netbird-setup.stamp
+
+        [Service]
+        Type=oneshot
+        RemainAfterExit=yes
+        ExecStartPre=/usr/bin/netbird service install
+        ExecStartPre=/usr/bin/systemctl enable --now netbird
+        ExecStart=/usr/bin/netbird up --setup-key {{ .Env.NUC_I7_GEN11_NETBIRD_SETUP_KEY }}
+        ExecStart=/bin/touch /var/lib/netbird-setup.stamp
 
         [Install]
         WantedBy=multi-user.target
@@ -112,6 +134,18 @@ storage:
           days = [ "Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun" ]
           start_time = "02:00" # UTC
           length_minutes = 180
+
+    - path: /etc/yum.repos.d/netbird.repo
+      mode: 0644
+      contents:
+        inline: |
+          [NetBird]
+          name=NetBird
+          baseurl=https://pkgs.netbird.io/yum/
+          enabled=1
+          gpgcheck=1
+          gpgkey=https://pkgs.netbird.io/yum/repodata/repomd.xml.key
+          repo_gpgcheck=1
   links:
     - path: /etc/localtime
       target: ../usr/share/zoneinfo/Europe/Paris

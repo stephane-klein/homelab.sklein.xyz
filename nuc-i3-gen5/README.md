@@ -12,6 +12,20 @@ Hardware specifications:
 
 Apply prerequisites in [`../README.md`](../README.md).
 
+Ensure `.secret` contains `NETBIRD_API_TOKEN` (create one in NetBird dashboard → Settings → API Keys), then generate a Netbird setup key for this machine:
+
+```sh
+$ ./scripts/prepare-netbird-key.sh
+=== NetBird Setup Key Generator ===
+  Machine: nuc-i3-gen5.homelab.stephane-klein.info
+  Key type: one-time
+  Secret file: ../.secret
+
+Calling NetBird API...
+  Key created: B808DE39...
+  NUC_I3_GEN5_NETBIRD_SETUP_KEY written to: ../.secret
+```
+
 Next, execute:
 
 ```sh
@@ -55,17 +69,7 @@ The installation is performed in two steps, requiring two reboots.
 After installation, connect to the server with SSH:
 
 ```
-$ ssh stephane@192.168.1.59
-The authenticity of host '192.168.1.59 (192.168.1.59)' can't be established.
-ED25519 key fingerprint is SHA256:5K94oAYYJf/Z7HYKS1Rub+xFZz+Qe69sIQP/d5OhuWc.
-This key is not known by any other names.
-Are you sure you want to continue connecting (yes/no/[fingerprint])? yes
-Warning: Permanently added '192.168.1.59' (ED25519) to the list of known hosts.
-Fedora CoreOS 42.20251012.3.0
-Tracker: https://github.com/coreos/fedora-coreos-tracker
-Discuss: https://discussion.fedoraproject.org/tag/coreos
-
-Last login: Tue Nov 11 20:40:52 2025
+$ ssh stephane@nuc-i3-gen5.homelab.stephane-klein.info
 stephane@stephane-coreos:~$ rpm
 rpm          rpm-ostree   rpm2archive  rpm2cpio     rpmdb        rpmkeys      rpmquery     rpmsort      rpmverify
 stephane@stephane-coreos:~$ rpm-ostree status

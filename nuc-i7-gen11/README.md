@@ -24,6 +24,20 @@ A [NanoKVM](https://wiki.sipeed.com/hardware/en/kvm/NanoKVM/quick_start.html) is
 
 Apply prerequisites in [`../README.md`](../README.md).
 
+Ensure `.secret` contains `NETBIRD_API_TOKEN` (create one in NetBird dashboard → Settings → API Keys), then generate a Netbird setup key for this machine:
+
+```sh
+$ ./scripts/prepare-netbird-key.sh
+=== NetBird Setup Key Generator ===
+  Machine: nuc-i7-gen11.homelab.stephane-klein.info
+  Key type: one-time
+  Secret file: .secret
+
+Calling NetBird API...
+  Key created: B808DE39...
+  NUC_I7_GEN11_NETBIRD_SETUP_KEY written to: .secret
+```
+
 Next, execute:
 
 ```sh
@@ -69,12 +83,7 @@ The installation is performed in two steps, requiring two reboots.
 After installation, connect to the server with SSH:
 
 ```sh
-$ ssh stephane@192.168.1.126
-Fedora CoreOS 42.20251012.3.0
-Tracker: https://github.com/coreos/fedora-coreos-tracker
-Discuss: https://discussion.fedoraproject.org/tag/coreos
-
-Last login: Tue Nov 11 21:16:37 2025
+$ ssh stephane@nuc-i7-gen11.homelab.stephane-klein.info
 stephane@stephane-coreos:~$ rpm-ostree status
 State: idle
 AutomaticUpdatesDriver: Zincati
