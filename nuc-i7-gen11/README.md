@@ -120,12 +120,3 @@ cockpit.nuc-i7-gen11.homelab.stephane-klein.info.key                            
   Access Cockpit at: https://cockpit.nuc-i7-gen11.homelab.stephane-klein.info:9090
   (only reachable via Netbird VPN)
 ```
-
-Prerequisites:
-- `mise` must be installed (see [`../README.md`](../README.md))
-- `minijinja-cli` is automatically installed by `mise` (defined in `.mise.toml`)
-- The server must be online and reachable via SSH on the Netbird VPN
-
-For fresh provisioned machines (via `create-custom-iso.sh`), Cockpit is already included
-in the Butane template — no manual script needed.
-```

@@ -97,12 +97,3 @@ $ ./scripts/install-cockpit.sh
 === Done ===
   Access Cockpit at: https://cockpit.nuc-i3-gen5.homelab.stephane-klein.info:9090
 ```
-
-Prerequisites:
-- `mise` must be installed (see [`../README.md`](../README.md))
-- `minijinja-cli` is automatically installed by `mise` (defined in `.mise.toml`)
-- The server must be online and reachable via SSH on the Netbird VPN
-
-For fresh provisioned machines (via `create-custom-iso.sh`), Cockpit is already included
-in the Butane template — no manual script needed.
-```
