@@ -22,21 +22,7 @@ A [NanoKVM](https://wiki.sipeed.com/hardware/en/kvm/NanoKVM/quick_start.html) is
 
 ## Provision NUC i7 gen11 server
 
-Apply prerequisites in [`../README.md`](../README.md).
-
-Ensure `.secret` contains `NETBIRD_API_TOKEN` (create one in NetBird dashboard → Settings → API Keys), then generate a Netbird setup key for this machine:
-
-```sh
-$ ./scripts/prepare-netbird-key.sh
-=== NetBird Setup Key Generator ===
-  Machine: nuc-i7-gen11.homelab.stephane-klein.info
-  Key type: one-time
-  Secret file: .secret
-
-Calling NetBird API...
-  Key created: B808DE39...
-  NUC_I7_GEN11_NETBIRD_SETUP_KEY written to: .secret
-```
+Make sure you have completed the steps in [`../README.md`](../README.md) first.
 
 Next, execute:
 
@@ -51,6 +37,8 @@ gpg: Bonne signature de « Fedora (42) <fedora-42-primary@fedoraproject.org> �
 Boot media will automatically install to /dev/nvme0n1 without confirmation.
 CoreOS custom iso builded in: images/fedora-coreos-for-nuc-i7-gen11.iso
 ```
+
+The setup key is retrieved automatically by the script via `tofu output -raw`.
 
 Next, plug USB key on workstation and execute:
 
@@ -136,7 +124,6 @@ cockpit.nuc-i7-gen11.homelab.stephane-klein.info.key                            
 Prerequisites:
 - `mise` must be installed (see [`../README.md`](../README.md))
 - `minijinja-cli` is automatically installed by `mise` (defined in `.mise.toml`)
-- `NETBIRD_API_TOKEN` must be present in `.secret` (loaded by `mise`)
 - The server must be online and reachable via SSH on the Netbird VPN
 
 For fresh provisioned machines (via `create-custom-iso.sh`), Cockpit is already included

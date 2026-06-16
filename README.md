@@ -46,6 +46,36 @@ For Stéphane Klein (gopass user), generate `.secret` directly from the Gopass s
 $ mise run setup-secret
 ```
 
+### Netbird VPN configuration with OpenTofu
+
+The [Netbird](https://netbird.io/) VPN mesh is configured using [OpenTofu](https://opentofu.org/)
+via the [`terraform-provider-netbird`](https://github.com/netbirdio/terraform-provider-netbird).
+
+Prerequisites:
+
+- `NB_PAT` must be present in `.secret` (Netbird Personal Access Token — generate one in
+  Settings → API Keys)
+- OpenTofu is automatically installed by `mise` (defined in `.mise.toml`)
+
+```bash
+$ tofu init
+$ tofu apply
+```
+
+This manages the following resources:
+
+- **Groups**: `homelab-servers` (the two NUCs) and `user-devices` (laptop, phone)
+- **Peers**: SSH enabled on servers via Netbird SSH proxy (no manual SSH key distribution)
+- **Policies**: unidirectional access — user devices can reach servers, servers cannot
+  initiate connections to user devices
+- **Setup keys**: generated for ISO builds
+
+To list existing resources and their IDs (useful for `tofu import`):
+
+```bash
+$ ./scripts/list-netbird-resources.sh
+```
+
 ### Server provisionning
 
 Go to:

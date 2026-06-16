@@ -19,6 +19,7 @@ mv "$tmpdir"/* images/fedora-coreos-live-iso.x86_64.iso
 rmdir "$tmpdir"
 
 export NUC_I3_GEN5_STEPHANE_PASSWORD_HASH="$(echo \"${NUC_I3_GEN5_STEPHANE_PASSWORD}\" | mkpasswd --method=yescrypt -s)"
+export NUC_I3_GEN5_NETBIRD_SETUP_KEY="$(tofu output -raw setup_key_nuc_i3_gen5)"
 
 gomplate -f coreos-custom-iso-config.bu.tmpl -o coreos-custom-iso-config.bu
 butane coreos-custom-iso-config.bu > coreos-custom-iso-config.ign
