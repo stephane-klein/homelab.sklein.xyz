@@ -1,11 +1,12 @@
 [env]
 _.file = ".secret"
-KUBECONFIG = "k3s.kubeconfig"
+KUBECONFIG = "{{config_root}}/k3s.kubeconfig"
 
 [tools]
 "github:mitsuhiko/minijinja" = "2.20.0"
 opentofu = "1.12.2"
 kubectl = "1.36.2"
+helm = "4.2.1"
 
 [tasks.generate-k3s-token]
 description = "Generate K3S_TOKEN and append it to .secret"
@@ -18,3 +19,15 @@ run = "bash scripts/k3s-health.sh"
 [tasks.setup-secret]
 description = "Generate .secret from scripts/generate-secret.sh via gopass"
 run = "scripts/generate-secret.sh > .secret"
+
+[tasks.deploy-traefik]
+description = "Deploy Traefik ingress controller + cert-manager with CA"
+run = "scripts/deploy-traefik.sh"
+
+[tasks.deploy-whoami]
+description = "Deploy whoami test app at https://whoami.sklein.internal"
+run = "scripts/deploy-whoami.sh"
+
+[tasks.destroy-whoami]
+description = "Destroy whoami test app"
+run = "scripts/destroy-whoami.sh"

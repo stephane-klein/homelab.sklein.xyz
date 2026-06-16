@@ -177,3 +177,88 @@ $ sudo update-ca-trust
 
 The CA is now trusted system-wide, including Firefox (uses the system trust store)
 and Chromium/Chrome.
+
+## Ingress controller (Traefik)
+
+[Traefik](https://traefik.io/) is the ingress controller. It is exposed on `nuc-i7-gen11`
+via the k3s service load balancer (`svclb`). The Netbird DNS wildcard
+`*.sklein.internal` (configured in `netbird-dns.tf`) resolves all subdomains to the
+ingress node.
+
+### Deploy
+
+```sh
+$ mise run deploy-traefik
+```
+
+This installs:
+
+- `cert-manager` in the `cert-manager` namespace
+- A `ClusterIssuer` named `homelab-ca` signed by the private CA in `certs/ca/`
+- Traefik in the `traefik` namespace, pinned to `nuc-i7-gen11` via the label
+  `node-role.kubernetes.io/ingress=true`
+
+> **Note:** On Fedora CoreOS 44 (kernel 7.0.9), `fib daddr type local` does not
+> match for traffic arriving on the Netbird `wt0` interface. The deploy script
+> applies an nftables workaround that accepts forwarded traffic from the Netbird
+> CIDR (`100.91.0.0/16`) to the pod CIDR (`10.42.0.0/16`).
+
+### Test with whoami
+
+Deploy a minimal test application:
+
+```sh
+$ mise run deploy-whoami
+```
+
+Access from any Netbird peer:
+
+```sh
+$ curl -k https://whoami.sklein.internal/
+```
+
+Or with the CA trusted system-wide:
+
+```sh
+$ curl https://whoami.sklein.internal/
+```
+
+You should see the whoami response (request headers and pod name).
+
+### Clean up the test app
+
+```sh
+$ mise run destroy-whoami
+```
+
+### Deploying your own apps
+
+Any workload can be exposed by creating an `Ingress` resource with a host under
+`*.sklein.internal` (e.g. `myapp.sklein.internal`). cert-manager automatically
+issues a TLS certificate signed by the private CA.
+
+```yaml
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: myapp
+  annotations:
+    cert-manager.io/cluster-issuer: homelab-ca
+spec:
+  ingressClassName: traefik
+  tls:
+  - hosts:
+    - myapp.sklein.internal
+    secretName: myapp-tls
+  rules:
+  - host: myapp.sklein.internal
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: myapp
+            port:
+              number: 80
+```
