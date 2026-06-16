@@ -12,7 +12,7 @@ Installation characteristics:
 
 - Use Fedora CoreOS atomic distribution
 - `/var/` mutable volume is encrypted with LUKS and unlock with TPM2 (Tang coming soon)
-- Servers automatically join the [Netbird](https://netbird.io/) VPN mesh network
+- Servers automatically join the [Netbird](https://netbird.io/) VPN mesh network (managed by OpenTofu)
 
 ## Getting started
 
