@@ -24,6 +24,14 @@ run = "scripts/generate-secret.sh > .secret"
 description = "Deploy Traefik ingress controller + cert-manager with CA"
 run = "scripts/deploy-traefik.sh"
 
+[tasks.destroy-traefik]
+description = "Destroy Traefik ingress controller + cert-manager"
+run = "scripts/destroy-traefik.sh"
+
+[tasks.disable-servicelb]
+description = "Disable k3s ServiceLB (SSH + restart k3s)"
+run = "scripts/disable-servicelb.sh"
+
 [tasks.deploy-whoami]
 description = "Deploy whoami test app at https://whoami.sklein.internal"
 run = "scripts/deploy-whoami.sh"

@@ -180,10 +180,10 @@ and Chromium/Chrome.
 
 ## Ingress controller (Traefik)
 
-[Traefik](https://traefik.io/) is the ingress controller. It is exposed on `nuc-i7-gen11`
-via the k3s service load balancer (`svclb`). The Netbird DNS wildcard
-`*.sklein.internal` (configured in `netbird-dns.tf`) resolves all subdomains to the
-ingress node.
+[Traefik](https://traefik.io/) is the ingress controller. It listens on ports 80 and 443
+via `hostPort` on `nuc-i7-gen11`. No LoadBalancer or additional nftables rules are needed.
+The Netbird DNS wildcard `*.sklein.internal` (configured in `netbird-dns.tf`) resolves
+all subdomains to the ingress node.
 
 ### Deploy
 
@@ -198,10 +198,25 @@ This installs:
 - Traefik in the `traefik` namespace, pinned to `nuc-i7-gen11` via the label
   `node-role.kubernetes.io/ingress=true`
 
-> **Note:** On Fedora CoreOS 44 (kernel 7.0.9), `fib daddr type local` does not
-> match for traffic arriving on the Netbird `wt0` interface. The deploy script
-> applies an nftables workaround that accepts forwarded traffic from the Netbird
-> CIDR (`100.91.0.0/16`) to the pod CIDR (`10.42.0.0/16`).
+### Destroy
+
+```sh
+$ mise run destroy-traefik
+```
+
+This removes Traefik, cert-manager, and the ClusterIssuer.
+
+### Disable k3s ServiceLB (optional)
+
+Since Traefik no longer uses a LoadBalancer service, the k3s ServiceLB
+controller is no longer needed. To disable it:
+
+```sh
+$ mise run disable-servicelb
+```
+
+This SSHes into `nuc-i7-gen11`, adds `servicelb` to the k3s `disable` list,
+and restarts the k3s server. The cluster is briefly unavailable (~30s).
 
 ### Test with whoami
 

@@ -3,8 +3,6 @@ set -euo pipefail
 
 cd "$(dirname "$0")"
 
-SSH_USER="${SSH_USER:-stephane}"
-
 echo "=== Deploying cert-manager ==="
 helm repo add jetstack https://charts.jetstack.io --force-update > /dev/null
 helm upgrade --install cert-manager jetstack/cert-manager \
@@ -39,26 +37,26 @@ echo "=== Deploying Traefik ==="
 helm repo add traefik https://traefik.github.io/charts --force-update > /dev/null
 helm upgrade --install traefik traefik/traefik \
   --namespace traefik --create-namespace \
-  --set deployment.replicas=1 \
   --set hostNetwork=false \
+  --set deployment.replicas=1 \
   --set ports.web.port=80 \
+  --set ports.web.hostPort=80 \
   --set ports.websecure.port=443 \
+  --set ports.websecure.hostPort=443 \
   --set ingressClass.enabled=true \
   --set ingressClass.isDefaultClass=true \
-  --set service.type=LoadBalancer \
+  --set service.type=ClusterIP \
   --set-string nodeSelector."node-role\.kubernetes\.io/ingress"=true > /dev/null
+
+echo "  Transforming Traefik service from LoadBalancer to ClusterIP..."
+kubectl patch svc traefik -n traefik -p '{"spec":{"type":"ClusterIP"}}' --type=merge > /dev/null 2>&1 || true
 
 echo "  Waiting for Traefik to be ready..."
 kubectl wait --for=condition=Available deployment \
   -n traefik traefik --timeout=120s > /dev/null
 
 echo ""
-echo "=== Applying Netbird forward fix ==="
-echo "  Adding nftables rule to accept traffic from Netbird to pods..."
-INGRESS_NODE="nuc-i7-gen11.homelab.stephane-klein.info"
-ssh "$SSH_USER@$INGRESS_NODE" 'sudo nft insert rule ip netbird netbird-acl-forward-filter iifname "wt0" ip saddr 100.91.0.0/16 ip daddr 10.42.0.0/16 accept 2>&1 || true' && echo "  Rule added"
-
-echo ""
 echo "=== Done ==="
 echo "  Traefik + cert-manager deployed"
+echo "  Traefik with hostPort 80/443 on nuc-i7-gen11"
 echo "  DNS wildcard *.sklein.internal -> nuc-i7-gen11"
