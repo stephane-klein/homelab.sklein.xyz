@@ -2,7 +2,6 @@
 _.file = ".secret"
 
 [tools]
-gomplate="3.11.5"
 "github:mitsuhiko/minijinja" = "2.20.0"
 opentofu = "1.12.2"
 
