@@ -1,10 +1,20 @@
 [env]
 _.file = ".secret"
+KUBECONFIG = "k3s.kubeconfig"
 
 [tools]
 "github:mitsuhiko/minijinja" = "2.20.0"
 opentofu = "1.12.2"
+kubectl = "1.36.2"
+
+[tasks.generate-k3s-token]
+description = "Generate K3S_TOKEN and append it to .secret"
+run = "scripts/generate-k3s-token.sh"
+
+[tasks.k3s-health]
+description = "Check k3s cluster health (nodes, pods, events, resources)"
+run = "bash scripts/k3s-health.sh"
 
 [tasks.setup-secret]
 description = "Generate .secret from scripts/generate-secret.sh via gopass"
-run = "bash scripts/generate-secret.sh > .secret"
+run = "scripts/generate-secret.sh > .secret"

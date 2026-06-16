@@ -7,4 +7,6 @@ NUC_I7_GEN11_LUKS_PASSPHRASE="$(gopass show nuc-i7-gen11.homelab.stephane-klein.
 # NetBird Personal Access Token, used by OpenTofu provider (terraform-provider-netbird)
 # Generate one in NetBird dashboard: Settings → API Keys → Create API Key
 NB_PAT="$(gopass show netbird/apikey)" 
+
+K3S_TOKEN="$(gopass show homelab/k3s_token)"
 EOF

@@ -7,3 +7,4 @@ certs/
 *.tfstate*
 *.tfplan
 *.lock.hcl
++k3s.kubeconfig

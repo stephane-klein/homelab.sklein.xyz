@@ -83,6 +83,73 @@ Go to:
 - [`./nuc-i3-gen5/README.md`](./nuc-i3-gen5/)
 - [`./nuc-i7-gen11/README.md`](./nuc-i7-gen11/)
 
+## Kubernetes cluster with k3s
+
+> **Prerequisite:** the two servers must be provisioned first (see
+> [Server provisioning](#server-provisionning) above).
+
+A multi-node [k3s](https://k3s.io/) cluster spans the two servers:
+
+| NUC | k3s role | Hardware |
+|---|---|---|
+| `nuc-i7-gen11` | **Server** (control-plane) | 32 GB RAM, 1 To SSD |
+| `nuc-i3-gen5` | **Agent** (worker) | 8 GB RAM, 120 Go SSD |
+
+### Generate the K3S token
+
+```sh
+$ mise run generate-k3s-token
+```
+
+This generates a random token via `openssl rand -base64 48` and writes
+`K3S_TOKEN` to `.secret`.
+
+### Deploy the cluster
+
+```sh
+$ ./scripts/deploy-k3s.sh
+```
+
+What the script does:
+
+1. Installs k3s control-plane on `nuc-i7-gen11` — binds on the Netbird VPN IP (`wt0`),
+   disables Traefik.
+2. Waits for the Kubernetes API to be ready.
+3. Installs k3s agent on `nuc-i3-gen5` — joins the server over the Netbird VPN.
+4. Retrieves the kubeconfig to `./k3s.kubeconfig` (added to `.gitignore`).
+
+```sh
+$ mise run k3s-health
+[k3s-health] $ bash scripts/k3s-health.sh
+=== k3s Cluster Health Check ===
+
+--- Nodes ---
+NAME                                       STATUS   ROLES           AGE    VERSION        INTERNAL-IP     EXTERNAL-IP   OS-IMAGE                        KERNEL-VERSION                  CONTAINER-RUNTIME
+nuc-i3-gen5.homelab.stephane-klein.info    Ready    <none>          150m   v1.36.1+k3s1   100.91.182.98   <none>        Fedora CoreOS 44.20260523.3.1   7.0.9-205.fc44.x86_64 (amd64)   containerd://2.2.3-k3s1
+nuc-i7-gen11.homelab.stephane-klein.info   Ready    control-plane   14h    v1.36.1+k3s1   100.91.106.71   <none>        Fedora CoreOS 44.20260523.3.1   7.0.9-205.fc44.x86_64 (amd64)   containerd://2.2.3-k3s1
+
+--- Control-plane components ---
+NAME                 STATUS    MESSAGE   ERROR
+etcd-0               Healthy   ok
+scheduler            Healthy   ok
+controller-manager   Healthy   ok
+
+--- All pods ---
+NAMESPACE     NAME                                      READY   STATUS    RESTARTS   AGE
+kube-system   coredns-6648f7576f-d65zg                  1/1     Running   0          14h
+kube-system   local-path-provisioner-58d557dc48-75wcc   1/1     Running   0          14h
+kube-system   metrics-server-7c86f97b8d-b6dfc           1/1     Running   0          14h
+
+--- Recent events (last 20) ---
+
+--- Resource usage ---
+NAME                                       CPU(cores)   CPU(%)   MEMORY(bytes)   MEMORY(%)
+nuc-i3-gen5.homelab.stephane-klein.info    51m          2%       2079Mi          26%
+nuc-i7-gen11.homelab.stephane-klein.info   99m          1%       1579Mi          4%
+
+=== Done ===
+```
+
 ## Private CA for internal services
 
 A private Certificate Authority is used to issue trusted TLS certificates for internal
