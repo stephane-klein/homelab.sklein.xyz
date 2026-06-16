@@ -39,3 +39,31 @@ run = "scripts/deploy-whoami.sh"
 [tasks.destroy-whoami]
 description = "Destroy whoami test app"
 run = "scripts/destroy-whoami.sh"
+
+[tasks.deploy-victoria-metrics]
+description = "Deploy VictoriaMetrics at https://metrics.sklein.internal"
+run = "scripts/deploy-victoria-metrics.sh"
+
+[tasks.destroy-victoria-metrics]
+description = "Destroy VictoriaMetrics"
+run = "scripts/destroy-victoria-metrics.sh"
+
+[tasks.deploy-perses]
+description = "Deploy Perses at https://perses.sklein.internal"
+run = "scripts/deploy-perses.sh"
+
+[tasks.destroy-perses]
+description = "Destroy Perses"
+run = "scripts/destroy-perses.sh"
+
+[tasks.deploy-custom-dashboards]
+description = "Deploy custom dashboards (node-hardware, node-overview) in Perses"
+run = "scripts/deploy-custom-dashboards.sh"
+
+[tasks.deploy-exporters]
+description = "Deploy kube-state-metrics, node-exporter, vmagent"
+run = "scripts/deploy-exporters.sh"
+
+[tasks.destroy-exporters]
+description = "Destroy exporters"
+run = "scripts/destroy-exporters.sh"

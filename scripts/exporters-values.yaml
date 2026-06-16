@@ -1,0 +1,19 @@
+extraScrapeConfigs:
+  - job_name: kube-state-metrics
+    kubernetes_sd_configs:
+      - role: endpoints
+    relabel_configs:
+      - source_labels: [__meta_kubernetes_service_name]
+        action: keep
+        regex: kube-state-metrics
+  - job_name: node-exporter
+    kubernetes_sd_configs:
+      - role: endpoints
+    relabel_configs:
+      - source_labels: [__meta_kubernetes_service_name]
+        action: keep
+        regex: .*-prometheus-node-exporter
+      - source_labels: [__meta_kubernetes_endpoint_node_name]
+        target_label: instance
+      - source_labels: [__meta_kubernetes_endpoint_node_name]
+        target_label: nodename

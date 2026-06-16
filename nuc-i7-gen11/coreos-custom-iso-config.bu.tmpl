@@ -37,7 +37,7 @@ systemd:
         [Service]
         Type=oneshot
         RemainAfterExit=yes
-        ExecStart=/usr/bin/rpm-ostree install -y --allow-inactive neovim htop python3 netbird cockpit
+        ExecStart=/usr/bin/rpm-ostree install -y --allow-inactive neovim htop python3 netbird cockpit lm_sensors
         ExecStart=/bin/touch /var/lib/%N.stamp
         ExecStart=/usr/bin/systemctl enable netbird-setup.service
         ExecStart=/bin/systemctl --no-block reboot

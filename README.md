@@ -277,3 +277,42 @@ spec:
             port:
               number: 80
 ```
+
+## Monitoring
+
+[VictoriaMetrics](https://victoriametrics.com/) (single-node) provides the metric store, [Perses](https://perses.dev/) provides the dashboards, and [vmagent](https://docs.victoriametrics.com/vmagent/) handles metric scraping.
+
+Access:
+- Metrics API: `https://metrics.sklein.internal`
+- Perses dashboards: `https://perses.sklein.internal`
+
+### Deploy
+
+```sh
+# 1. Metrics storage
+$ mise run deploy-victoria-metrics
+
+# 2. Exporters + vmagent (scraping)
+$ mise run deploy-exporters
+
+# 3. Perses dashboards
+$ mise run deploy-perses
+```
+
+This installs:
+
+- **VictoriaMetrics** — single-node TSDB, retention 30d, PVC 10Gi
+- **kube-state-metrics** — Kubernetes cluster state metrics
+- **prometheus-node-exporter** — per-node system metrics (CPU, memory, disk)
+- **vmagent** — lightweight scrape agent, sends data to VictoriaMetrics via remote write
+- **Perses** — dashboard UI at `https://perses.sklein.internal`
+- **Perses Operator** — manages datasources and dashboards via CRDs
+- **Community dashboards** — Kubernetes cluster dashboards (pre-built from [community-mixins](https://github.com/perses/community-mixins))
+
+### Clean up
+
+```sh
+$ mise run destroy-perses
+$ mise run destroy-exporters
+$ mise run destroy-victoria-metrics
+```

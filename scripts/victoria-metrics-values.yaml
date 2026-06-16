@@ -1,0 +1,26 @@
+server:
+  service:
+    clusterIP: ""
+  retentionPeriod: 30d
+  persistentVolume:
+    size: 10Gi
+  resources:
+    requests:
+      cpu: 200m
+      memory: 256Mi
+    limits:
+      cpu: 500m
+      memory: 512Mi
+  ingress:
+    enabled: true
+    annotations:
+      cert-manager.io/cluster-issuer: homelab-ca
+    hosts:
+      - name: metrics.sklein.internal
+        path:
+          - /
+        port: http
+    tls:
+      - secretName: metrics-tls
+        hosts:
+          - metrics.sklein.internal

@@ -1,0 +1,219 @@
+kind: Dashboard
+metadata:
+  name: node-hardware
+  version: 0
+  project: perses-dev
+spec:
+  display:
+    name: Node Hardware Monitoring
+  variables:
+    - kind: ListVariable
+      spec:
+        display:
+          name: instance
+          hidden: false
+        allowAllValue: true
+        allowMultiple: false
+        name: instance
+        plugin:
+          kind: PrometheusLabelValuesVariable
+          spec:
+            datasource:
+              kind: PrometheusDatasource
+              name: prometheus-datasource
+            labelName: instance
+            matchers:
+              - node_uname_info{job="node-exporter",sysname!="Darwin"}
+  panels:
+    "0_0":
+      kind: Panel
+      spec:
+        display:
+          name: CPU Core Temperatures
+          description: Per-core temperatures from coretemp sensors
+        plugin:
+          kind: TimeSeriesChart
+          spec:
+            legend:
+              position: bottom
+              mode: table
+              values:
+                - last
+        queries:
+          - kind: TimeSeriesQuery
+            spec:
+              plugin:
+                kind: PrometheusTimeSeriesQuery
+                spec:
+                  datasource:
+                    kind: PrometheusDatasource
+                    name: prometheus-datasource
+                  query: node_hwmon_temp_celsius{job="node-exporter",chip=~"platform_coretemp.*",instance=~"$instance"}
+                  seriesNameFormat: '{{nodename}} - {{sensor}}'
+          - kind: TimeSeriesQuery
+            spec:
+              plugin:
+                kind: PrometheusTimeSeriesQuery
+                spec:
+                  datasource:
+                    kind: PrometheusDatasource
+                    name: prometheus-datasource
+                  query: max by (instance) (node_hwmon_temp_celsius{job="node-exporter",chip=~"platform_coretemp.*",instance=~"$instance"})
+                  seriesNameFormat: 'Max - {{nodename}}'
+          - kind: TimeSeriesQuery
+            spec:
+              plugin:
+                kind: PrometheusTimeSeriesQuery
+                spec:
+                  datasource:
+                    kind: PrometheusDatasource
+                    name: prometheus-datasource
+                  query: avg by (instance) (node_hwmon_temp_celsius{job="node-exporter",chip=~"platform_coretemp.*",instance=~"$instance"})
+                  seriesNameFormat: 'Avg - {{nodename}}'
+    "1_0":
+      kind: Panel
+      spec:
+        display:
+          name: NVMe Temperature
+          description: SSD disk temperature
+        plugin:
+          kind: TimeSeriesChart
+          spec:
+            legend:
+              position: bottom
+              mode: table
+              values:
+                - last
+        queries:
+          - kind: TimeSeriesQuery
+            spec:
+              plugin:
+                kind: PrometheusTimeSeriesQuery
+                spec:
+                  datasource:
+                    kind: PrometheusDatasource
+                    name: prometheus-datasource
+                  query: node_hwmon_temp_celsius{job="node-exporter",chip=~"nvme.*",instance=~"$instance"}
+                  seriesNameFormat: '{{nodename}} - {{chip}}'
+    "1_1":
+      kind: Panel
+      spec:
+        display:
+          name: Thermal Zones
+          description: ACPI and package thermal zone temperatures
+        plugin:
+          kind: TimeSeriesChart
+          spec:
+            legend:
+              position: bottom
+              mode: table
+              values:
+                - last
+        queries:
+          - kind: TimeSeriesQuery
+            spec:
+              plugin:
+                kind: PrometheusTimeSeriesQuery
+                spec:
+                  datasource:
+                    kind: PrometheusDatasource
+                    name: prometheus-datasource
+                  query: node_thermal_zone_temp{job="node-exporter",instance=~"$instance"}
+                  seriesNameFormat: '{{nodename}} - {{type}} zone {{zone}}'
+    "2_0":
+      kind: Panel
+      spec:
+        display:
+          name: CPU Frequency
+          description: Current CPU scaling frequency per core
+        plugin:
+          kind: TimeSeriesChart
+          spec:
+            legend:
+              position: bottom
+              mode: table
+              values:
+                - last
+        queries:
+          - kind: TimeSeriesQuery
+            spec:
+              plugin:
+                kind: PrometheusTimeSeriesQuery
+                spec:
+                  datasource:
+                    kind: PrometheusDatasource
+                    name: prometheus-datasource
+                  query: node_cpu_scaling_frequency_hertz{job="node-exporter",instance=~"$instance"}
+                  seriesNameFormat: '{{nodename}} - CPU {{cpu}}'
+    "2_1":
+      kind: Panel
+      spec:
+        display:
+          name: CPU Core Throttling
+          description: Rate of CPU core throttling events
+        plugin:
+          kind: TimeSeriesChart
+          spec:
+            legend:
+              position: bottom
+              mode: table
+              values:
+                - last
+        queries:
+          - kind: TimeSeriesQuery
+            spec:
+              plugin:
+                kind: PrometheusTimeSeriesQuery
+                spec:
+                  datasource:
+                    kind: PrometheusDatasource
+                    name: prometheus-datasource
+                  query: rate(node_cpu_core_throttles_total{job="node-exporter",instance=~"$instance"}[$__rate_interval])
+                  seriesNameFormat: '{{nodename}} - CPU {{cpu}}'
+  layouts:
+    - kind: Grid
+      spec:
+        display:
+          title: CPU Temperature
+        items:
+          - x: 0
+            "y": 0
+            width: 24
+            height: 8
+            content:
+              $ref: '#/spec/panels/0_0'
+    - kind: Grid
+      spec:
+        display:
+          title: NVMe & Thermal Zones
+        items:
+          - x: 0
+            "y": 0
+            width: 12
+            height: 6
+            content:
+              $ref: '#/spec/panels/1_0'
+          - x: 12
+            "y": 0
+            width: 12
+            height: 6
+            content:
+              $ref: '#/spec/panels/1_1'
+    - kind: Grid
+      spec:
+        display:
+          title: CPU Performance
+        items:
+          - x: 0
+            "y": 0
+            width: 12
+            height: 6
+            content:
+              $ref: '#/spec/panels/2_0'
+          - x: 12
+            "y": 0
+            width: 12
+            height: 6
+            content:
+              $ref: '#/spec/panels/2_1'
+  duration: 1h

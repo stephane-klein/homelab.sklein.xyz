@@ -1,0 +1,32 @@
+ingress:
+  enabled: true
+  ingressClassName: traefik
+  annotations:
+    cert-manager.io/cluster-issuer: homelab-ca
+  hosts:
+    - host: perses.sklein.internal
+      paths:
+        - path: /
+          pathType: Prefix
+  tls:
+    - secretName: perses-tls
+      hosts:
+        - perses.sklein.internal
+persistence:
+  enabled: true
+  size: 2Gi
+sidecar:
+  enabled: true
+  label: "perses.dev/resource"
+  labelValue: "true"
+  allNamespaces: true
+config:
+  frontend:
+    important_dashboards:
+      - project: perses-dev
+        dashboard: node-overview
+  provisioning:
+    interval: 30s
+  security:
+    enable_auth: false
+    readonly: false
