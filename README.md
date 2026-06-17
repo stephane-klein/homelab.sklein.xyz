@@ -316,3 +316,35 @@ $ mise run destroy-perses
 $ mise run destroy-exporters
 $ mise run destroy-victoria-metrics
 ```
+
+## Contribution
+
+### Secret detection with gitleaks
+
+[Gitleaks](https://github.com/gitleaks/gitleaks) scans for secrets before they
+reach the remote repository. It runs at two points:
+
+- **`git commit`** — the `git-hooks/pre-commit` hook checks staged files.
+- **`jj publish`** — local alias that runs `mise run gitleaks-check-push` before
+  `jj git push`.
+
+Both scans skip known safe paths (`.secret`, `certs/`, `*.tfstate*`,
+`k3s.kubeconfig`, `README.md`) and use a lowered entropy threshold (2.0 vs 3.5)
+for the `generic-api-key` rule.
+
+Configuration is in `.gitleaks.toml`.
+
+**One-time setup after clone:**
+
+```
+mise install
+mise run setup-git-hooks
+mise run setup-jj-alias
+```
+
+**Manual scan** (outside of hooks):
+
+```
+mise run gitleaks-scan        # full project scan
+mise run gitleaks-check-push  # pre-push scan (called by `jj publish`)
+```

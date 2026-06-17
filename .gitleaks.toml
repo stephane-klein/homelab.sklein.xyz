@@ -1,0 +1,30 @@
+[extend]
+useDefault = true
+
+[[rules]]
+id = "generic-api-key"
+entropy = 2
+
+[[allowlists]]
+description = "Allow .jj internal files (local-only, never committed)"
+paths = [
+    "\\.jj/"
+]
+
+[[allowlists]]
+description = "Allow .secret files"
+paths = [
+    "\\.secret$"
+]
+
+[[allowlists]]
+description = "Allow certs directory"
+paths = [
+    "certs/"
+]
+
+[[allowlists]]
+description = "Allow Terraform state files"
+paths = [
+    ".*\\.tfstate"
+]

@@ -35,6 +35,30 @@ Key choices:
   SSH key distribution — user identities are managed in Netbird.
 - **Setup keys** are created by `tofu apply` and extracted via `tofu output -raw`.
 
+### Secret detection with gitleaks
+
+[Gitleaks](https://github.com/gitleaks/gitleaks) prevents committing secrets
+accidentally. It runs as:
+
+- **Git pre-commit hook** (`git-hooks/pre-commit`) — checks staged files on `git commit`.
+- **`mise run gitleaks-check-push`** — scan the whole project before `jj git push`.
+- **`jj publish`** — local alias that updates the `main` bookmark, runs gitleaks, then pushes.
+
+Configuration:
+
+- `.gitleaks.toml` — extends default rules with lower entropy threshold (2.0 vs 3.5)
+  for `generic-api-key`, and allowlists for known safe paths (`.secret`, `certs/`,
+  `*.tfstate*`, `k3s.kubeconfig`, `README.md`).
+- Gitleaks is installed via `mise` and pinned to version `8.30.1`.
+
+Setup (one-time, after clone):
+
+```
+mise install
+mise run setup-git-hooks
+mise run setup-jj-alias
+```
+
 ### Provisioning workflow
 
 1. `mise run setup-secret` — populate `.secret` from Gopass

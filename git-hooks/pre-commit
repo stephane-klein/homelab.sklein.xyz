@@ -1,0 +1,15 @@
+#!/bin/bash
+
+set -euo pipefail
+
+if ! command -v mise &>/dev/null; then
+    echo "Error: mise is not installed or not in PATH"
+    exit 1
+fi
+
+echo "Running gitleaks to check for secrets leaks..."
+
+mise exec -- gitleaks git --no-banner --pre-commit --staged -v
+
+echo "No leaks detected by gitleaks."
+exit 0
