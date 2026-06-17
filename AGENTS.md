@@ -48,7 +48,7 @@ Configuration:
 
 - `.gitleaks.toml` — extends default rules with lower entropy threshold (2.0 vs 3.5)
   for `generic-api-key`, and allowlists for known safe paths (`.secret`, `certs/`,
-  `*.tfstate*`, `k3s.kubeconfig`, `README.md`).
+  `*.tfstate*`, `README.md`).
 - Gitleaks is installed via `mise` and pinned to version `8.30.1`.
 
 Setup (one-time, after clone):
