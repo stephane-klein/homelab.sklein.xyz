@@ -14,7 +14,7 @@ run = "scripts/generate-k3s-token.sh"
 
 [tasks.k3s-health]
 description = "Check k3s cluster health (nodes, pods, events, resources)"
-run = "bash scripts/k3s-health.sh"
+run = "scripts/k3s-health.sh"
 
 [tasks.setup-secret]
 description = "Generate .secret from scripts/generate-secret.sh via gopass"
