@@ -66,6 +66,14 @@ Service-specific configuration files live in `config/<service>/` (e.g.,
 executable scripts. Scripts reference config via relative paths:
 `-f config/perses/values.yaml`.
 
+### Authelia
+
+[Authelia](https://www.authelia.com/) provides SSO authentication before
+Traefik via a `ForwardAuth` middleware. Configuration lives in
+`config/authelia/`. Access control rules use a wildcard
+(`*.sklein.internal`, `one_factor`) so any new subdomain is automatically
+protected.
+
 ### Provisioning workflow
 
 1. `mise run setup-secret` — populate `.secret` from Gopass

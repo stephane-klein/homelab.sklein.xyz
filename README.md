@@ -278,6 +278,25 @@ spec:
               number: 80
 ```
 
+### Authentication with Authelia
+
+[Authelia](https://www.authelia.com/) protects apps by requiring
+authentication before Traefik routes the request. Once deployed, add the
+annotation `traefik.ingress.kubernetes.io/router.middlewares:
+traefik-forwardauth-authelia@kubernetescrd` to any Ingress to protect it.
+
+```sh
+$ mise run deploy-authelia
+```
+
+Users (credentials in `.secret`) authenticate via `https://auth.sklein.internal`.
+The user database lives in `config/authelia/users.yml` (gitignored). After
+manual edits, push changes to the running pod:
+
+```sh
+$ mise run push-authelia-config
+```
+
 ## Monitoring
 
 [VictoriaMetrics](https://victoriametrics.com/) (single-node) provides the metric store, [Perses](https://perses.dev/) provides the dashboards, and [vmagent](https://docs.victoriametrics.com/vmagent/) handles metric scraping.

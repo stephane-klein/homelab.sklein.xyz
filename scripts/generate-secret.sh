@@ -9,4 +9,7 @@ NUC_I7_GEN11_LUKS_PASSPHRASE="$(gopass show nuc-i7-gen11.homelab.stephane-klein.
 NB_PAT="$(gopass show netbird/apikey)" 
 
 K3S_TOKEN="$(gopass show homelab/k3s_token)"
+
+# https://auth.sklein.internal
+AUTHELIA_PASSWORD="$(gopass show auth.sklein.internal/stephane/password)"
 EOF

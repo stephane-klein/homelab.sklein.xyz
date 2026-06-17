@@ -1,0 +1,13 @@
+users:
+  stephane:
+    disabled: false
+    displayname: "Stephane Klein"
+    password: "$argon2id$v=19$m=65536,t=3,p=4$..."
+    email: contact@stephane-klein.info
+    groups:
+      - admins
+    given_name: "Stephane"
+    family_name: "Klein"
+    gender: male
+    locale: fr-FR
+    zoneinfo: Europe/Paris

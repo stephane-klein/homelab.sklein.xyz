@@ -77,6 +77,30 @@ run = "scripts/destroy-perses.sh"
 description = "Deploy custom dashboards (node-hardware, node-overview) in Perses"
 run = "scripts/deploy-custom-dashboards.sh"
 
+[tasks.deploy-authelia]
+description = "Deploy Authelia at https://auth.sklein.internal"
+run = "scripts/deploy-authelia.sh"
+
+[tasks.destroy-authelia]
+description = "Destroy Authelia"
+run = "scripts/destroy-authelia.sh"
+
+[tasks.add-authelia-user]
+description = "Add or update a user in Authelia"
+run = "scripts/add-authelia-user.sh"
+
+[tasks.push-authelia-config]
+description = "Push config/authelia/users.yml to the authelia-users ConfigMap"
+run = "scripts/push-authelia-config.sh"
+
+[tasks.deploy-authelia-demo]
+description = "Deploy whoami demo app protected by Authelia"
+run = "scripts/deploy-authelia-demo.sh"
+
+[tasks.destroy-authelia-demo]
+description = "Destroy whoami Authelia demo app"
+run = "scripts/destroy-authelia-demo.sh"
+
 [tasks.deploy-exporters]
 description = "Deploy kube-state-metrics, node-exporter, vmagent"
 run = "scripts/deploy-exporters.sh"

@@ -3,6 +3,7 @@ ingress:
   ingressClassName: traefik
   annotations:
     cert-manager.io/cluster-issuer: homelab-ca
+    traefik.ingress.kubernetes.io/router.middlewares: traefik-forwardauth-authelia@kubernetescrd
   hosts:
     - host: perses.sklein.internal
       paths:

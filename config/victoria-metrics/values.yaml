@@ -15,6 +15,7 @@ server:
     enabled: true
     annotations:
       cert-manager.io/cluster-issuer: homelab-ca
+      traefik.ingress.kubernetes.io/router.middlewares: traefik-forwardauth-authelia@kubernetescrd
     hosts:
       - name: metrics.sklein.internal
         path:
