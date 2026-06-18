@@ -1,10 +1,10 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-cd "$(dirname "$0")"
+cd "$(dirname "$0")/../"
 
 PERSES_URL="https://perses.sklein.internal"
-DASHBOARD_FILE="../perses/dashboards/node-hardware.yaml"
+DASHBOARD_FILE="perses/dashboards/node-hardware.yaml"
 API_PATH="/api/v1/projects/perses-dev/dashboards/node-hardware"
 
 echo "=== Deploying Node Hardware Dashboard ==="

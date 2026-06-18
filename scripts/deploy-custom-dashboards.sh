@@ -1,10 +1,10 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-cd "$(dirname "$0")"
+cd "$(dirname "$0")/../"
 
 PERSES_URL="https://perses.sklein.internal"
-DASHBOARDS_DIR="../perses/dashboards"
+DASHBOARDS_DIR="perses/dashboards"
 
 for yaml_file in "$DASHBOARDS_DIR"/*.yaml; do
   name="$(basename "$yaml_file" .yaml)"

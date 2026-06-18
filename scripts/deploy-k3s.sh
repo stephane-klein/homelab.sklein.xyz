@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-cd "$(dirname "$0")"
+cd "$(dirname "$0")/../"
 
 # Required env: K3S_TOKEN (loaded via mise from .secret)
 # Optional env with defaults: SSH_USER, K3S_VERSION
@@ -42,7 +42,7 @@ echo ""
 # Step 2: Deploy k3s server
 # ============================================================
 echo "--- Step 2: Deploying k3s server on $SERVER_HOST ---"
-minijinja-cli --env _payload_deploy_k3s_server.sh | ssh "$SSH_USER@$SERVER_HOST" 'sudo bash -s'
+minijinja-cli --env scripts/_payload_deploy_k3s_server.sh | ssh "$SSH_USER@$SERVER_HOST" 'sudo bash -s'
 echo "  k3s server deployed"
 echo ""
 
@@ -71,7 +71,7 @@ echo ""
 # ============================================================
 echo "--- Step 4: Deploying k3s agent on $AGENT_HOST ---"
 set +e
-minijinja-cli --env _payload_deploy_k3s_agent.sh | ssh "$SSH_USER@$AGENT_HOST" 'sudo bash -s'
+minijinja-cli --env scripts/_payload_deploy_k3s_agent.sh | ssh "$SSH_USER@$AGENT_HOST" 'sudo bash -s'
 PAYLOAD_EXIT=$?
 set -e
 
@@ -102,7 +102,7 @@ echo ""
 # Step 6: Retrieve kubeconfig
 # ============================================================
 echo "--- Step 6: Retrieving kubeconfig ---"
-KUBECONFIG_DEST="../k3s.kubeconfig"
+KUBECONFIG_DEST="k3s.kubeconfig"
 scp "$SSH_USER@$SERVER_HOST:/etc/rancher/k3s/k3s.yaml" "$KUBECONFIG_DEST"
 sed -i "s/127.0.0.1/${K3S_SERVER_IP}/g" "$KUBECONFIG_DEST"
 sed -i "s/localhost/${K3S_SERVER_IP}/g" "$KUBECONFIG_DEST"

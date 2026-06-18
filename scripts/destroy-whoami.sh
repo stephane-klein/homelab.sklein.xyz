@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-cd "$(dirname "$0")"
+cd "$(dirname "$0")/../"
 
 kubectl delete ingress whoami --ignore-not-found > /dev/null
 kubectl delete service whoami --ignore-not-found > /dev/null

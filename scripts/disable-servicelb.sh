@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-cd "$(dirname "$0")"
+cd "$(dirname "$0")/../"
 
 SSH_USER="${SSH_USER:-stephane}"
 SERVER_HOSTNAME="nuc-i7-gen11.homelab.stephane-klein.info"

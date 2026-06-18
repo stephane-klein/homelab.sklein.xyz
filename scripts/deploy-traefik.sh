@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-cd "$(dirname "$0")"
+cd "$(dirname "$0")/../"
 
 echo "=== Deploying cert-manager ==="
 helm repo add jetstack https://charts.jetstack.io --force-update > /dev/null
@@ -12,8 +12,8 @@ helm upgrade --install cert-manager jetstack/cert-manager \
 echo "  Creating CA secret..."
 kubectl create secret tls ca-key-pair \
   --namespace cert-manager \
-  --cert=../certs/ca/ca.crt \
-  --key=../certs/ca/ca.key \
+  --cert=certs/ca/ca.crt \
+  --key=certs/ca/ca.key \
   --dry-run=client -o yaml | kubectl apply -f - > /dev/null
 
 echo "  Creating ClusterIssuer..."

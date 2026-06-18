@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-cd "$(dirname "$0")"
+cd "$(dirname "$0")/../"
 
 echo "=== Destroying Traefik ==="
 helm uninstall traefik --namespace traefik 2>/dev/null || true

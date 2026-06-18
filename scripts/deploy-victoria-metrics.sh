@@ -1,14 +1,14 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-cd "$(dirname "$0")"
+cd "$(dirname "$0")/../"
 
 echo "=== Deploying VictoriaMetrics ==="
 
 helm repo add vm https://victoriametrics.github.io/helm-charts/ --force-update > /dev/null
 helm upgrade --install victoria-metrics vm/victoria-metrics-single \
   --namespace victoria-metrics --create-namespace \
-  -f victoria-metrics-values.yaml > /dev/null
+  -f config/victoria-metrics/values.yaml > /dev/null
 
 echo "  Waiting for VictoriaMetrics to be ready..."
 kubectl wait --for=condition=Ready pod \

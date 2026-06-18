@@ -59,6 +59,13 @@ mise run setup-git-hooks
 mise run setup-jj-alias
 ```
 
+## Config directory
+
+Service-specific configuration files live in `config/<service>/` (e.g.,
+`config/perses/values.yaml`). The `scripts/` directory contains only
+executable scripts. Scripts reference config via relative paths:
+`-f config/perses/values.yaml`.
+
 ### Provisioning workflow
 
 1. `mise run setup-secret` — populate `.secret` from Gopass

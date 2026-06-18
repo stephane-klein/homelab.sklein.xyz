@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-cd "$(dirname "$0")"
+cd "$(dirname "$0")/../"
 
 NAMESPACE="perses"
 
@@ -10,8 +10,7 @@ echo "=== Deploying Perses ==="
 helm repo add perses https://perses.github.io/helm-charts --force-update > /dev/null
 helm upgrade --install perses perses/perses \
   --namespace "$NAMESPACE" --create-namespace \
-  -f perses-values.yaml \
-  -f perses-values.yaml > /dev/null
+  -f config/perses/values.yaml > /dev/null
 
 echo "  Waiting for Perses to be ready..."
 kubectl wait --for=condition=Ready pod \
