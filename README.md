@@ -14,6 +14,23 @@ Installation characteristics:
 - `/var/` mutable volume is encrypted with LUKS and unlock with TPM2 (Tang coming soon)
 - Servers automatically join the [Netbird](https://netbird.io/) VPN mesh network (managed by OpenTofu)
 
+Deployed services:
+
+- **Network**
+  - [Netbird](https://github.com/netbirdio/netbird) VPN mesh (managed by OpenTofu)
+- **Kubernetes cluster**
+  - [k3s](https://github.com/k3s-io/k3s) multi-node
+  - [Traefik](https://github.com/traefik/traefik) (ingress controller)
+  - [cert-manager](https://github.com/cert-manager/cert-manager) (TLS certificates)
+  - [Authelia](https://github.com/authelia/authelia) (SSO authentication)
+- **Monitoring**
+  - [VictoriaMetrics](https://github.com/VictoriaMetrics/VictoriaMetrics) (metric store)
+  - [vmagent](https://github.com/VictoriaMetrics/VictoriaMetrics) (metric scraping)
+  - [kube-state-metrics](https://github.com/kubernetes/kube-state-metrics) (cluster state metrics)
+  - [prometheus-node-exporter](https://github.com/prometheus/node_exporter) (per-node system metrics)
+  - [Perses](https://github.com/perses/perses) (dashboards)
+  - [Perses Operator](https://github.com/perses/perses-operator) (CRD management)
+
 ## Getting started
 
 ### Prerequisites

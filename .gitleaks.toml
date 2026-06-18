@@ -30,6 +30,14 @@ paths = [
 ]
 
 [[allowlists]]
+description = "Allow known safe scripts (generic-api-key false positives)"
+paths = [
+    "scripts/deploy-authelia-demo.sh"
+]
+[[allowlists.rules]]
+id = "generic-api-key"
+
+[[allowlists]]
 description = "Allow gitignored kubeconfig (local-only, never committed)"
 paths = [
     "k3s.kubeconfig"
