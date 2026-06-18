@@ -28,3 +28,9 @@ description = "Allow Terraform state files"
 paths = [
     ".*\\.tfstate"
 ]
+
+[[allowlists]]
+description = "Allow gitignored kubeconfig (local-only, never committed)"
+paths = [
+    "k3s.kubeconfig"
+]
