@@ -101,6 +101,14 @@ run = "scripts/deploy-authelia-demo.sh"
 description = "Destroy whoami Authelia demo app"
 run = "scripts/destroy-authelia-demo.sh"
 
+[tasks.deploy-homepage]
+description = "Deploy Homepage at https://homepage.sklein.internal"
+run = "scripts/deploy-homepage.sh"
+
+[tasks.destroy-homepage]
+description = "Destroy Homepage"
+run = "scripts/destroy-homepage.sh"
+
 [tasks.deploy-exporters]
 description = "Deploy kube-state-metrics, node-exporter, vmagent"
 run = "scripts/deploy-exporters.sh"

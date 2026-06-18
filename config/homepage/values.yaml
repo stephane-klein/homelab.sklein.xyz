@@ -1,0 +1,158 @@
+ingress:
+  main:
+    enabled: true
+    ingressClassName: traefik
+    annotations:
+      cert-manager.io/cluster-issuer: homelab-ca
+      traefik.ingress.kubernetes.io/router.middlewares: traefik-forwardauth-authelia@kubernetescrd
+    hosts:
+      - host: &host homepage.sklein.internal
+        paths:
+          - path: /
+            pathType: Prefix
+    tls:
+      - secretName: homepage-tls
+        hosts:
+          - *host
+
+image:
+  tag: v1.13.2
+
+env:
+  - name: HOMEPAGE_ALLOWED_HOSTS
+    value: homepage.sklein.internal
+
+enableRbac: true
+serviceAccount:
+  create: true
+
+config:
+  kubernetes:
+    mode: cluster
+
+  settings:
+    title: "Homelab"
+    headerStyle: boxed
+    layout:
+      Infrastructure:
+        style: row
+        columns: 4
+      nuc-i3-gen5:
+        style: row
+        columns: 4
+      nuc-i7-gen11:
+        style: row
+        columns: 4
+
+  services:
+    - Infrastructure:
+        - Traefik:
+            icon: si-traefikproxy
+            href: https://traefik.sklein.internal
+            description: Ingress Controller
+        - Authelia:
+            icon: si-authelia
+            href: https://auth.sklein.internal
+            description: SSO Authentication
+        - VictoriaMetrics:
+            icon: si-victoriametrics
+            href: https://metrics.sklein.internal
+            description: Metrics Storage
+        - Perses:
+            href: https://perses.sklein.internal
+            description: Monitoring Dashboards
+
+    - nuc-i3-gen5:
+        - CPU:
+            widget:
+              type: prometheusmetric
+              url: http://victoria-metrics-victoria-metrics-single-server.victoria-metrics.svc:8428
+              metrics:
+                - label: Used
+                  query: 100 - avg(rate(node_cpu_seconds_total{instance=~"nuc-i3-gen5.*",mode="idle"}[5m])) * 100
+                  format:
+                    type: number
+                    suffix: "%"
+        - RAM:
+            widget:
+              type: prometheusmetric
+              url: http://victoria-metrics-victoria-metrics-single-server.victoria-metrics.svc:8428
+              metrics:
+                - label: Used
+                  query: (1 - (node_memory_MemAvailable_bytes{instance=~"nuc-i3-gen5.*"} / node_memory_MemTotal_bytes{instance=~"nuc-i3-gen5.*"})) * 100
+                  format:
+                    type: number
+                    suffix: "%"
+        - Disk /var:
+            widget:
+              type: prometheusmetric
+              url: http://victoria-metrics-victoria-metrics-single-server.victoria-metrics.svc:8428
+              metrics:
+                - label: Available
+                  query: node_filesystem_avail_bytes{instance=~"nuc-i3-gen5.*",mountpoint="/var"}
+                  format:
+                    type: bytes
+                - label: Total
+                  query: node_filesystem_size_bytes{instance=~"nuc-i3-gen5.*",mountpoint="/var"}
+                  format:
+                    type: bytes
+
+    - nuc-i7-gen11:
+        - CPU:
+            widget:
+              type: prometheusmetric
+              url: http://victoria-metrics-victoria-metrics-single-server.victoria-metrics.svc:8428
+              metrics:
+                - label: Used
+                  query: 100 - avg(rate(node_cpu_seconds_total{instance=~"nuc-i7-gen11.*",mode="idle"}[5m])) * 100
+                  format:
+                    type: number
+                    suffix: "%"
+        - RAM:
+            widget:
+              type: prometheusmetric
+              url: http://victoria-metrics-victoria-metrics-single-server.victoria-metrics.svc:8428
+              metrics:
+                - label: Used
+                  query: (1 - (node_memory_MemAvailable_bytes{instance=~"nuc-i7-gen11.*"} / node_memory_MemTotal_bytes{instance=~"nuc-i7-gen11.*"})) * 100
+                  format:
+                    type: number
+                    suffix: "%"
+        - Disk /var:
+            widget:
+              type: prometheusmetric
+              url: http://victoria-metrics-victoria-metrics-single-server.victoria-metrics.svc:8428
+              metrics:
+                - label: Available
+                  query: node_filesystem_avail_bytes{instance=~"nuc-i7-gen11.*",mountpoint="/var"}
+                  format:
+                    type: bytes
+                - label: Total
+                  query: node_filesystem_size_bytes{instance=~"nuc-i7-gen11.*",mountpoint="/var"}
+                  format:
+                    type: bytes
+
+  widgets:
+    - resources:
+        backend: kubernetes
+        expanded: true
+        cpu: true
+        memory: true
+    - resources:
+        label: Storage
+        disk: /host/var
+        expanded: true
+    - search:
+        provider: duckduckgo
+        target: _blank
+    - kubernetes:
+        cluster:
+          show: true
+          cpu: true
+          memory: true
+          showLabel: true
+        nodes:
+          show: true
+          cpu: true
+          memory: true
+          showLabel: true

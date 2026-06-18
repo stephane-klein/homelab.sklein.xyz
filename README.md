@@ -23,6 +23,10 @@ Deployed services:
   - [Traefik](https://github.com/traefik/traefik) (ingress controller)
   - [cert-manager](https://github.com/cert-manager/cert-manager) (TLS certificates)
   - [Authelia](https://github.com/authelia/authelia) (SSO authentication)
+- **Application dashboard**
+  - [Homepage](https://gethomepage.dev/) at `https://homepage.sklein.internal`
+    — central dashboard with Kubernetes resources, per-node CPU/RAM/disk metrics
+    via VictoriaMetrics PromQL, and a disk gauge for `/var`
 - **Monitoring**
   - [VictoriaMetrics](https://github.com/VictoriaMetrics/VictoriaMetrics) (metric store)
   - [vmagent](https://github.com/VictoriaMetrics/VictoriaMetrics) (metric scraping)
@@ -352,6 +356,31 @@ $ mise run destroy-perses
 $ mise run destroy-exporters
 $ mise run destroy-victoria-metrics
 ```
+
+## Homepage — Application Dashboard
+
+[Homepage](https://gethomepage.dev/) is a centralized dashboard
+
+**Access:** `https://homepage.sklein.internal`
+
+Deploy:
+
+```sh
+$ mise run deploy-homepage
+```
+
+Destroy:
+
+```sh
+$ mise run destroy-homepage
+```
+
+### Configuration
+
+The YAML configuration lives in `config/homepage/values.yaml`.
+Deployed behind Traefik, Homepage automatically benefits from TLS
+certificates (cert-manager) and Authelia authentication
+(`forwardauth-authelia` middleware).
 
 ## Contribution
 
