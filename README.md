@@ -23,6 +23,7 @@ Deployed services:
   - [Traefik](https://github.com/traefik/traefik) (ingress controller)
   - [cert-manager](https://github.com/cert-manager/cert-manager) (TLS certificates)
   - [Authelia](https://github.com/authelia/authelia) (SSO authentication)
+  - [CloudNativePG](https://cloudnative-pg.io/) (PostgreSQL operator with backup to Scaleway Object Storage)
 - **Application dashboard**
   - [Homepage](https://gethomepage.dev/) at `https://homepage.sklein.internal`
     — central dashboard with Kubernetes resources, per-node CPU/RAM/disk metrics
@@ -39,7 +40,7 @@ Deployed services:
 
 Here are some service ideas I plan to deploy on my homelab.
 
-- [ ] **Database operator**: [CloudNativePG](https://cloudnative-pg.io/) - with backup to Scaleway Object Storage [untested]
+- [x] **Database operator**: [CloudNativePG](https://cloudnative-pg.io/) — with backup to Scaleway Object Storage
 - [ ] **Internal certificate authority**: [step-ca](https://github.com/smallstep/certificates) [untested]
 - [ ] **GPS tracking server**: [gpstracker](https://git.fabiomanganiello.com/gpstracker) - connected to [GPSLogger for Android](https://github.com/mendhak/gpslogger/) [untested]
 - [ ] **Agent memory system**: [Hindsight](https://github.com/vectorize-io/hindsight) - agents that learn over time, not just remember [untested]
@@ -320,8 +321,40 @@ manual edits, push changes to the running pod:
 $ mise run push-authelia-config
 ```
 
-> An Authelia authentication demo is available in
-> [`PLAYGROUND.md`](./PLAYGROUND.md).
+> See [`PLAYGROUND.md`](./PLAYGROUND.md) for an Authelia authentication demo.
+
+## CloudNativePG Operator
+
+[CloudNativePG](https://cloudnative-pg.io/) is the PostgreSQL operator. It manages PostgreSQL
+clusters on Kubernetes, with built-in backup to S3-compatible object storage (Scaleway).
+
+```sh
+$ mise run deploy-cnpg
+```
+
+Verify:
+
+```sh
+$ kubectl get deployment -n cnpg-system
+$ kubectl get crd | grep cloudnative-pg
+```
+
+This installs:
+
+- **CloudNativePG operator** in the `cnpg-system` namespace, pinned to `nuc-i7-gen11`
+- Webhook TLS certificates managed by the operator (self-signed CA)
+- Requires `CNPG_BACKUPS_ACCESS_KEY` and `CNPG_BACKUPS_SECRET_KEY` in `.secret`,
+  and `CNPG_BACKUPS_BUCKET` + `CNPG_BACKUPS_REGION` in `config/cnpg/env`
+
+> See [`PLAYGROUND.md`](./PLAYGROUND.md) for CloudNativePG admin operations.
+
+### Destroy CNPG operator
+
+```sh
+$ mise run destroy-cnpg
+```
+
+This removes the operator and the `cnpg-system` namespace.
 
 ## Monitoring
 

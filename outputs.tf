@@ -9,3 +9,10 @@ output "setup_key_nuc_i7_gen11" {
   sensitive   = true
   description = "Netbird setup key for nuc-i7-gen11 ISO builds"
 }
+
+output "cnpg_backups_bucket_name" {
+  value       = scaleway_object_bucket.cnpg_backups.name
+  description = "Object Storage bucket for CNPG backups"
+}
+
+

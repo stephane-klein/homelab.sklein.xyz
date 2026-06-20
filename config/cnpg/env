@@ -1,0 +1,2 @@
+CNPG_BACKUPS_BUCKET="homelab-cnpg-backups"
+CNPG_BACKUPS_REGION="fr-par"

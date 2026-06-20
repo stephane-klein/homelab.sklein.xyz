@@ -1,6 +1,12 @@
 [env]
-_.file = ".secret"
+_.file = [
+  ".secret",
+  "config/cnpg/env"
+]
 KUBECONFIG = "{{config_root}}/k3s.kubeconfig"
+
+[plugins]
+krew = "https://github.com/soupglasses/mise-krew"
 
 [tools]
 "github:mitsuhiko/minijinja" = "2.20.0"
@@ -11,6 +17,7 @@ helm = "4.2.1"
 "aqua:google/yamlfmt" = "0.21.0"
 scaleway-cli = "2.57.0"
 awscli = "2.35.9"
+"krew:cnpg" = "1.29.1"
 
 [tasks.setup-git-hooks]
 description = "Configure git hooks path for gitleaks"
@@ -108,6 +115,22 @@ run = "scripts/deploy-authelia-demo.sh"
 description = "Destroy whoami Authelia demo app"
 run = "scripts/destroy-authelia-demo.sh"
 
+[tasks.deploy-cnpg]
+description = "Deploy CloudNativePG operator on nuc-i7-gen11"
+run = "scripts/deploy-cnpg.sh"
+
+[tasks.destroy-cnpg]
+description = "Destroy CloudNativePG operator"
+run = "scripts/destroy-cnpg.sh"
+
+[tasks.deploy-cnpg-dummy-cluster]
+description = "Deploy dummy CNPG cluster (1 instance, 1Gi, no backup)"
+run = "scripts/deploy-cnpg-dummy-cluster.sh"
+
+[tasks.destroy-cnpg-dummy-cluster]
+description = "Destroy dummy CNPG cluster"
+run = "scripts/destroy-cnpg-dummy-cluster.sh"
+
 [tasks.deploy-homepage]
 description = "Deploy Homepage at https://homepage.sklein.internal"
 run = "scripts/deploy-homepage.sh"
@@ -123,6 +146,14 @@ run = "scripts/deploy-exporters.sh"
 [tasks.destroy-exporters]
 description = "Destroy exporters"
 run = "scripts/destroy-exporters.sh"
+
+[tasks.test-cnpg-backups]
+description = "Test CNPG backups bucket access (requires CNPG_BACKUPS_* in .secret)"
+run = "scripts/test-cnpg-backups.sh"
+
+[tasks.list-cnpg-backups]
+description = "List backups in CNPG bucket (size and file listing)"
+run = "scripts/list-cnpg-backups.sh"
 
 [tasks.test-scaleway-auth]
 description = "Test that Scaleway API credentials are valid"

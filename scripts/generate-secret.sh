@@ -18,4 +18,8 @@ SCW_ACCESS_KEY="$(gopass show homelab/scaleway/SCW_ACCESS_KEY)"
 SCW_SECRET_KEY="$(gopass show homelab/scaleway/SCW_SECRET_KEY)"
 SCW_DEFAULT_ORGANIZATION_ID="$(gopass show homelab/scaleway/SCW_DEFAULT_ORGANIZATION_ID)"
 SCW_DEFAULT_PROJECT_ID="$(gopass show homelab/scaleway/SCW_DEFAULT_PROJECT_ID)"
+
+# Scaleway object storage for CloudNativePG backup system
+CNPG_BACKUPS_ACCESS_KEY="$(gopass show homelab/scaleway/CNPG_BACKUPS_ACCESS_KEY)"
+CNPG_BACKUPS_SECRET_KEY="$(gopass show homelab/scaleway/CNPG_BACKUPS_SECRET_KEY)"
 EOF
