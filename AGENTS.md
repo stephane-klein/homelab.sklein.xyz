@@ -7,8 +7,8 @@
 
 ## Architecture Overview
 
-This project provisions Fedora CoreOS bare-metal servers and manages the Netbird
-VPN mesh network that connects them.
+This project provisions Fedora CoreOS bare-metal servers, runs a two-node k3s
+cluster across them, and manages the Netbird VPN mesh that connects everything.
 
 ### Netbird management with OpenTofu
 
@@ -34,6 +34,23 @@ Key choices:
 - **Netbird SSH proxy** (`ssh_enabled`, `netbird-ssh` protocol) avoids manual
   SSH key distribution — user identities are managed in Netbird.
 - **Setup keys** are created by `tofu apply` and extracted via `tofu output -raw`.
+
+### k3s cluster
+
+[k3s](https://k3s.io/) is the single runtime platform for all services. It is
+installed post-OS via the official `get.k3s.io` script, driven by
+`scripts/deploy-k3s.sh`.
+
+- **nuc-i7-gen11** — control-plane (server) with embedded etcd
+- **nuc-i3-gen5** — worker (agent)
+- **Netbird-local networking** — k3s binds on the Netbird VPN IP (`wt0`)
+  interface. systemd units have `After=netbird.service` so the cluster only
+  starts after the VPN is up.
+- **Built-in components disabled** — embedded Traefik and ServiceLB are turned
+  off; a standalone Traefik deployed via Helm serves as the Ingress controller.
+- **Deployment pattern** — every workload is deployed via `helm upgrade
+  --install` from `scripts/deploy-<service>.sh`, with values in
+  `config/<service>/values.yaml`.
 
 ### Secret detection with gitleaks
 
@@ -62,15 +79,17 @@ mise run setup-jj-alias
 ## Config directory
 
 Service-specific configuration files live in `config/<service>/` (e.g.,
-`config/perses/values.yaml`). The `scripts/` directory contains only
-executable scripts. Scripts reference config via relative paths:
+`config/perses/values.yaml`). All services deploy as k3s workloads via Helm,
+using these values files. The `scripts/` directory contains only executable
+scripts. Scripts reference config via relative paths:
 `-f config/perses/values.yaml`.
 
 ### Authelia
 
 [Authelia](https://www.authelia.com/) provides SSO authentication before
-Traefik via a `ForwardAuth` middleware. Configuration lives in
-`config/authelia/`. Access control rules use a wildcard
+Traefik via a `ForwardAuth` middleware. It runs as a k3s workload in the
+`authelia` namespace, deployed via `scripts/deploy-authelia.sh`. Configuration
+lives in `config/authelia/`. Access control rules use a wildcard
 (`*.sklein.internal`, `one_factor`) so any new subdomain is automatically
 protected.
 
@@ -80,3 +99,5 @@ protected.
 2. `tofu init && tofu apply` — apply Netbird configuration
 3. `tofu output -raw setup_key_nuc_i3_gen5 >> .secret` — extract setup keys
 4. `./nuc-*/create-custom-iso.sh` — build Fedora CoreOS ISO
+5. `./scripts/deploy-k3s.sh` — install k3s (server + agent) over SSH
+6. `./scripts/deploy-traefik.sh` — deploy Traefik ingress controller and cert-manager
