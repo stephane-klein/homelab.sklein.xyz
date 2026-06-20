@@ -12,4 +12,10 @@ K3S_TOKEN="$(gopass show homelab/k3s_token)"
 
 # https://auth.sklein.internal
 AUTHELIA_PASSWORD="$(gopass show auth.sklein.internal/stephane/password)"
+
+# Scaleway API KEY for OpenTofu provider
+SCW_ACCESS_KEY="$(gopass show homelab/scaleway/SCW_ACCESS_KEY)"
+SCW_SECRET_KEY="$(gopass show homelab/scaleway/SCW_SECRET_KEY)"
+SCW_DEFAULT_ORGANIZATION_ID="$(gopass show homelab/scaleway/SCW_DEFAULT_ORGANIZATION_ID)"
+SCW_DEFAULT_PROJECT_ID="$(gopass show homelab/scaleway/SCW_DEFAULT_PROJECT_ID)"
 EOF

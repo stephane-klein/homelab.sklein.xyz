@@ -10,5 +10,9 @@ terraform {
       source  = "registry.terraform.io/netbirdio/netbird"
       version = "~> 0.0.9"
     }
+    scaleway = {
+      source  = "scaleway/scaleway"
+      version = "~> 2.76.0"
+    }
   }
 }
