@@ -35,6 +35,33 @@ Deployed services:
   - [Perses](https://github.com/perses/perses) (dashboards)
   - [Perses Operator](https://github.com/perses/perses-operator) (CRD management)
 
+## Roadmap
+
+Here are some service ideas I plan to deploy on my homelab.
+
+- [ ] **Database operator**: [CloudNativePG](https://cloudnative-pg.io/) - with backup to Scaleway Object Storage [untested]
+- [ ] **Internal certificate authority**: [step-ca](https://github.com/smallstep/certificates) [untested]
+- [ ] **GPS tracking server**: [gpstracker](https://git.fabiomanganiello.com/gpstracker) - connected to [GPSLogger for Android](https://github.com/mendhak/gpslogger/) [untested]
+- [ ] **Agent memory system**: [Hindsight](https://github.com/vectorize-io/hindsight) - agents that learn over time, not just remember [untested]
+- [ ] **File sync & share**: [Nextcloud](https://nextcloud.com/) - with backup on Scaleway Object Storage
+- [ ] **RSS feed reader**: [Miniflux](https://miniflux.app/)
+- [ ] **Virtual machine management**: [KubeVirt](https://kubevirt.io/) [untested]
+  - [ ] **Development VM**: instance based on [sklein-devbox-chezmoi](https://github.com/stephane-klein/sklein-devbox-chezmoi) - to access OpenCode from my smartphone
+- [ ] **LLM chat interface**: [OpenWebUI](https://github.com/open-webui/open-webui) or [LibreChat](https://github.com/danny-avila/LibreChat)
+- [ ] **XMPP instant messaging server**: [ejabberd](https://github.com/processone/ejabberd)
+  - [ ] **Team messaging**: [fluux-messenger](https://github.com/processone/fluux-messenger/) - Mattermost-like group chat built on XMPP, for communities and organizations [untested]
+- [ ] **Autonomous AI agent framework**: [Hermes Agent](https://github.com/NousResearch/hermes-agent) [untested]
+- [ ] **Dashboard / startpage**: [Glance](https://github.com/glanceapp/glance/)
+- [ ] **Home automation platform**: [Home Assistant](https://www.home-assistant.io/) [untested]
+- [ ] **Hike sharing**: [Wanderer](https://github.com/open-wanderer/wanderer) - self-hosted trail database to share hikes [untested]
+- [ ] **Photo management**: [Memories](https://memories.gallery/) or [Immich](https://immich.app/) or [PhotoPrism](https://photoprism.org/) [untested]
+- [ ] **Private metasearch engine**: [SearXNG](https://github.com/searxng/searxng)
+  - [ ] possibly complemented by [Hister](https://hister.org) [untested]
+- [ ] **File synchronization relay**: [syncthing](https://syncthing.net)
+- [ ] **Backup server**: [Borg](https://www.borgbackup.org/) - TimeMachine-like backups for workstations via [Pika Backup](https://apps.gnome.org/PikaBackup/)
+
+I'm not sure I will actually deploy and use all these services. Some will likely be changed or dropped as I experiment.
+
 ## Getting started
 
 ### Prerequisites
