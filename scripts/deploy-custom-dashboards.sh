@@ -3,33 +3,21 @@ set -euo pipefail
 
 cd "$(dirname "$0")/../"
 
-PERSES_URL="https://perses.sklein.internal"
 DASHBOARDS_DIR="perses/dashboards"
 
 for yaml_file in "$DASHBOARDS_DIR"/*.yaml; do
-  name="$(basename "$yaml_file" .yaml)"
+  name="perses-dashboard-$(basename "$yaml_file" .yaml)"
   echo "=== Deploying $name ==="
 
-  PAYLOAD=$(python3 -c "
-import json, yaml
-with open('$yaml_file') as f:
-    print(json.dumps(yaml.safe_load(f)))
-")
+  kubectl create configmap "$name" \
+    --namespace perses \
+    --from-file="$(basename "$yaml_file")=$yaml_file" \
+    --dry-run=client -o yaml | kubectl apply -f - > /dev/null
 
-  HTTP_CODE=$(curl -sk -o /dev/null -w '%{http_code}' \
-    -X PUT "$PERSES_URL/api/v1/projects/perses-dev/dashboards/$name" \
-    -H "Content-Type: application/json" \
-    -d "$PAYLOAD")
+  kubectl label configmap -n perses "$name" \
+    perses.dev/resource="true" --overwrite > /dev/null
 
-  if [ "$HTTP_CODE" = "200" ] || [ "$HTTP_CODE" = "201" ]; then
-    echo "  Done (HTTP $HTTP_CODE)"
-  else
-    echo "  Creating..."
-    curl -sk -X POST "$PERSES_URL/api/v1/projects/perses-dev/dashboards" \
-      -H "Content-Type: application/json" \
-      -d "$PAYLOAD" > /dev/null
-    echo "  Done (created)"
-  fi
+  echo "  Done"
 done
 
 echo ""
