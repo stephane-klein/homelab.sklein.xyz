@@ -10,6 +10,7 @@ helm = "4.2.1"
 "aqua:gitleaks/gitleaks" = "8.30.1"
 "aqua:google/yamlfmt" = "0.21.0"
 scaleway-cli = "2.57.0"
+awscli = "2.35.9"
 
 [tasks.setup-git-hooks]
 description = "Configure git hooks path for gitleaks"
