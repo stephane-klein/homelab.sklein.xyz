@@ -5,7 +5,7 @@ cd "$(dirname "$0")/../"
 
 PERSES_URL="https://perses.sklein.internal"
 DASHBOARD_FILE="perses/dashboards/node-hardware.yaml"
-API_PATH="/api/v1/projects/perses-dev/dashboards/node-hardware"
+API_PATH="/api/v1/projects/homelab/dashboards/node-hardware"
 
 echo "=== Deploying Node Hardware Dashboard ==="
 
@@ -27,11 +27,11 @@ if [ "$HTTP_CODE" = "200" ] || [ "$HTTP_CODE" = "201" ]; then
 else
   # Create if not exists (POST expects no existing resource)
   echo "  Creating new dashboard..."
-  curl -sk -X POST "$PERSES_URL/api/v1/projects/perses-dev/dashboards" \
+  curl -sk -X POST "$PERSES_URL/api/v1/projects/homelab/dashboards" \
     -H "Content-Type: application/json" \
     -d "$PAYLOAD" > /dev/null
   echo "  Done (created)"
 fi
 
 echo ""
-echo "  https://perses.sklein.internal/projects/perses-dev/dashboards/node-hardware"
+echo "  https://perses.sklein.internal/projects/homelab/dashboards/node-hardware"

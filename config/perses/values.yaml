@@ -24,7 +24,7 @@ sidecar:
 config:
   frontend:
     important_dashboards:
-      - project: perses-dev
+      - project: homelab
         dashboard: node-overview
   provisioning:
     interval: 30s

@@ -1,7 +1,10 @@
 kind: Dashboard
 metadata:
   name: node-overview
-  project: perses-dev
+  createdAt: '2026-06-21T09:44:57.98652897Z'
+  updatedAt: '2026-06-21T10:02:28.000300074Z'
+  version: 35
+  project: homelab
 spec:
   display:
     name: Node Overview

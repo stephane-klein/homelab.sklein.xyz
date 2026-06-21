@@ -59,7 +59,7 @@ data:
 EOF
 
 echo ""
-echo "=== Creating perses-dev project ==="
+echo "=== Creating homelab project ==="
 kubectl apply -f - > /dev/null <<'EOF'
 apiVersion: v1
 kind: ConfigMap
@@ -72,7 +72,7 @@ data:
   project.yaml: |
     kind: Project
     metadata:
-      name: perses-dev
+      name: homelab
 EOF
 
 echo ""
