@@ -384,6 +384,33 @@ $ mise run destroy-exporters
 $ mise run destroy-victoria-metrics
 ```
 
+### Dashboards
+
+Dashboards are defined as YAML files in `perses/dashboards/` and synced
+to the cluster via ConfigMaps labeled `perses.dev/resource: "true"`. The Perses
+operator watches these ConfigMaps and syncs them to the Perses internal database
+under the `homelab` project.
+
+**Push (local → cluster):**
+
+```sh
+$ mise run push-perses-dashboards
+```
+
+This creates or updates ConfigMaps from each `perses/dashboards/*.yaml` and
+removes dashboards that no longer exist locally. No need to redeploy Perses.
+
+**Pull (UI → local):**
+
+After editing dashboards in the Perses UI, pull them back to YAML:
+
+```sh
+$ mise run pull-perses-dashboards
+```
+
+This reaches Perses internally via `kubectl port-forward` (bypassing Authelia)
+and saves each dashboard to `perses/dashboards/<name>.yaml`.
+
 ## Homepage — Application Dashboard
 
 [Homepage](https://gethomepage.dev/) is a centralized dashboard

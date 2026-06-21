@@ -75,9 +75,13 @@ run = "scripts/deploy-perses.sh"
 description = "Destroy Perses"
 run = "scripts/destroy-perses.sh"
 
-[tasks.deploy-custom-dashboards]
-description = "Deploy custom dashboards (node-hardware, node-overview) in Perses"
-run = "scripts/deploy-custom-dashboards.sh"
+[tasks.pull-perses-dashboards]
+description = "Pull dashboards from Perses API to perses/dashboards/"
+run = "scripts/pull-perses-dashboards.sh"
+
+[tasks.push-perses-dashboards]
+description = "Push dashboards from perses/dashboards/ to cluster"
+run = "scripts/push-perses-dashboards.sh"
 
 [tasks.deploy-authelia]
 description = "Deploy Authelia at https://auth.sklein.internal"
@@ -122,3 +126,5 @@ run = "scripts/destroy-exporters.sh"
 [tasks.test-scaleway-auth]
 description = "Test that Scaleway API credentials are valid"
 run = "scw object bucket list 1>/dev/null 2>&1 && echo 'ok'"
+
+
