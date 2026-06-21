@@ -76,25 +76,7 @@ data:
 EOF
 
 echo ""
-echo "=== Deploying community dashboards ==="
-DASHBOARDS_DIR="/tmp/community-mixins/examples/dashboards/perses"
-if [ ! -d "$DASHBOARDS_DIR" ]; then
-  echo "  Cloning community-mixins..."
-  git clone --depth 1 https://github.com/perses/community-mixins /tmp/community-mixins > /dev/null 2>&1
-fi
-for dir in "$DASHBOARDS_DIR"/*/; do
-  component="$(basename "$dir")"
-  echo "  Creating ConfigMaps for $component..."
-  for file in "$dir"/*.yaml; do
-    name="perses-dashboard-$(basename "$file" .yaml)"
-    kubectl create configmap "$name" \
-      --namespace perses \
-      --from-file="$(basename "$file")=$file" \
-      --dry-run=client -o yaml | kubectl apply -f - > /dev/null
-    kubectl label configmap -n perses "$name" \
-      perses.dev/resource="true" --overwrite > /dev/null
-  done
-done
+./scripts/deploy-custom-dashboards.sh
 
 echo ""
 echo "=== Done ==="

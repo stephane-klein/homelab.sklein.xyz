@@ -373,8 +373,8 @@ This installs:
 - **prometheus-node-exporter** — per-node system metrics (CPU, memory, disk)
 - **vmagent** — lightweight scrape agent, sends data to VictoriaMetrics via remote write
 - **Perses** — dashboard UI at `https://perses.sklein.internal`
-- **Perses Operator** — manages datasources and dashboards via CRDs
-- **Community dashboards** — Kubernetes cluster dashboards (pre-built from [community-mixins](https://github.com/perses/community-mixins))
+- **Perses Operator** — manages datasources and dashboards via ConfigMaps
+- **Custom dashboards** — node-hardware and node-overview, deployed from `perses/dashboards/`
 
 ### Clean up
 
