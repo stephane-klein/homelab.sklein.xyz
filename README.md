@@ -266,33 +266,8 @@ $ mise run disable-servicelb
 This SSHes into `nuc-i7-gen11`, adds `servicelb` to the k3s `disable` list,
 and restarts the k3s server. The cluster is briefly unavailable (~30s).
 
-### Test with whoami
-
-Deploy a minimal test application:
-
-```sh
-$ mise run deploy-whoami
-```
-
-Access from any Netbird peer:
-
-```sh
-$ curl -k https://whoami.sklein.internal/
-```
-
-Or with the CA trusted system-wide:
-
-```sh
-$ curl https://whoami.sklein.internal/
-```
-
-You should see the whoami response (request headers and pod name).
-
-### Clean up the test app
-
-```sh
-$ mise run destroy-whoami
-```
+> Test the ingress connectivity with a whoami application —
+> see [`PLAYGROUND.md`](./PLAYGROUND.md).
 
 ### Deploying your own apps
 
@@ -344,6 +319,9 @@ manual edits, push changes to the running pod:
 ```sh
 $ mise run push-authelia-config
 ```
+
+> An Authelia authentication demo is available in
+> [`PLAYGROUND.md`](./PLAYGROUND.md).
 
 ## Monitoring
 
