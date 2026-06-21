@@ -52,6 +52,17 @@ installed post-OS via the official `get.k3s.io` script, driven by
   --install` from `scripts/deploy-<service>.sh`, with values in
   `config/<service>/values.yaml`.
 
+### Perses
+
+[Perses](https://perses.dev/) is a dashboard visualization tool deployed as a
+k3s workload via `scripts/deploy-perses.sh` and exposed at
+`https://perses.sklein.internal` (protected by Authelia — all `*.sklein.internal`
+subdomains are behind `ForwardAuth`). Scripts interact with the Perses API
+bypassing Authelia via `kubectl port-forward -n perses svc/perses`, since the
+internal k8s service does not require authentication. Dashboards are
+provisioned from YAML files in `perses/dashboards/` via ConfigMaps labeled
+`perses.dev/resource: "true"`.
+
 ### Secret detection with gitleaks
 
 [Gitleaks](https://github.com/gitleaks/gitleaks) prevents committing secrets
