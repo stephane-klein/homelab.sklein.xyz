@@ -1,0 +1,6 @@
+formatter:
+  type: basic
+  indent: 2
+  retain_line_breaks_single: true
+  max_line_length: 0
+  line_ending: lf
