@@ -9,17 +9,17 @@ spec:
   display:
     name: Node Overview
   panels:
-    "0_0":
+    '0_0':
       kind: Panel
       spec:
         display:
-          name: nuc-i7-gen11 — CPU Load
+          name: "nuc-i7-gen11 — CPU Load"
         plugin:
           kind: TimeSeriesChart
           spec:
             legend:
-              position: bottom
               mode: table
+              position: bottom
               values:
                 - last
         queries:
@@ -53,17 +53,17 @@ spec:
                     name: prometheus-datasource
                   query: node_load15{instance="nuc-i7-gen11.homelab.stephane-klein.info",job="node-exporter"}
                   seriesNameFormat: Load 15m
-    "0_1":
+    '0_1':
       kind: Panel
       spec:
         display:
-          name: nuc-i3-gen5 — CPU Load
+          name: "nuc-i3-gen5 — CPU Load"
         plugin:
           kind: TimeSeriesChart
           spec:
             legend:
-              position: bottom
               mode: table
+              position: bottom
               values:
                 - last
         queries:
@@ -97,23 +97,23 @@ spec:
                     name: prometheus-datasource
                   query: node_load15{instance="nuc-i3-gen5.homelab.stephane-klein.info",job="node-exporter"}
                   seriesNameFormat: Load 15m
-    "1_0":
+    '1_0':
       kind: Panel
       spec:
         display:
-          name: nuc-i7-gen11 — Memory
+          name: "nuc-i7-gen11 — Memory"
         plugin:
           kind: TimeSeriesChart
           spec:
             legend:
-              position: bottom
               mode: table
+              position: bottom
               values:
                 - last
             yAxis:
               format:
-                unit: bytes
                 shortValues: true
+                unit: bytes
         queries:
           - kind: TimeSeriesQuery
             spec:
@@ -135,23 +135,23 @@ spec:
                     name: prometheus-datasource
                   query: node_memory_MemAvailable_bytes{instance="nuc-i7-gen11.homelab.stephane-klein.info",job="node-exporter"}
                   seriesNameFormat: Available
-    "1_1":
+    '1_1':
       kind: Panel
       spec:
         display:
-          name: nuc-i3-gen5 — Memory
+          name: "nuc-i3-gen5 — Memory"
         plugin:
           kind: TimeSeriesChart
           spec:
             legend:
-              position: bottom
               mode: table
+              position: bottom
               values:
                 - last
             yAxis:
               format:
-                unit: bytes
                 shortValues: true
+                unit: bytes
         queries:
           - kind: TimeSeriesQuery
             spec:
@@ -173,17 +173,17 @@ spec:
                     name: prometheus-datasource
                   query: node_memory_MemAvailable_bytes{instance="nuc-i3-gen5.homelab.stephane-klein.info",job="node-exporter"}
                   seriesNameFormat: Available
-    "2_0":
+    '2_0':
       kind: Panel
       spec:
         display:
-          name: nuc-i7-gen11 — Temperature (max)
+          name: "nuc-i7-gen11 — Temperature (max)"
         plugin:
           kind: TimeSeriesChart
           spec:
             legend:
-              position: bottom
               mode: table
+              position: bottom
               values:
                 - last
         queries:
@@ -196,18 +196,18 @@ spec:
                     kind: PrometheusDatasource
                     name: prometheus-datasource
                   query: max(node_hwmon_temp_celsius{instance="nuc-i7-gen11.homelab.stephane-klein.info",job="node-exporter",chip=~"platform_coretemp.*"})
-                  seriesNameFormat: Max Temperature °C
-    "2_1":
+                  seriesNameFormat: "Max Temperature °C"
+    '2_1':
       kind: Panel
       spec:
         display:
-          name: nuc-i3-gen5 — Temperature (max)
+          name: "nuc-i3-gen5 — Temperature (max)"
         plugin:
           kind: TimeSeriesChart
           spec:
             legend:
-              position: bottom
               mode: table
+              position: bottom
               values:
                 - last
         queries:
@@ -220,24 +220,24 @@ spec:
                     kind: PrometheusDatasource
                     name: prometheus-datasource
                   query: max(node_hwmon_temp_celsius{instance="nuc-i3-gen5.homelab.stephane-klein.info",job="node-exporter",chip=~"platform_coretemp.*"})
-                  seriesNameFormat: Max Temperature °C
-    "3_0":
+                  seriesNameFormat: "Max Temperature °C"
+    '3_0':
       kind: Panel
       spec:
         display:
-          name: nuc-i7-gen11 — Disk /
+          name: "nuc-i7-gen11 — Disk /"
         plugin:
           kind: TimeSeriesChart
           spec:
             legend:
-              position: bottom
               mode: table
+              position: bottom
               values:
                 - last
             yAxis:
               format:
-                unit: bytes
                 shortValues: true
+                unit: bytes
         queries:
           - kind: TimeSeriesQuery
             spec:
@@ -259,23 +259,23 @@ spec:
                     name: prometheus-datasource
                   query: node_filesystem_size_bytes{instance="nuc-i7-gen11.homelab.stephane-klein.info",job="node-exporter",mountpoint="/var",fstype!="tmpfs"} - node_filesystem_avail_bytes{instance="nuc-i7-gen11.homelab.stephane-klein.info",job="node-exporter",mountpoint="/var",fstype!="tmpfs"}
                   seriesNameFormat: Used
-    "3_1":
+    '3_1':
       kind: Panel
       spec:
         display:
-          name: nuc-i3-gen5 — Disk /
+          name: "nuc-i3-gen5 — Disk /"
         plugin:
           kind: TimeSeriesChart
           spec:
             legend:
-              position: bottom
               mode: table
+              position: bottom
               values:
                 - last
             yAxis:
               format:
-                unit: bytes
                 shortValues: true
+                unit: bytes
         queries:
           - kind: TimeSeriesQuery
             spec:
@@ -304,13 +304,13 @@ spec:
           title: CPU Load
         items:
           - x: 0
-            "y": 0
+            y: 0
             width: 12
             height: 15
             content:
               $ref: '#/spec/panels/0_0'
           - x: 12
-            "y": 0
+            y: 0
             width: 12
             height: 15
             content:
@@ -321,13 +321,13 @@ spec:
           title: Memory
         items:
           - x: 0
-            "y": 0
+            y: 0
             width: 12
             height: 15
             content:
               $ref: '#/spec/panels/1_0'
           - x: 12
-            "y": 0
+            y: 0
             width: 12
             height: 15
             content:
@@ -338,13 +338,13 @@ spec:
           title: Temperature (max)
         items:
           - x: 0
-            "y": 0
+            y: 0
             width: 12
             height: 15
             content:
               $ref: '#/spec/panels/2_0'
           - x: 12
-            "y": 0
+            y: 0
             width: 12
             height: 15
             content:
@@ -355,15 +355,16 @@ spec:
           title: Disk /
         items:
           - x: 0
-            "y": 0
+            y: 0
             width: 12
             height: 15
             content:
               $ref: '#/spec/panels/3_0'
           - x: 12
-            "y": 0
+            y: 0
             width: 12
             height: 15
             content:
               $ref: '#/spec/panels/3_1'
   duration: 1h
+

@@ -16,7 +16,6 @@ spec:
           hidden: false
         allowAllValue: true
         allowMultiple: false
-        name: instance
         plugin:
           kind: PrometheusLabelValuesVariable
           spec:
@@ -26,8 +25,9 @@ spec:
             labelName: instance
             matchers:
               - node_uname_info{job="node-exporter",sysname!="Darwin"}
+        name: instance
   panels:
-    "0_0":
+    '0_0':
       kind: Panel
       spec:
         display:
@@ -37,8 +37,8 @@ spec:
           kind: TimeSeriesChart
           spec:
             legend:
-              position: bottom
               mode: table
+              position: bottom
               values:
                 - last
         queries:
@@ -61,7 +61,7 @@ spec:
                     kind: PrometheusDatasource
                     name: prometheus-datasource
                   query: max by (instance) (node_hwmon_temp_celsius{job="node-exporter",chip=~"platform_coretemp.*",instance=~"$instance"})
-                  seriesNameFormat: 'Max - {{nodename}}'
+                  seriesNameFormat: Max - {{nodename}}
           - kind: TimeSeriesQuery
             spec:
               plugin:
@@ -71,8 +71,8 @@ spec:
                     kind: PrometheusDatasource
                     name: prometheus-datasource
                   query: avg by (instance) (node_hwmon_temp_celsius{job="node-exporter",chip=~"platform_coretemp.*",instance=~"$instance"})
-                  seriesNameFormat: 'Avg - {{nodename}}'
-    "1_0":
+                  seriesNameFormat: Avg - {{nodename}}
+    '1_0':
       kind: Panel
       spec:
         display:
@@ -82,8 +82,8 @@ spec:
           kind: TimeSeriesChart
           spec:
             legend:
-              position: bottom
               mode: table
+              position: bottom
               values:
                 - last
         queries:
@@ -97,7 +97,7 @@ spec:
                     name: prometheus-datasource
                   query: node_hwmon_temp_celsius{job="node-exporter",chip=~"nvme.*",instance=~"$instance"}
                   seriesNameFormat: '{{nodename}} - {{chip}}'
-    "1_1":
+    '1_1':
       kind: Panel
       spec:
         display:
@@ -107,8 +107,8 @@ spec:
           kind: TimeSeriesChart
           spec:
             legend:
-              position: bottom
               mode: table
+              position: bottom
               values:
                 - last
         queries:
@@ -122,7 +122,7 @@ spec:
                     name: prometheus-datasource
                   query: node_thermal_zone_temp{job="node-exporter",instance=~"$instance"}
                   seriesNameFormat: '{{nodename}} - {{type}} zone {{zone}}'
-    "2_0":
+    '2_0':
       kind: Panel
       spec:
         display:
@@ -132,8 +132,8 @@ spec:
           kind: TimeSeriesChart
           spec:
             legend:
-              position: bottom
               mode: table
+              position: bottom
               values:
                 - last
         queries:
@@ -147,7 +147,7 @@ spec:
                     name: prometheus-datasource
                   query: node_cpu_scaling_frequency_hertz{job="node-exporter",instance=~"$instance"}
                   seriesNameFormat: '{{nodename}} - CPU {{cpu}}'
-    "2_1":
+    '2_1':
       kind: Panel
       spec:
         display:
@@ -157,8 +157,8 @@ spec:
           kind: TimeSeriesChart
           spec:
             legend:
-              position: bottom
               mode: table
+              position: bottom
               values:
                 - last
         queries:
@@ -179,9 +179,9 @@ spec:
           title: CPU Temperature
         items:
           - x: 0
-            "y": 0
+            y: 0
             width: 24
-            height: 8
+            height: 20
             content:
               $ref: '#/spec/panels/0_0'
     - kind: Grid
@@ -190,15 +190,15 @@ spec:
           title: NVMe & Thermal Zones
         items:
           - x: 0
-            "y": 0
+            y: 0
             width: 12
-            height: 6
+            height: 15
             content:
               $ref: '#/spec/panels/1_0'
           - x: 12
-            "y": 0
+            y: 0
             width: 12
-            height: 6
+            height: 15
             content:
               $ref: '#/spec/panels/1_1'
     - kind: Grid
@@ -207,15 +207,16 @@ spec:
           title: CPU Performance
         items:
           - x: 0
-            "y": 0
+            y: 0
             width: 12
-            height: 6
+            height: 15
             content:
               $ref: '#/spec/panels/2_0'
           - x: 12
-            "y": 0
+            y: 0
             width: 12
-            height: 6
+            height: 15
             content:
               $ref: '#/spec/panels/2_1'
   duration: 1h
+
