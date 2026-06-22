@@ -2,8 +2,8 @@ kind: Dashboard
 metadata:
   name: node-hardware
   createdAt: '2026-06-21T09:44:57.970221375Z'
-  updatedAt: '2026-06-21T21:06:27.973752816Z'
-  version: 1363
+  updatedAt: '2026-06-22T19:19:28.008787178Z'
+  version: 4029
   project: homelab
 spec:
   display:
