@@ -26,6 +26,8 @@ config:
     important_dashboards:
       - project: homelab
         dashboard: node-overview
+      - project: homelab
+        dashboard: node-hardware
   provisioning:
     interval: 30s
   security:

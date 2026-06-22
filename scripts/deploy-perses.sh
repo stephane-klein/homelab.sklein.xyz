@@ -8,6 +8,10 @@ NAMESPACE="perses"
 echo "=== Deploying Perses ==="
 
 helm repo add perses https://perses.github.io/helm-charts --force-update > /dev/null
+# Re-apply ConfigMap under Helm's field manager to clear any kubectl-client-side-apply conflict
+kubectl get configmap -n "$NAMESPACE" perses -o yaml 2>/dev/null | \
+  kubectl apply --server-side --force-conflicts --field-manager=helm -f - 2>/dev/null || true
+
 helm upgrade --install perses perses/perses \
   --namespace "$NAMESPACE" --create-namespace \
   -f config/perses/values.yaml > /dev/null
@@ -23,9 +27,8 @@ kubectl get configmap -n "$NAMESPACE" perses -o json | python3 -c "
 import json, sys
 cm = json.load(sys.stdin)
 raw = cm['data']['config.yaml']
-cm['data']['config.yaml'] = raw.lstrip('\n')
-json.dump(cm, sys.stdout)
-" | kubectl apply -f - > /dev/null
+print(json.dumps({'data': {'config.yaml': raw.lstrip('\n')}}))
+" | kubectl patch configmap -n "$NAMESPACE" perses --patch-file /dev/stdin > /dev/null
 kubectl rollout restart statefulset -n "$NAMESPACE" perses > /dev/null 2>&1
 echo "  Restarting Perses..."
 kubectl wait --for=condition=Ready pod \
@@ -76,7 +79,7 @@ data:
 EOF
 
 echo ""
-./scripts/deploy-custom-dashboards.sh
+./scripts/push-perses-dashboards.sh
 
 echo ""
 echo "=== Done ==="
