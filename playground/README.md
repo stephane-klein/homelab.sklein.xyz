@@ -319,3 +319,31 @@ Stop the container and delete its named volume (all data is lost):
 $ mise run teardown-local-postgres
 ```
 
+## Destroy CloudNativePG dummy database cluster on k3s
+
+```sh
+$ mise run destroy-cnpg-dummy-cluster
+```
+
+## Delete all backups from Scaleway Object Storage
+
+This permanently removes ALL S3 objects (base backups and WAL archives) for
+the `dummy` cluster from the Scaleway bucket.
+
+```sh
+$ mise run delete-all-barman-backups
+=== Delete ALL S3 objects for dummy ===
+  S3 URL: s3://homelab-cnpg-backups/dummy
+  Endpoint: https://s3.fr-par.scw.cloud
+
+  WARNING: This will permanently delete ALL backups (base + WAL)
+           for cluster 'dummy' from Scaleway Object Storage.
+
+  Are you sure? Type 'yes' to confirm: yes
+
+  Deleting all objects under s3://homelab-cnpg-backups/dummy ...
+
+
+=== Done ===
+  All objects deleted under s3://homelab-cnpg-backups/dummy
+```

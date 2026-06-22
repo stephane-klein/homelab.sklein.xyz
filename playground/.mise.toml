@@ -38,6 +38,10 @@ run = "podman exec -e PGPASSWORD=app -it pg-dummy-local psql -U app -d app -h 12
 description = "List barman backup timestamps/IDs for the dummy cluster on Scaleway S3"
 run = "scripts/list-barman-backups.sh"
 
+[tasks.delete-all-barman-backups]
+description = "Delete ALL backups (base + WAL) for the dummy cluster from Scaleway S3"
+run = "scripts/delete-all-barman-backups.sh"
+
 [tasks.start-local-postgres]
 description = "Start local PostgreSQL via podman-compose"
 run = "podman-compose -f podman-compose.yml up -d"
