@@ -19,6 +19,10 @@ scaleway-cli = "2.57.0"
 awscli = "2.35.9"
 "krew:cnpg" = "1.29.1"
 
+[hooks.enter]
+shell = "zsh"
+script = "source <(kubectl completion zsh)"
+
 [tasks.setup-git-hooks]
 description = "Configure git hooks path for gitleaks"
 run = "scripts/setup-git-hooks.sh"
