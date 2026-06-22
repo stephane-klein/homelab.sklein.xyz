@@ -10,9 +10,8 @@ krew = "https://github.com/soupglasses/mise-krew"
 
 [tools]
 "github:mitsuhiko/minijinja" = "2.20.0"
-opentofu = "1.12.2"
 kubectl = "1.36.2"
-helm = "4.2.1"
+helm = "4.2.2"
 "aqua:gitleaks/gitleaks" = "8.30.1"
 "aqua:google/yamlfmt" = "0.21.0"
 scaleway-cli = "2.57.0"
