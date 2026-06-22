@@ -59,14 +59,6 @@ run = "scripts/destroy-traefik.sh"
 description = "Disable k3s ServiceLB (SSH + restart k3s)"
 run = "scripts/disable-servicelb.sh"
 
-[tasks.deploy-whoami]
-description = "Deploy whoami test app at https://whoami.sklein.internal"
-run = "scripts/deploy-whoami.sh"
-
-[tasks.destroy-whoami]
-description = "Destroy whoami test app"
-run = "scripts/destroy-whoami.sh"
-
 [tasks.deploy-victoria-metrics]
 description = "Deploy VictoriaMetrics at https://metrics.sklein.internal"
 run = "scripts/deploy-victoria-metrics.sh"
@@ -107,14 +99,6 @@ run = "scripts/add-authelia-user.sh"
 description = "Push config/authelia/users.yml to the authelia-users ConfigMap"
 run = "scripts/push-authelia-config.sh"
 
-[tasks.deploy-authelia-demo]
-description = "Deploy whoami demo app protected by Authelia"
-run = "scripts/deploy-authelia-demo.sh"
-
-[tasks.destroy-authelia-demo]
-description = "Destroy whoami Authelia demo app"
-run = "scripts/destroy-authelia-demo.sh"
-
 [tasks.deploy-cnpg]
 description = "Deploy CloudNativePG operator on nuc-i7-gen11"
 run = "scripts/deploy-cnpg.sh"
@@ -122,14 +106,6 @@ run = "scripts/deploy-cnpg.sh"
 [tasks.destroy-cnpg]
 description = "Destroy CloudNativePG operator"
 run = "scripts/destroy-cnpg.sh"
-
-[tasks.deploy-cnpg-dummy-cluster]
-description = "Deploy dummy CNPG cluster (1 instance, 1Gi, no backup)"
-run = "scripts/deploy-cnpg-dummy-cluster.sh"
-
-[tasks.destroy-cnpg-dummy-cluster]
-description = "Destroy dummy CNPG cluster"
-run = "scripts/destroy-cnpg-dummy-cluster.sh"
 
 [tasks.deploy-homepage]
 description = "Deploy Homepage at https://homepage.sklein.internal"
@@ -150,10 +126,6 @@ run = "scripts/destroy-exporters.sh"
 [tasks.test-cnpg-backups]
 description = "Test CNPG backups bucket access (requires CNPG_BACKUPS_* in .secret)"
 run = "scripts/test-cnpg-backups.sh"
-
-[tasks.list-cnpg-backups]
-description = "List backups in CNPG bucket (size and file listing)"
-run = "scripts/list-cnpg-backups.sh"
 
 [tasks.test-scaleway-auth]
 description = "Test that Scaleway API credentials are valid"

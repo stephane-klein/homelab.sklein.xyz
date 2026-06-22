@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-cd "$(dirname "$0")/.."
+cd "$(dirname "$0")/../../"
 
 if [ -z "${CNPG_BACKUPS_BUCKET:-}" ]; then
   if [ -f "config/cnpg/env" ]; then

@@ -1,0 +1,27 @@
+[tasks.deploy-whoami]
+description = "Deploy whoami test app at https://whoami.sklein.internal"
+run = "scripts/deploy-whoami.sh"
+
+[tasks.destroy-whoami]
+description = "Destroy whoami test app"
+run = "scripts/destroy-whoami.sh"
+
+[tasks.deploy-authelia-demo]
+description = "Deploy whoami demo app protected by Authelia"
+run = "scripts/deploy-authelia-demo.sh"
+
+[tasks.destroy-authelia-demo]
+description = "Destroy whoami Authelia demo app"
+run = "scripts/destroy-authelia-demo.sh"
+
+[tasks.deploy-cnpg-dummy-cluster]
+description = "Deploy dummy CNPG cluster (1 instance, 1Gi, no backup)"
+run = "scripts/deploy-cnpg-dummy-cluster.sh"
+
+[tasks.destroy-cnpg-dummy-cluster]
+description = "Destroy dummy CNPG cluster"
+run = "scripts/destroy-cnpg-dummy-cluster.sh"
+
+[tasks.list-cnpg-backups]
+description = "List backups in CNPG bucket (size and file listing)"
+run = "scripts/list-cnpg-backups.sh"

@@ -268,7 +268,7 @@ This SSHes into `nuc-i7-gen11`, adds `servicelb` to the k3s `disable` list,
 and restarts the k3s server. The cluster is briefly unavailable (~30s).
 
 > Test the ingress connectivity with a whoami application —
-> see [`PLAYGROUND.md`](./PLAYGROUND.md).
+> see [`playground/README.md`](./playground/README.md).
 
 ### Deploying your own apps
 
@@ -321,7 +321,7 @@ manual edits, push changes to the running pod:
 $ mise run push-authelia-config
 ```
 
-> See [`PLAYGROUND.md`](./PLAYGROUND.md) for an Authelia authentication demo.
+> See [`playground/README.md`](./playground/README.md) for an Authelia authentication demo.
 
 ## CloudNativePG Operator
 
@@ -346,7 +346,7 @@ This installs:
 - Requires `CNPG_BACKUPS_ACCESS_KEY` and `CNPG_BACKUPS_SECRET_KEY` in `.secret`,
   and `CNPG_BACKUPS_BUCKET` + `CNPG_BACKUPS_REGION` in `config/cnpg/env`
 
-> See [`PLAYGROUND.md`](./PLAYGROUND.md) for CloudNativePG admin operations.
+> See [`playground/README.md`](./playground/README.md) for CloudNativePG admin operations.
 
 ### Destroy CNPG operator
 

@@ -7,13 +7,13 @@ Test and learning deployments to get familiar with the homelab.
 Deploy a minimal whoami application to verify the ingress works.
 
 ```sh
-mise run deploy-whoami
+$ mise run deploy-whoami
 ```
 
 Access from any Netbird peer:
 
 ```sh
-curl https://whoami.sklein.internal/
+$ curl https://whoami.sklein.internal/
 ```
 
 You should see the whoami response (request headers and pod name).
@@ -21,7 +21,7 @@ You should see the whoami response (request headers and pod name).
 To remove:
 
 ```sh
-mise run destroy-whoami
+$ mise run destroy-whoami
 ```
 
 ## Authelia authentication demo
@@ -29,7 +29,7 @@ mise run destroy-whoami
 Deploy whoami behind Authelia ForwardAuth to see the authentication flow.
 
 ```sh
-mise run deploy-authelia-demo
+$ mise run deploy-authelia-demo
 ```
 
 Access `https://whoami-authelia-demo.sklein.internal`. You should be
@@ -38,13 +38,13 @@ redirected to `https://auth.sklein.internal` for login.
 To remove:
 
 ```sh
-mise run destroy-authelia-demo
+$ mise run destroy-authelia-demo
 ```
 
-## Deploy ClusterNativePG dummy cluster demo
+## Deploy CloudNativePG dummy cluster demo
 
 ```sh
-$ mise run destroy-cnpg-dummy-cluster
+$ mise run deploy-cnpg-dummy-cluster
 === Deploying CloudNativePG dummy cluster ===
   Waiting for postgres instance to be ready...
 
