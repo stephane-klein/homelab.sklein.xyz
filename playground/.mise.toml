@@ -22,6 +22,54 @@ run = "scripts/deploy-cnpg-dummy-cluster.sh"
 description = "Destroy dummy CNPG cluster"
 run = "scripts/destroy-cnpg-dummy-cluster.sh"
 
-[tasks.list-cnpg-backups]
-description = "List backups in CNPG bucket (size and file listing)"
-run = "scripts/list-cnpg-backups.sh"
+[tasks.import-db-schema-and-fixtures-from-local-files-to-k3s-dummy-cnpg-cluster]
+description = "Import schema.sql and data-fixtures.sql into the dummy CNPG cluster"
+run = "scripts/import-db-schema-and-fixtures.sh"
+
+[tasks.enter-in-k3s-dummy-database]
+description = "Open an interactive psql session into the dummy CNPG cluster"
+run = "kubectl cnpg psql dummy -n cnpg-demo"
+
+[tasks.enter-in-local-db]
+description = "Open an interactive psql session into the local Podman PostgreSQL (dummydb)"
+run = "podman exec -e PGPASSWORD=app -it pg-dummy-local psql -U app -d app -h 127.0.0.1"
+
+[tasks.list-backups-on-scaleway-s3]
+description = "List barman backup timestamps/IDs for the dummy cluster on Scaleway S3"
+run = "scripts/list-barman-backups.sh"
+
+[tasks.start-local-postgres]
+description = "Start local PostgreSQL via podman-compose"
+run = "podman-compose -f podman-compose.yml up -d"
+
+[tasks.stop-local-postgres]
+description = "Stop local PostgreSQL via podman-compose"
+run = "podman-compose -f podman-compose.yml down"
+
+[tasks.clean-db-on-local-podman-postgres]
+description = "Drop and recreate the app database on local Podman PostgreSQL"
+run = "scripts/clean-local-db.sh"
+
+[tasks.teardown-local-postgres]
+description = "Stop and remove the local Podman PostgreSQL container and volume"
+run = "podman compose down -v"
+
+[tasks.copy-db-from-k3s-dummy-cnpg-cluster-to-local-podman-postgres]
+description = "Dump CNPG app database and restore to local Podman PostgreSQL"
+run = "scripts/copy-db-from-cnpg-to-local.sh"
+
+[tasks.restore-db-from-scaleway-dummy-cnpg-barman-s3-backup-to-local-podman-postgres]
+description = "Restore CNPG barman S3 backup to local Podman PostgreSQL"
+run = "scripts/restore-db-from-barman-s3-to-local.sh"
+
+[tasks.restore-dump-to-local-podman-postgres]
+description = "Restore a pg_dump -Fc dump file into the local app database"
+run = "scripts/restore-dump-to-local.sh $@"
+
+[tasks.dump-db-from-scaleway-dummy-cnpg-barman-s3-backup-to-file]
+description = "Dump dummydb database from barman S3 backup to playground/dumps/"
+run = "scripts/dump-db-from-barman-s3-to-file.sh"
+
+[tasks.force-cnpg-backup]
+description = "Force an immediate backup of the dummy CNPG cluster"
+run = "kubectl cnpg -n cnpg-demo backup dummy"
