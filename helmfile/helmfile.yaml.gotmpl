@@ -15,3 +15,11 @@ releases:
         value: {{ env "CNPG_BACKUPS_ACCESS_KEY" | quote }}
       - name: backups.s3.secretKey
         value: {{ env "CNPG_BACKUPS_SECRET_KEY" | quote }}
+
+  - name: toggl-pg-mirror
+    namespace: toggl-pg-mirror
+    createNamespace: true
+    chart: oci://ghcr.io/stephane-klein/charts/toggl-pg-mirror
+    version: 0.1.0
+    values:
+      - values/toggl-pg-mirror.yaml

@@ -1,0 +1,28 @@
+postgresql:
+  schema: toggl
+
+cnpg:
+  clusterName: memex
+  namespace: memex
+  secretName: memex-cluster-app
+  copySecretName: memex-app
+
+toggl:
+  existingSecret:
+    name: toggl-api-token
+    key: token
+
+eso:
+  enabled: true
+  clusterSecretStoreName: kubernetes-cnpg-memex
+
+resources:
+  requests:
+    cpu: 50m
+    memory: 64Mi
+  limits:
+    cpu: 200m
+    memory: 128Mi
+
+nodeSelector:
+  kubernetes.io/hostname: nuc-i3-gen5.homelab.stephane-klein.info

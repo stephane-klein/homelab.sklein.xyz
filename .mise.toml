@@ -21,6 +21,8 @@ awscli = "2.35.9"
 kubectx = "0.11.0"
 kubens = "0.11.0"
 helmfile = "1.5.5"
+"krew:stern" = "1.34.0"
+k9s = "0.51.0"
 
 [hooks.enter]
 shell = "zsh"
@@ -161,5 +163,9 @@ run = "scw object bucket list 1>/dev/null 2>&1 && echo 'ok'"
 [tasks.deploy-external-secrets]
 description = "Deploy external-secrets operator"
 run = "scripts/deploy-external-secrets.sh"
+
+[tasks.deploy-toggl-pg-mirror]
+description = "Deploy toggl-pg-mirror (syncs Toggl time entries to PostgreSQL)"
+run = "scripts/deploy-toggl-pg-mirror.sh"
 
 

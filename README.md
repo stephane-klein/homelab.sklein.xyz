@@ -512,6 +512,18 @@ $ mise run destroy-cnpg-memex
 ```
 
 
+## toggl-pg-mirror
+
+[toggl-pg-mirror](https://github.com/stephane-klein/toggl-pg-mirror) mirrors
+Toggl time-tracking data into the Memex PostgreSQL database via a periodic
+sync daemon. Tables are stored in the `toggl` schema.
+
+```sh
+$ mise run deploy-toggl-pg-mirror
+```
+
+Config: `helmfile/values/toggl-pg-mirror.yaml` 
+
 ## Contribution
 
 ### Secret detection with gitleaks
