@@ -48,9 +48,10 @@ installed post-OS via the official `get.k3s.io` script, driven by
   starts after the VPN is up.
 - **Built-in components disabled** — embedded Traefik and ServiceLB are turned
   off; a standalone Traefik deployed via Helm serves as the Ingress controller.
-- **Deployment pattern** — every workload is deployed via `helm upgrade
-  --install` from `scripts/deploy-<service>.sh`, with values in
-  `config/<service>/values.yaml`.
+- **Deployment pattern** — **Helmfile is preferred over raw `helm upgrade
+  --install`** whenever possible (see [why](https://notes.sklein.xyz/2025-05-01_1622/)). New workloads should use Helmfile. Existing
+  `helm upgrade --install` scripts are candidates for migration. See the
+  [Helmfile](#helmfile) section below.
 
 ### Perses
 
@@ -90,10 +91,21 @@ mise run setup-jj-alias
 ## Config directory
 
 Service-specific configuration files live in `config/<service>/` (e.g.,
-`config/perses/values.yaml`). All services deploy as k3s workloads via Helm,
-using these values files. The `scripts/` directory contains only executable
-scripts. Scripts reference config via relative paths:
-`-f config/perses/values.yaml`.
+`config/perses/values.yaml`). Services using Helmfile have their definition in
+`helmfile/helmfile.yaml.gotmpl` and values in `helmfile/values/`. All services
+deploy as k3s workloads via Helm. The `scripts/` directory contains only
+executable scripts. Scripts reference config via relative paths:
+`-f config/perses/values.yaml` or `helmfile -f helmfile/helmfile.yaml.gotmpl`.
+
+### Helmfile
+
+[Helmfile](https://helmfile.readthedocs.io/) is for Helm what `docker-compose.yml`
+is for Docker — a declarative way to define, version, and apply Helm releases.
+It is the preferred deployment method over raw `helm upgrade --install`.
+
+- Definitions live in `helmfile/helmfile.yaml.gotmpl` (Go-templated).
+- Values live in `helmfile/values/<release>.yaml`.
+- Scripts invoke it as `helmfile -f helmfile/helmfile.yaml.gotmpl apply`.
 
 ### Authelia
 
