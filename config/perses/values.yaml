@@ -33,3 +33,9 @@ config:
   security:
     enable_auth: false
     readonly: false
+volumes:
+  - name: plugins
+    emptyDir: {}
+volumeMounts:
+  - name: plugins
+    mountPath: /etc/perses/plugins

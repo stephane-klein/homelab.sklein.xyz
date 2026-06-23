@@ -8,9 +8,8 @@ NAMESPACE="perses"
 echo "=== Deploying Perses ==="
 
 helm repo add perses https://perses.github.io/helm-charts --force-update > /dev/null
-# Re-apply ConfigMap under Helm's field manager to clear any kubectl-client-side-apply conflict
-kubectl get configmap -n "$NAMESPACE" perses -o yaml 2>/dev/null | \
-  kubectl apply --server-side --force-conflicts --field-manager=helm -f - 2>/dev/null || true
+# Delete ConfigMap so Helm can recreate it cleanly (avoids managedFields conflicts)
+kubectl delete configmap -n "$NAMESPACE" perses --ignore-not-found=true
 
 helm upgrade --install perses perses/perses \
   --namespace "$NAMESPACE" --create-namespace \
