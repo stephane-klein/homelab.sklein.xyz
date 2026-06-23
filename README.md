@@ -36,6 +36,10 @@ Deployed services:
   - [Perses](https://github.com/perses/perses) (dashboards)
   - [Perses Operator](https://github.com/perses/perses-operator) (CRD management)
 
+My databases:
+
+- Memex
+
 ## Roadmap
 
 Here are some service ideas I plan to deploy on my homelab.
@@ -446,6 +450,56 @@ The YAML configuration lives in `config/homepage/values.yaml`.
 Deployed behind Traefik, Homepage automatically benefits from TLS
 certificates (cert-manager) and Authelia authentication
 (`forwardauth-authelia` middleware).
+
+## Managed databases
+
+Databases deployed with CloudNativePG:
+
+### Memex
+
+Deploy `Memex`:
+
+```sh
+$ mise run deploy-cnpg-memex
+```
+
+Get the password:
+
+```sh
+$ kubectl get secret memex-cluster-memex -n memex \
+    -o jsonpath='{.data.password}' | base64 -d
+```
+
+Connect:
+
+```sh
+$ kubectl cnpg psql memex-cluster -n memex
+```
+
+List backups:
+
+```sh
+$ mise run list-cnpg-memex-backups
+```
+
+Trigger an immediate backup:
+
+```sh
+$ mise run backup-cnpg-memex
+```
+
+Delete a backup (by name):
+
+```sh
+$ mise run delete-cnpg-memex-backup <backup-name>
+```
+
+Destroy:
+
+```sh
+$ mise run destroy-cnpg-memex
+```
+
 
 ## Contribution
 

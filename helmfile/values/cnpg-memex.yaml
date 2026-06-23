@@ -1,0 +1,39 @@
+type: postgresql
+mode: standalone
+version:
+  postgresql: "18"
+
+cluster:
+  instances: 1
+  storage:
+    size: 10Gi
+  enableSuperuserAccess: true
+  monitoring:
+    enabled: true
+    podMonitor:
+      enabled: false
+    prometheusRule:
+      enabled: false
+  affinity:
+    nodeSelector:
+      kubernetes.io/hostname: nuc-i3-gen5.homelab.stephane-klein.info
+  initdb:
+    database: memex
+    owner: memex
+
+backups:
+  enabled: true
+  provider: s3
+  destinationPath: "s3://homelab-cnpg-backups/memex/"
+  endpointURL: "https://s3.fr-par.scw.cloud"
+  s3:
+    bucket: homelab-cnpg-backups
+    region: fr-par
+    path: /memex
+  retentionPolicy: "30d"
+  scheduledBackups:
+    - name: nightly-backup
+      schedule: "0 0 0 * * *"
+      backupOwnerReference: self
+  secret:
+    create: true

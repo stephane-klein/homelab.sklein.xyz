@@ -20,6 +20,7 @@ awscli = "2.35.9"
 "krew:cnpg" = "1.29.1"
 kubectx = "0.11.0"
 kubens = "0.11.0"
+helmfile = "1.5.5"
 
 [hooks.enter]
 shell = "zsh"
@@ -112,6 +113,26 @@ run = "scripts/deploy-cnpg.sh"
 [tasks.destroy-cnpg]
 description = "Destroy CloudNativePG operator"
 run = "scripts/destroy-cnpg.sh"
+
+[tasks.deploy-cnpg-memex]
+description = "Deploy CNPG cluster Memex via helmfile"
+run = "scripts/deploy-cnpg-memex.sh"
+
+[tasks.destroy-cnpg-memex]
+description = "Destroy CNPG cluster Memex"
+run = "scripts/destroy-cnpg-memex.sh"
+
+[tasks.list-cnpg-memex-backups]
+description = "List CNPG Memex backups"
+run = "scripts/list-cnpg-memex-backups.sh"
+
+[tasks.backup-cnpg-memex]
+description = "Trigger immediate CNPG Memex backup"
+run = "scripts/backup-cnpg-memex.sh"
+
+[tasks.delete-cnpg-memex-backup]
+description = "Delete a CNPG Memex backup by name"
+run = "scripts/delete-cnpg-memex-backup.sh"
 
 [tasks.deploy-homepage]
 description = "Deploy Homepage at https://homepage.sklein.internal"
