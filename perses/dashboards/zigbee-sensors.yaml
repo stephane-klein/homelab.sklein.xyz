@@ -1,0 +1,215 @@
+kind: Dashboard
+metadata:
+  name: zigbee-sensors
+  createdAt: '2026-06-23T21:15:49.728660504Z'
+  updatedAt: '2026-06-23T21:43:51.383086086Z'
+  version: 46
+  project: homelab
+spec:
+  display:
+    name: Zigbee Sensors
+  panels:
+    '0_0':
+      kind: Panel
+      spec:
+        display:
+          name: "Temperature (°C)"
+        plugin:
+          kind: TimeSeriesChart
+          spec:
+            legend:
+              mode: list
+              position: bottom
+              values:
+                - last
+            querySettings:
+              - queryIndex: 0
+                colorMode: fixed-single
+                colorValue: '#e53935'
+              - queryIndex: 1
+                colorMode: fixed-single
+                colorValue: '#1e88e5'
+            visual:
+              areaOpacity: 0
+              connectNulls: false
+              display: line
+              lineStyle: solid
+              lineWidth: 2.25
+              pointRadius: 3.75
+            yAxis:
+              format:
+                unit: celsius
+              label: ''
+              max: 44
+              min: 0
+              show: true
+        queries:
+          - kind: TimeSeriesQuery
+            spec:
+              plugin:
+                kind: PrometheusTimeSeriesQuery
+                spec:
+                  datasource:
+                    kind: PrometheusDatasource
+                    name: prometheus-datasource
+                  query: 'keep_last_value(zigbee_temperature{sensor="A - Intérieur"})'
+                  seriesNameFormat: 'A - Intérieur'
+          - kind: TimeSeriesQuery
+            spec:
+              plugin:
+                kind: PrometheusTimeSeriesQuery
+                spec:
+                  datasource:
+                    kind: PrometheusDatasource
+                    name: prometheus-datasource
+                  query: 'keep_last_value(zigbee_temperature{sensor="B - Extérieur"})'
+                  seriesNameFormat: 'B - Extérieur'
+    '1_0':
+      kind: Panel
+      spec:
+        display:
+          name: Humidity (%)
+        plugin:
+          kind: TimeSeriesChart
+          spec:
+            legend:
+              mode: list
+              position: bottom
+              values:
+                - last
+            querySettings:
+              - queryIndex: 0
+                colorMode: fixed-single
+                colorValue: '#e53935'
+              - queryIndex: 1
+                colorMode: fixed-single
+                colorValue: '#1e88e5'
+            visual:
+              areaOpacity: 0
+              connectNulls: false
+              display: line
+              lineStyle: solid
+              lineWidth: 3
+              pointRadius: 4.5
+            yAxis:
+              format:
+                unit: percent
+              label: ''
+              show: true
+        queries:
+          - kind: TimeSeriesQuery
+            spec:
+              plugin:
+                kind: PrometheusTimeSeriesQuery
+                spec:
+                  datasource:
+                    kind: PrometheusDatasource
+                    name: prometheus-datasource
+                  query: 'keep_last_value(zigbee_humidity{sensor="A - Intérieur"})'
+                  seriesNameFormat: 'A - Intérieur'
+          - kind: TimeSeriesQuery
+            spec:
+              plugin:
+                kind: PrometheusTimeSeriesQuery
+                spec:
+                  datasource:
+                    kind: PrometheusDatasource
+                    name: prometheus-datasource
+                  query: 'keep_last_value(zigbee_humidity{sensor="B - Extérieur"})'
+                  seriesNameFormat: 'B - Extérieur'
+    '2_0':
+      kind: Panel
+      spec:
+        display:
+          name: Battery (%)
+        plugin:
+          kind: TimeSeriesChart
+          spec:
+            legend:
+              mode: list
+              position: bottom
+              values:
+                - last
+            querySettings:
+              - queryIndex: 0
+                colorMode: fixed-single
+                colorValue: '#e53935'
+              - queryIndex: 1
+                colorMode: fixed-single
+                colorValue: '#1e88e5'
+            visual:
+              areaOpacity: 0
+              connectNulls: false
+              display: line
+              lineStyle: solid
+              lineWidth: 2.25
+              pointRadius: 3.75
+            yAxis:
+              format:
+                unit: percent
+              max: 100
+              min: 0
+              show: true
+        queries:
+          - kind: TimeSeriesQuery
+            spec:
+              plugin:
+                kind: PrometheusTimeSeriesQuery
+                spec:
+                  datasource:
+                    kind: PrometheusDatasource
+                    name: prometheus-datasource
+                  query: 'keep_last_value(zigbee_battery{sensor="A - Intérieur"})'
+                  seriesNameFormat: 'A - Intérieur'
+          - kind: TimeSeriesQuery
+            spec:
+              plugin:
+                kind: PrometheusTimeSeriesQuery
+                spec:
+                  datasource:
+                    kind: PrometheusDatasource
+                    name: prometheus-datasource
+                  query: 'keep_last_value(zigbee_battery{sensor="B - Extérieur"})'
+                  seriesNameFormat: 'B - Extérieur'
+  layouts:
+    - kind: Grid
+      spec:
+        display:
+          title: Temperature
+          collapse:
+            open: true
+        items:
+          - x: 0
+            y: 0
+            width: 24
+            height: 18
+            content:
+              $ref: '#/spec/panels/0_0'
+    - kind: Grid
+      spec:
+        display:
+          title: Humidity
+          collapse:
+            open: true
+        items:
+          - x: 0
+            y: 0
+            width: 24
+            height: 18
+            content:
+              $ref: '#/spec/panels/1_0'
+    - kind: Grid
+      spec:
+        display:
+          title: Battery
+          collapse:
+            open: true
+        items:
+          - x: 0
+            y: 0
+            width: 24
+            height: 18
+            content:
+              $ref: '#/spec/panels/2_0'
+  duration: 1h
+  refreshInterval: 30s

@@ -1,6 +1,10 @@
 repositories:
   - name: cnpg
     url: https://cloudnative-pg.github.io/charts
+  - name: sintef-mosquitto
+    url: https://sintef.github.io/mosquitto-helm-chart
+  - name: zigbee2mqtt
+    url: https://charts.zigbee2mqtt.io
 
 releases:
   - name: memex
@@ -23,3 +27,19 @@ releases:
     version: 0.1.0
     values:
       - values/toggl-pg-mirror.yaml
+
+  - name: mosquitto
+    namespace: zigbee
+    createNamespace: true
+    chart: sintef-mosquitto/mosquitto
+    version: 0.1.1
+    values:
+      - values/mosquitto.yaml
+
+  - name: zigbee2mqtt
+    namespace: zigbee
+    createNamespace: true
+    chart: zigbee2mqtt/zigbee2mqtt
+    version: 2.12.0
+    values:
+      - values/zigbee2mqtt.yaml

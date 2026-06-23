@@ -61,6 +61,17 @@ config:
         - Perses:
             href: https://perses.sklein.internal
             description: Monitoring Dashboards
+        - Zigbee2MQTT:
+            href: https://zigbee2mqtt.sklein.internal
+            description: Zigbee Coordinator
+
+    - Environment Monitoring:
+        - Zigbee2MQTT:
+            href: https://zigbee2mqtt.sklein.internal
+            description: Zigbee Coordinator UI
+        - Zigbee Dashboard:
+            href: https://perses.sklein.internal/projects/homelab/dashboards/zigbee-sensors
+            description: Temp & Humidity Dashboards
 
     - nuc-i3-gen5:
         - CPU:

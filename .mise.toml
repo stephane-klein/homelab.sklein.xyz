@@ -168,4 +168,12 @@ run = "scripts/deploy-external-secrets.sh"
 description = "Deploy toggl-pg-mirror (syncs Toggl time entries to PostgreSQL)"
 run = "scripts/deploy-toggl-pg-mirror.sh"
 
+[tasks.deploy-zigbee]
+description = "Deploy Mosquitto + Zigbee2MQTT + MQTT bridge in k3s for temperature monitoring"
+run = "scripts/deploy-zigbee.sh"
+
+[tasks.destroy-zigbee]
+description = "Destroy Zigbee monitoring stack (Mosquitto + Zigbee2MQTT + bridge)"
+run = "scripts/destroy-zigbee.sh"
+
 

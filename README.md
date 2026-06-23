@@ -25,6 +25,13 @@ Deployed services:
   - [Authelia](https://github.com/authelia/authelia) (SSO authentication)
   - [CloudNativePG](https://cloudnative-pg.io/) (PostgreSQL operator with backup to Scaleway Object Storage)
   - [External Secrets Operator](https://external-secrets.io/) (cross-namespace secret sharing)
+- **Environment monitoring**
+  - [Mosquitto](https://mosquitto.org/) — MQTT broker for IoT sensor data
+  - [Zigbee2MQTT](https://www.zigbee2mqtt.io/) — Zigbee coordinator at `https://zigbee2mqtt.sklein.internal`
+  - MQTT → VictoriaMetrics bridge (Python, deployed as k8s Deployment)
+  - **Hardware**:
+    - [SONOFF ZBDongle-E](https://sonoff.tech/fr-fr/products/sonoff-zigbee-3-0-usb-dongle-plus-zbdongle-e) — USB Zigbee coordinator (EFR32MG21, `ember` driver), plugged on `nuc-i7-gen11`
+    - 2× [SONOFF SNZB-02D](https://sonoff.tech/fr-fr/products/sonoff-snzb-02d-zigbee-lcd-smart-temperature-humidity-sensor) — temperature & humidity sensors with LCD display (Zigbee 3.0, CR2450 battery)
 - **Application dashboard**
   - [Homepage](https://gethomepage.dev/) at `https://homepage.sklein.internal`
     — central dashboard with Kubernetes resources, per-node CPU/RAM/disk metrics
@@ -461,6 +468,42 @@ The YAML configuration lives in `config/homepage/values.yaml`.
 Deployed behind Traefik, Homepage automatically benefits from TLS
 certificates (cert-manager) and Authelia authentication
 (`forwardauth-authelia` middleware).
+
+## Zigbee Environment Monitoring
+
+Temperature and humidity monitoring via Zigbee sensors, deployed in the `zigbee` namespace.
+
+**Architecture:** Zigbee2MQTT (k3s StatefulSet) → Mosquitto (k3s Service) → Python bridge → VictoriaMetrics
+
+**Access:**
+- Zigbee2MQTT UI: `https://zigbee2mqtt.sklein.internal`
+- Metrics dashboard: `zigbee-sensors` in Perses (`https://perses.sklein.internal`)
+
+**Deploy:**
+
+```sh
+$ mise run deploy-zigbee
+```
+
+**Pair a sensor:**
+
+1. Open `https://zigbee2mqtt.sklein.internal`
+2. Click **Permit Join**
+3. Hold the button on the back of the SNZB-02D for 5 seconds
+4. The sensor appears in the UI within a few seconds
+5. Disable Permit Join
+
+**Destroy:**
+
+```sh
+$ mise run destroy-zigbee
+```
+
+**Configuration files:**
+
+- `helmfile/values/zigbee2mqtt.yaml` — Zigbee2MQTT Helm values
+- `helmfile/values/mosquitto.yaml` — Mosquitto Helm values
+- `config/zigbee/bridge.py` — Python bridge script (MQTT → VictoriaMetrics)
 
 ## Managed databases
 

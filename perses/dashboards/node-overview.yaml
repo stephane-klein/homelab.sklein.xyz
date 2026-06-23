@@ -2,8 +2,8 @@ kind: Dashboard
 metadata:
   name: node-overview
   createdAt: '2026-06-21T09:44:57.98652897Z'
-  updatedAt: '2026-06-22T19:19:32.954285373Z'
-  version: 4030
+  updatedAt: '2026-06-23T21:43:49.733875889Z'
+  version: 5647
   project: homelab
 spec:
   display:

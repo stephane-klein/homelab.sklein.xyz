@@ -1,0 +1,42 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: mqtt-bridge
+  labels:
+    app: mqtt-bridge
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: mqtt-bridge
+  template:
+    metadata:
+      labels:
+        app: mqtt-bridge
+    spec:
+      containers:
+        - name: bridge
+          image: python:3.12-alpine
+          env:
+            - name: PYTHONUNBUFFERED
+              value: "1"
+          command:
+            - sh
+            - -c
+            - |
+              pip install -q paho-mqtt requests && exec python /app/bridge.py
+          volumeMounts:
+            - name: script
+              mountPath: /app/bridge.py
+              subPath: bridge.py
+          resources:
+            requests:
+              memory: 64Mi
+              cpu: 50m
+            limits:
+              memory: 128Mi
+              cpu: 100m
+      volumes:
+        - name: script
+          configMap:
+            name: mqtt-bridge

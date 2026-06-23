@@ -1,0 +1,38 @@
+statefulset:
+  nodeSelector:
+    kubernetes.io/hostname: nuc-i7-gen11.homelab.stephane-klein.info
+  storage:
+    enabled: true
+    size: 1Gi
+    storageClassName: local-path
+  volumes:
+    - name: dev-serial
+      hostPath:
+        path: /dev/serial/by-id/
+  volumeMounts:
+    - name: dev-serial
+      mountPath: /dev/serial/by-id/
+
+zigbee2mqtt:
+  homeassistant:
+    enabled: false
+  permit_join: false
+  mqtt:
+    server: mqtt://mosquitto.zigbee.svc.cluster.local:1883
+  serial:
+    port: /dev/serial/by-id/usb-Itead_Sonoff_Zigbee_3.0_USB_Dongle_Plus_V2_9c214e62c9c2ef1186fe53ac8048b910-if00-port0
+    adapter: ember
+  frontend:
+    enabled: true
+    port: 8080
+
+ingress:
+  enabled: true
+  ingressClassName: traefik
+  annotations:
+    traefik.ingress.kubernetes.io/router.middlewares: traefik-forwardauth-authelia@kubernetescrd
+  hosts:
+    - host: zigbee2mqtt.sklein.internal
+      paths:
+        - path: /
+          pathType: Prefix
