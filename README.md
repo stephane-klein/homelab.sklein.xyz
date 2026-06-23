@@ -24,6 +24,7 @@ Deployed services:
   - [cert-manager](https://github.com/cert-manager/cert-manager) (TLS certificates)
   - [Authelia](https://github.com/authelia/authelia) (SSO authentication)
   - [CloudNativePG](https://cloudnative-pg.io/) (PostgreSQL operator with backup to Scaleway Object Storage)
+  - [External Secrets Operator](https://external-secrets.io/) (cross-namespace secret sharing)
 - **Application dashboard**
   - [Homepage](https://gethomepage.dev/) at `https://homepage.sklein.internal`
     — central dashboard with Kubernetes resources, per-node CPU/RAM/disk metrics
@@ -326,6 +327,16 @@ $ mise run push-authelia-config
 ```
 
 > See [`playground/README.md`](./playground/README.md) for an Authelia authentication demo.
+
+## External Secrets Operator
+
+[External Secrets Operator](https://external-secrets.io/) synchronises secrets from
+external APIs into Kubernetes. It is used to replicate secrets across namespaces
+(e.g., sharing the Memex database password with other workloads).
+
+```sh
+$ mise run deploy-external-secrets
+```
 
 ## CloudNativePG Operator
 

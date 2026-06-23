@@ -158,4 +158,8 @@ run = "scripts/test-cnpg-backups.sh"
 description = "Test that Scaleway API credentials are valid"
 run = "scw object bucket list 1>/dev/null 2>&1 && echo 'ok'"
 
+[tasks.deploy-external-secrets]
+description = "Deploy external-secrets operator"
+run = "scripts/deploy-external-secrets.sh"
+
 
