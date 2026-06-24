@@ -53,6 +53,7 @@ My databases:
 Here are some service ideas I plan to deploy on my homelab.
 
 - [x] **Database operator**: [CloudNativePG](https://cloudnative-pg.io/) — with backup to Scaleway Object Storage
+- [ ] [Deploy Netbird Reverse Proxy (self-hosted) on nuc-i7-gen11 for public HTTPS ingress](https://github.com/stephane-klein/homelab.sklein.xyz/issues/1)
 - [ ] **Internal certificate authority**: [step-ca](https://github.com/smallstep/certificates) [untested]
 - [ ] **GPS tracking server**: [gpstracker](https://git.fabiomanganiello.com/gpstracker) - connected to [GPSLogger for Android](https://github.com/mendhak/gpslogger/) [untested]
 - [ ] **Agent memory system**: [Hindsight](https://github.com/vectorize-io/hindsight) - agents that learn over time, not just remember [untested]
