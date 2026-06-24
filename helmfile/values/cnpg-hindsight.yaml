@@ -1,0 +1,23 @@
+type: postgresql
+mode: standalone
+version:
+  postgresql: "18"
+
+cluster:
+  instances: 1
+  imageName: "docker.io/paradedb/paradedb:pg18"
+  storage:
+    size: 50Gi
+  enableSuperuserAccess: true
+  monitoring:
+    enabled: true
+    podMonitor:
+      enabled: false
+    prometheusRule:
+      enabled: false
+  affinity:
+    nodeSelector:
+      kubernetes.io/hostname: nuc-i7-gen11.homelab.stephane-klein.info
+  initdb:
+    database: hindsight
+    owner: hindsight

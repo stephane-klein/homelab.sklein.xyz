@@ -557,6 +557,33 @@ Destroy:
 $ mise run destroy-cnpg-memex
 ```
 
+### Hindsight
+
+Deploy `Hindsight`:
+
+```sh
+$ mise run deploy-cnpg-hindsight
+```
+
+Get the password:
+
+```sh
+$ kubectl get secret hindsight-cnpg-cluster-app -n hindsight \
+    -o jsonpath='{.data.password}' | base64 -d
+```
+
+Connect:
+
+```sh
+$ kubectl cnpg psql hindsight-cnpg-cluster -n hindsight
+```
+
+Destroy:
+
+```sh
+$ mise run destroy-cnpg-hindsight
+```
+
 
 ## toggl-pg-mirror
 

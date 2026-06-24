@@ -43,3 +43,11 @@ releases:
     version: 2.12.0
     values:
       - values/zigbee2mqtt.yaml
+
+  - name: hindsight-cnpg
+    namespace: hindsight
+    createNamespace: true
+    chart: cnpg/cluster
+    version: 0.7.0
+    values:
+      - values/cnpg-hindsight.yaml

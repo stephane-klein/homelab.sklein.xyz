@@ -179,4 +179,12 @@ run = "scripts/deploy-zigbee.sh"
 description = "Destroy Zigbee monitoring stack (Mosquitto + Zigbee2MQTT + bridge)"
 run = "scripts/destroy-zigbee.sh"
 
+[tasks.deploy-cnpg-hindsight]
+description = "Deploy CNPG cluster Hindsight via helmfile"
+run = "scripts/deploy-cnpg-hindsight.sh"
+
+[tasks.destroy-cnpg-hindsight]
+description = "Destroy CNPG cluster Hindsight"
+run = "scripts/destroy-cnpg-hindsight.sh"
+
 
