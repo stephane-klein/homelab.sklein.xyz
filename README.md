@@ -32,6 +32,9 @@ Deployed services:
   - **Hardware**:
     - [SONOFF ZBDongle-E](https://sonoff.tech/fr-fr/products/sonoff-zigbee-3-0-usb-dongle-plus-zbdongle-e) — USB Zigbee coordinator (EFR32MG21, `ember` driver), plugged on `nuc-i7-gen11`
     - 2× [SONOFF SNZB-02D](https://sonoff.tech/fr-fr/products/sonoff-snzb-02d-zigbee-lcd-smart-temperature-humidity-sensor) — temperature & humidity sensors with LCD display (Zigbee 3.0, CR2450 battery)
+- **AI / Agent memory**
+  - [Hindsight](https://github.com/vectorize-io/hindsight) at `https://hindsight.sklein.internal`
+    — agent memory system with pgvector + pg_search (ParadeDB)
 - **Application dashboard**
   - [Homepage](https://gethomepage.dev/) at `https://homepage.sklein.internal`
     — central dashboard with Kubernetes resources, per-node CPU/RAM/disk metrics
@@ -53,10 +56,10 @@ My databases:
 Here are some service ideas I plan to deploy on my homelab.
 
 - [x] **Database operator**: [CloudNativePG](https://cloudnative-pg.io/) — with backup to Scaleway Object Storage
+- [x] **Agent memory system**: [Hindsight](https://github.com/vectorize-io/hindsight) - agents that learn over time, not just remember
 - [ ] [Deploy Netbird Reverse Proxy (self-hosted) on nuc-i7-gen11 for public HTTPS ingress](https://github.com/stephane-klein/homelab.sklein.xyz/issues/1)
 - [ ] **Internal certificate authority**: [step-ca](https://github.com/smallstep/certificates) [untested]
 - [ ] **GPS tracking server**: [gpstracker](https://git.fabiomanganiello.com/gpstracker) - connected to [GPSLogger for Android](https://github.com/mendhak/gpslogger/) [untested]
-- [ ] **Agent memory system**: [Hindsight](https://github.com/vectorize-io/hindsight) - agents that learn over time, not just remember [untested]
 - [ ] **File sync & share**: [Nextcloud](https://nextcloud.com/) - with backup on Scaleway Object Storage
 - [ ] **RSS feed reader**: [Miniflux](https://miniflux.app/)
 - [ ] **Virtual machine management**: [KubeVirt](https://kubevirt.io/) [untested]
@@ -559,13 +562,30 @@ $ mise run destroy-cnpg-memex
 
 ### Hindsight
 
-Deploy `Hindsight`:
+[Hindsight](https://github.com/vectorize-io/hindsight) is an agent memory
+system that persists context, learns from interactions, and provides MCP tools
+for agents (OpenCode, Claude Code, etc.).
+
+Hindsight use PostgreSQL with pgvector + pg_search ([ParadeDB](https://github.com/paradedb/paradedb)).
+
+#### Model Configuration
+
+
+| Component | Provider | Model | Price (as of 2026-07-01) |
+|---|---|---|---|
+| LLM | OpenCode Go | `deepseek-v4-flash` | via [OpenCode Go](https://opencode.ai/docs/en/go/#usage-limits) |
+| Embeddings | DeepInfra | `Qwen/Qwen3-Embedding-8B` (1024d) | $0.01 / 1M tokens |
+| Reranker | OpenRouter → Cohere | `cohere/rerank-4-fast` | $0.001 / search |
+
+Config: [`helmfile/values/hindsight.yaml`](helmfile/values/hindsight.yaml)
+
+#### Deploy the CNPG cluster (once)
 
 ```sh
 $ mise run deploy-cnpg-hindsight
 ```
 
-Get the password:
+Get the database password:
 
 ```sh
 $ kubectl get secret hindsight-cnpg-cluster-app -n hindsight \
@@ -578,12 +598,49 @@ Connect:
 $ kubectl cnpg psql hindsight-cnpg-cluster -n hindsight
 ```
 
-Destroy:
+#### Deploy the Hindsight app
 
 ```sh
-$ mise run destroy-cnpg-hindsight
+$ mise run deploy-hindsight
 ```
 
+#### Backup
+
+Logical backups (`pg_dump -Fc`) are taken nightly at 3am Paris time,
+uploaded to Scaleway S3 (`homelab-cnpg-backups/hindsight-logical/`)
+with 7-day retention via a Kubernetes CronJob.
+
+```sh
+$ mise run list-hindsight-backups                 # List backups on S3 + recent jobs
+$ mise run backup-hindsight-now                   # Trigger an immediate backup
+$ mise run verify-hindsight-backup                # Validate the latest backup (pg_restore -l)
+$ mise run verify-hindsight-backup -- <file>      # Validate a specific backup file
+```
+
+#### Restore into a temporary local container
+
+For testing purposes only, restore a backup into a temporary ParadeDB container with full pgvector + pg_search
+support and an interactive `psql` session. The container is removed on exit.
+
+```sh
+$ mise run try-restore-hindsight-backup                 # Latest backup
+$ mise run try-restore-hindsight-backup -- <file>       # Specific backup file
+```
+
+#### Destroy
+
+Destroy the app (preserves the CNPG cluster):
+
+```sh
+$ mise run destroy-hindsight
+```
+
+Destroy everything (app + database):
+
+```sh
+$ mise run destroy-hindsight
+$ mise run destroy-cnpg-hindsight
+```
 
 ## toggl-pg-mirror
 

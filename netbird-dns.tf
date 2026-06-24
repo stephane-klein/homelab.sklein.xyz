@@ -35,3 +35,11 @@ resource "netbird_dns_record" "wildcard_ingress" {
   content = "nuc-i7-gen11.homelab.stephane-klein.info"
   ttl     = 300
 }
+
+resource "netbird_dns_record" "api_hindsight" {
+  zone_id = netbird_dns_zone.sklein_internal.id
+  name    = "api.hindsight.sklein.internal"
+  type    = "CNAME"
+  content = "nuc-i7-gen11.homelab.stephane-klein.info"
+  ttl     = 300
+}

@@ -1,0 +1,91 @@
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: hindsight-logical-backup
+  namespace: hindsight
+spec:
+  schedule: "0 3 * * *"
+  timeZone: "Europe/Paris"
+  successfulJobsHistoryLimit: 3
+  failedJobsHistoryLimit: 1
+  jobTemplate:
+    spec:
+      ttlSecondsAfterFinished: 86400
+      template:
+        spec:
+          restartPolicy: OnFailure
+          initContainers:
+            - name: pg-dump
+              image: ghcr.io/cloudnative-pg/postgresql:18
+              env:
+                - name: PGPASSWORD
+                  valueFrom:
+                    secretKeyRef:
+                      name: hindsight-cnpg-cluster-app
+                      key: password
+                - name: PGDUMP
+                  value: -Fc --no-owner --no-acl -h hindsight-cnpg-cluster-rw -U hindsight -d hindsight -f /tmp/backup.dump
+              command:
+                - sh
+                - -c
+                - pg_dump $PGDUMP
+              volumeMounts:
+                - name: backup
+                  mountPath: /tmp
+          containers:
+            - name: s3-upload
+              image: docker.io/amazon/aws-cli:latest
+              env:
+                - name: AWS_ACCESS_KEY_ID
+                  valueFrom:
+                    secretKeyRef:
+                      name: hindsight-backup-credentials
+                      key: accessKey
+                - name: AWS_SECRET_ACCESS_KEY
+                  valueFrom:
+                    secretKeyRef:
+                      name: hindsight-backup-credentials
+                      key: secretKey
+                - name: S3_ENDPOINT
+                  value: https://s3.fr-par.scw.cloud
+                - name: S3_REGION
+                  value: fr-par
+                - name: S3_BUCKET
+                  value: homelab-cnpg-backups
+                - name: S3_PREFIX
+                  value: hindsight-logical
+                - name: UPLOAD_FILE
+                  value: /tmp/backup.dump
+              command:
+                - sh
+                - -c
+                - |
+                  set -euo pipefail
+
+                  TIMESTAMP=$(date -u +%Y%m%d-%H%M%S)
+                  DEST="s3://${S3_BUCKET}/${S3_PREFIX}/hindsight-${TIMESTAMP}.dump"
+
+                  echo "Uploading backup to ${DEST}"
+                  aws s3 cp "${UPLOAD_FILE}" "${DEST}" \
+                    --endpoint-url "${S3_ENDPOINT}" --region "${S3_REGION}"
+
+                  echo "Purging backups older than 7 days"
+                  CUTOFF=$(date -d '7 days ago' +%s)
+                  aws s3 ls "s3://${S3_BUCKET}/${S3_PREFIX}/" \
+                    --endpoint-url "${S3_ENDPOINT}" --region "${S3_REGION}" \
+                    | while read -r DATE TIME SIZE KEY; do
+                        FILE_TS=$(date -d "${DATE} ${TIME}" +%s 2>/dev/null || true)
+                        if [ -n "${FILE_TS}" ] && [ "${FILE_TS}" -lt "${CUTOFF}" ]; then
+                          echo "  Deleting old backup: ${KEY}"
+                          aws s3 rm "s3://${S3_BUCKET}/${S3_PREFIX}/${KEY}" \
+                            --endpoint-url "${S3_ENDPOINT}" --region "${S3_REGION}"
+                        fi
+                      done
+
+                  echo "Done"
+              volumeMounts:
+                - name: backup
+                  mountPath: /tmp
+          volumes:
+            - name: backup
+              emptyDir: {}

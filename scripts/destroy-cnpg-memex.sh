@@ -5,6 +5,6 @@ cd "$(dirname "$0")/../"
 
 echo "=== Destroying CNPG cluster: memex ==="
 
-helmfile -f helmfile/helmfile.yaml.gotmpl destroy
+helmfile -f helmfile/helmfile.yaml.gotmpl destroy --selector name=memex
 
 echo "=== Done ==="

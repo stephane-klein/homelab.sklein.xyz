@@ -127,6 +127,28 @@ run = "scripts/deploy-cnpg-memex.sh"
 description = "Destroy CNPG cluster Memex"
 run = "scripts/destroy-cnpg-memex.sh"
 
+[tasks.list-hindsight-backups]
+description = "List Hindsight logical backups (S3 + jobs)"
+run = "scripts/list-hindsight-backups.sh"
+
+[tasks.backup-hindsight-now]
+description = "Trigger immediate Hindsight logical backup"
+run = "scripts/backup-hindsight-now.sh"
+
+[tasks.verify-hindsight-backup]
+description = "Verify a Hindsight logical backup (default: latest)"
+usage = '''
+arg "<file>" help="Backup filename (default: latest)" default=""
+'''
+run = "scripts/verify-hindsight-backup.sh"
+
+[tasks.try-restore-hindsight-backup]
+description = "Restore a Hindsight backup into a temporary local ParadeDB container and open psql"
+usage = '''
+arg "<file>" help="Backup filename (default: latest)" default=""
+'''
+run = "scripts/try-restore-hindsight-backup.sh"
+
 [tasks.list-cnpg-memex-backups]
 description = "List CNPG Memex backups"
 run = "scripts/list-cnpg-memex-backups.sh"
@@ -186,5 +208,13 @@ run = "scripts/deploy-cnpg-hindsight.sh"
 [tasks.destroy-cnpg-hindsight]
 description = "Destroy CNPG cluster Hindsight"
 run = "scripts/destroy-cnpg-hindsight.sh"
+
+[tasks.deploy-hindsight]
+description = "Deploy Hindsight agent memory system at https://hindsight.sklein.internal"
+run = "scripts/deploy-hindsight.sh"
+
+[tasks.destroy-hindsight]
+description = "Destroy Hindsight"
+run = "scripts/destroy-hindsight.sh"
 
 

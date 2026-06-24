@@ -21,3 +21,10 @@ SCW_DEFAULT_PROJECT_ID="{{ getpw "homelab/scaleway/SCW_DEFAULT_PROJECT_ID" }}"
 # Scaleway object storage for CloudNativePG backup system
 CNPG_BACKUPS_ACCESS_KEY="{{ getpw "homelab/scaleway/CNPG_BACKUPS_ACCESS_KEY" }}"
 CNPG_BACKUPS_SECRET_KEY="{{ getpw "homelab/scaleway/CNPG_BACKUPS_SECRET_KEY" }}"
+
+# Hindsight.sklein.internal
+HINDSIGHT_LLM_API_KEY="{{ getpw "hindsight/llm_api_key" }}"
+HINDSIGHT_MCP_TOKEN="{{ getpw "hindsight/mcp_token" }}"
+HINDSIGHT_API_EMBEDDINGS_DEEPSEEK_API_KEY="{{ getpw "hindsight/deepinfra/apikey" }}"
+HINDSIGHT_API_RERANKER_OPENROUTER_API_KEY="{{ getpw "hindsight/openrouter" }}"
+

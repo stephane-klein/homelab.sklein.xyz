@@ -61,6 +61,9 @@ config:
         - Perses:
             href: https://perses.sklein.internal
             description: Monitoring Dashboards
+        - Hindsight:
+            href: https://hindsight.sklein.internal
+            description: Agent Memory System
         - Zigbee2MQTT:
             href: https://zigbee2mqtt.sklein.internal
             description: Zigbee Coordinator

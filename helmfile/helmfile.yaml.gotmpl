@@ -51,3 +51,11 @@ releases:
     version: 0.7.0
     values:
       - values/cnpg-hindsight.yaml
+
+  - name: hindsight
+    namespace: hindsight
+    createNamespace: false
+    chart: oci://ghcr.io/vectorize-io/charts/hindsight
+    version: 0.8.3
+    values:
+      - values/hindsight.yaml

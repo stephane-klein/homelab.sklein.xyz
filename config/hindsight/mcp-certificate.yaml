@@ -1,0 +1,13 @@
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: hindsight-api-tls
+  namespace: hindsight
+spec:
+  secretName: hindsight-api-tls
+  dnsNames:
+    - api.hindsight.sklein.internal
+  issuerRef:
+    group: cert-manager.io
+    kind: ClusterIssuer
+    name: homelab-ca

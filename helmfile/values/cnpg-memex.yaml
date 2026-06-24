@@ -20,6 +20,11 @@ cluster:
   initdb:
     database: memex
     owner: memex
+  postgresql:
+    parameters:
+      max_wal_size: "256MB"
+      min_wal_size: "64MB"
+      wal_compression: "on"
 
 backups:
   enabled: true

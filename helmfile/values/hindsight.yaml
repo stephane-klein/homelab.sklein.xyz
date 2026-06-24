@@ -1,0 +1,55 @@
+postgresql:
+  enabled: false
+  external:
+    host: hindsight-cnpg-cluster-rw
+    port: 5432
+    database: hindsight
+    username: hindsight
+
+existingSecret: hindsight-config
+
+api:
+  env:
+    HINDSIGHT_API_LLM_PROVIDER: openai
+    HINDSIGHT_API_LLM_BASE_URL: https://opencode.ai/zen/go/v1
+    HINDSIGHT_API_LLM_MODEL: deepseek-v4-flash
+    HINDSIGHT_API_EMBEDDINGS_PROVIDER: openai
+    HINDSIGHT_API_EMBEDDINGS_OPENAI_BASE_URL: https://api.deepinfra.com/v1/openai
+    HINDSIGHT_API_EMBEDDINGS_OPENAI_MODEL: Qwen/Qwen3-Embedding-8B
+    HINDSIGHT_API_EMBEDDINGS_OPENAI_DIMENSIONS: 1024
+    HINDSIGHT_API_VECTOR_EXTENSION: pgvector
+    HINDSIGHT_API_TEXT_SEARCH_EXTENSION: pg_search
+    HINDSIGHT_API_TEXT_SEARCH_EXTENSION_PG_SEARCH_TOKENIZER: icu
+    HINDSIGHT_API_RERANKER_PROVIDER: openrouter
+    HINDSIGHT_API_RERANKER_OPENROUTER_MODEL: cohere/rerank-4-fast
+    HINDSIGHT_API_MCP_ENABLED: "true"
+    HINDSIGHT_MCP_BANK_ID: default
+
+ingress:
+  enabled: true
+  className: traefik
+  annotations:
+    cert-manager.io/cluster-issuer: homelab-ca
+    traefik.ingress.kubernetes.io/router.middlewares: traefik-forwardauth-authelia@kubernetescrd
+  hosts:
+    - host: hindsight.sklein.internal
+      paths:
+        - path: /
+          pathType: Prefix
+          service: controlPlane
+  tls:
+    - secretName: hindsight-tls
+      hosts:
+        - hindsight.sklein.internal
+
+nodeSelector:
+  kubernetes.io/hostname: nuc-i7-gen11.homelab.stephane-klein.info
+
+worker:
+  enabled: false
+
+tei:
+  reranker:
+    enabled: false
+  embedding:
+    enabled: false

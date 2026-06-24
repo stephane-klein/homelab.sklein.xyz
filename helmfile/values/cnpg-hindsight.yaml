@@ -5,7 +5,11 @@ version:
 
 cluster:
   instances: 1
-  imageName: "docker.io/paradedb/paradedb:pg18"
+  postgresUID: 999
+  postgresGID: 999
+  postgresql:
+    shared_preload_libraries:
+      - pg_search
   storage:
     size: 50Gi
   enableSuperuserAccess: true
@@ -15,9 +19,17 @@ cluster:
       enabled: false
     prometheusRule:
       enabled: false
+  imageCatalogRef:
+    kind: ImageCatalog
   affinity:
     nodeSelector:
       kubernetes.io/hostname: nuc-i7-gen11.homelab.stephane-klein.info
   initdb:
     database: hindsight
     owner: hindsight
+
+imageCatalog:
+  create: true
+  images:
+    - image: docker.io/paradedb/paradedb:pg18
+      major: 18

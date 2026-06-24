@@ -13,27 +13,32 @@ helm upgrade --install homepage jameswynn/homepage \
   -f config/homepage/values.yaml > /dev/null
 
 echo "  Patching deployment to mount host /var for disk gauge..."
-kubectl patch deployment homepage -n "$NAMESPACE" --type json -p='[
-  {
-    "op": "add",
-    "path": "/spec/template/spec/containers/0/volumeMounts/-",
-    "value": {
-      "name": "host-var",
-      "mountPath": "/host/var",
-      "readOnly": true
-    }
-  },
-  {
-    "op": "add",
-    "path": "/spec/template/spec/volumes/-",
-    "value": {
-      "name": "host-var",
-      "hostPath": {
-        "path": "/var"
+if kubectl get deployment homepage -n "$NAMESPACE" \
+  -o jsonpath='{.spec.template.spec.volumes[*].name}' | grep -q host-var; then
+  echo "  Volume host-var already exists, skipping patch."
+else
+  kubectl patch deployment homepage -n "$NAMESPACE" --type json -p='[
+    {
+      "op": "add",
+      "path": "/spec/template/spec/containers/0/volumeMounts/-",
+      "value": {
+        "name": "host-var",
+        "mountPath": "/host/var",
+        "readOnly": true
+      }
+    },
+    {
+      "op": "add",
+      "path": "/spec/template/spec/volumes/-",
+      "value": {
+        "name": "host-var",
+        "hostPath": {
+          "path": "/var"
+        }
       }
     }
-  }
-]' > /dev/null
+  ]' > /dev/null
+fi
 
 echo "  Waiting for Homepage to be ready..."
 sleep 2
