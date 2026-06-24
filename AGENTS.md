@@ -5,6 +5,12 @@
 - **All project content must be in English**: source code, comments, commit messages, and documentation.
 - **Human conversations in OpenCode remain in French**.
 
+## Safety Rules
+
+- **Never run any `destroy-*` script or `helmfile destroy` command without explicit user confirmation** in the same conversation turn. Always ask first.
+- If you must run `helmfile destroy`, always use `--selector name=<release>` to target only one release.
+- When in doubt about a command's destructiveness, ask before executing.
+
 ## Architecture Overview
 
 This project provisions Fedora CoreOS bare-metal servers, runs a two-node k3s
