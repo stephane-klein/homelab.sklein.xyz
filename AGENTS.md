@@ -116,6 +116,11 @@ lives in `config/authelia/`. Access control rules use a wildcard
 (`*.sklein.internal`, `one_factor`) so any new subdomain is automatically
 protected.
 
+### .opencode/skills/new-service-checklist/SKILL.md
+
+Checklist to follow when deploying a new service with Helmfile in this project.
+Read this file before adding a new service.
+
 ### Provisioning workflow
 
 1. `mise run setup-secret` — populate `.secret` from Gopass
