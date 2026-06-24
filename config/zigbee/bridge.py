@@ -9,6 +9,11 @@ MQTT_PORT = 1883
 MQTT_TOPIC = "zigbee2mqtt/#"
 
 
+def on_connect(client, userdata, flags, reason_code):
+    client.subscribe(MQTT_TOPIC)
+    print(f"Connected/reconnected to {MQTT_BROKER}:{MQTT_PORT}, subscribed to {MQTT_TOPIC}")
+
+
 def on_message(client, userdata, msg):
     topic = msg.topic
     sensor = topic.split("/")[-1]
@@ -35,14 +40,13 @@ def main():
     while True:
         try:
             client = mqtt.Client()
+            client.on_connect = on_connect
             client.on_message = on_message
             client.connect(MQTT_BROKER, MQTT_PORT, 60)
             break
         except Exception as e:
             print(f"MQTT connection failed: {e}, retrying in 5s...")
             time.sleep(5)
-    client.subscribe(MQTT_TOPIC)
-    print(f"Connected to {MQTT_BROKER}:{MQTT_PORT}, subscribed to {MQTT_TOPIC}")
     client.loop_forever()
 
 
