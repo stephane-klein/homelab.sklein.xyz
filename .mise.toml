@@ -54,7 +54,10 @@ run = "scripts/k3s-health.sh"
 
 [tasks.setup-secret]
 description = "Generate .secret from .secret.tpl via gopass"
-run = "gopass process .secret.tpl > .secret"
+run = """
+gopass process .secret.tpl > .secret
+gopass process .opencode/vibeguard.config.json.tpl > .opencode/vibeguard.config.json
+"""
 
 [tasks.deploy-traefik]
 description = "Deploy Traefik ingress controller + cert-manager with CA"
