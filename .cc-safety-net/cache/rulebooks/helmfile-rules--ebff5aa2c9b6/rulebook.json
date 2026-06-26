@@ -1,0 +1,35 @@
+{
+  "rulebook_version": 1,
+  "name": "helmfile-rules",
+  "version": "1.0.0",
+  "description": "Block destructive helmfile operations — destroy and sync",
+  "author": "homelab.sklein.xyz",
+  "allowed_commands": ["helmfile"],
+  "rules": [
+    {
+      "name": "block-helmfile-destroy",
+      "command": "helmfile",
+      "block_args": ["destroy"],
+      "reason": "helmfile destroy can delete releases. Ask the user for confirmation first, or use a destroy-* script."
+    },
+    {
+      "name": "block-helmfile-sync",
+      "command": "helmfile",
+      "block_args": ["sync"],
+      "reason": "helmfile sync can delete resources. Use 'helmfile apply' to safely deploy changes."
+    }
+  ],
+  "tests": [
+    { "command": "helmfile -f helmfile/helmfile.yaml.gotmpl destroy", "expect": "blocked", "rule": "block-helmfile-destroy" },
+    { "command": "helmfile -f helmfile/helmfile.yaml.gotmpl destroy --selector name=memex", "expect": "blocked", "rule": "block-helmfile-destroy" },
+    { "command": "helmfile destroy --selector name=hindsight-cnpg", "expect": "blocked", "rule": "block-helmfile-destroy" },
+    { "command": "helmfile destroy", "expect": "blocked", "rule": "block-helmfile-destroy" },
+    { "command": "helmfile -f helmfile/helmfile.yaml.gotmpl sync", "expect": "blocked", "rule": "block-helmfile-sync" },
+    { "command": "helmfile sync", "expect": "blocked", "rule": "block-helmfile-sync" },
+    { "command": "helmfile -f helmfile/helmfile.yaml.gotmpl apply", "expect": "allowed" },
+    { "command": "helmfile apply", "expect": "allowed" },
+    { "command": "helmfile diff", "expect": "allowed" },
+    { "command": "helmfile template", "expect": "allowed" },
+    { "command": "helmfile deps", "expect": "allowed" }
+  ]
+}

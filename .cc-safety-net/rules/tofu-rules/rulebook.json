@@ -1,0 +1,35 @@
+{
+  "rulebook_version": 1,
+  "name": "tofu-rules",
+  "version": "1.0.0",
+  "description": "Block destructive OpenTofu operations — apply, destroy",
+  "author": "homelab.sklein.xyz",
+  "allowed_commands": ["tofu"],
+  "rules": [
+    {
+      "name": "block-tofu-apply",
+      "command": "tofu",
+      "block_args": ["apply"],
+      "reason": "tofu apply modifies Netbird infrastructure. Run it manually: tofu init && tofu apply"
+    },
+    {
+      "name": "block-tofu-destroy",
+      "command": "tofu",
+      "block_args": ["destroy"],
+      "reason": "tofu destroy destroys ALL Netbird resources. Run it manually with user confirmation."
+    }
+  ],
+  "tests": [
+    { "command": "tofu apply", "expect": "blocked", "rule": "block-tofu-apply" },
+    { "command": "tofu apply -auto-approve", "expect": "blocked", "rule": "block-tofu-apply" },
+    { "command": "tofu destroy", "expect": "blocked", "rule": "block-tofu-destroy" },
+    { "command": "tofu destroy -auto-approve", "expect": "blocked", "rule": "block-tofu-destroy" },
+    { "command": "tofu init", "expect": "allowed" },
+    { "command": "tofu plan", "expect": "allowed" },
+    { "command": "tofu output -raw setup_key_nuc_i7_gen5", "expect": "allowed" },
+    { "command": "tofu fmt", "expect": "allowed" },
+    { "command": "tofu validate", "expect": "allowed" },
+    { "command": "tofu version", "expect": "allowed" },
+    { "command": "tofu state list", "expect": "allowed" }
+  ]
+}

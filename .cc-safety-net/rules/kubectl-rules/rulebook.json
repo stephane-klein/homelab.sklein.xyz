@@ -1,0 +1,62 @@
+{
+  "rulebook_version": 1,
+  "name": "kubectl-rules",
+  "version": "1.0.0",
+  "description": "Block destructive kubectl operations — namespace/crd/pvc deletion, rollout restart",
+  "author": "homelab.sklein.xyz",
+  "allowed_commands": ["kubectl"],
+  "rules": [
+    {
+      "name": "block-kubectl-delete-namespace",
+      "command": "kubectl",
+      "subcommand": "delete",
+      "block_args": ["namespace"],
+      "reason": "kubectl delete namespace destroys ALL resources in a namespace. Use a destroy-* script or ask the user."
+    },
+    {
+      "name": "block-kubectl-delete-crd",
+      "command": "kubectl",
+      "subcommand": "delete",
+      "block_args": ["crd", "customresourcedefinition", "customresourcedefinitions"],
+      "reason": "kubectl delete crd can break Kubernetes operators and their resources."
+    },
+    {
+      "name": "block-kubectl-delete-pvc",
+      "command": "kubectl",
+      "subcommand": "delete",
+      "block_args": ["pvc", "persistentvolumeclaim"],
+      "reason": "kubectl delete pvc can cause permanent data loss. Use a destroy-* script instead."
+    },
+    {
+      "name": "block-kubectl-delete-clusterissuer",
+      "command": "kubectl",
+      "subcommand": "delete",
+      "block_args": ["clusterissuer"],
+      "reason": "kubectl delete clusterissuer breaks certificate issuance via cert-manager."
+    },
+    {
+      "name": "block-kubectl-rollout-restart",
+      "command": "kubectl",
+      "subcommand": "rollout",
+      "block_args": ["restart"],
+      "reason": "kubectl rollout restart causes service disruption. Use a deploy script or ask the user."
+    }
+  ],
+  "tests": [
+    { "command": "kubectl delete namespace authelia", "expect": "blocked", "rule": "block-kubectl-delete-namespace" },
+    { "command": "kubectl delete ns traefik", "expect": "allowed" },
+    { "command": "kubectl delete crd perses.perses.dev", "expect": "blocked", "rule": "block-kubectl-delete-crd" },
+    { "command": "kubectl delete pvc data-perses-0", "expect": "blocked", "rule": "block-kubectl-delete-pvc" },
+    { "command": "kubectl delete persistentvolumeclaim data-vm-0", "expect": "blocked", "rule": "block-kubectl-delete-pvc" },
+    { "command": "kubectl delete clusterissuer homelab-ca", "expect": "blocked", "rule": "block-kubectl-delete-clusterissuer" },
+    { "command": "kubectl rollout restart statefulset perses", "expect": "blocked", "rule": "block-kubectl-rollout-restart" },
+    { "command": "kubectl get pods -A", "expect": "allowed" },
+    { "command": "kubectl apply -f config/external-secrets/clustersecretstore.yaml", "expect": "allowed" },
+    { "command": "kubectl wait --for=condition=Ready pod -l app=test", "expect": "allowed" },
+    { "command": "kubectl delete configmap foo -n ns --ignore-not-found", "expect": "allowed" },
+    { "command": "kubectl delete secret bar -n ns", "expect": "allowed" },
+    { "command": "kubectl rollout status deployment homepage", "expect": "allowed" },
+    { "command": "kubectl cnpg psql memex-cluster -n memex", "expect": "allowed" },
+    { "command": "kubectl port-forward svc/perses 8080:8080", "expect": "allowed" }
+  ]
+}
