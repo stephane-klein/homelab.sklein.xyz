@@ -53,8 +53,8 @@ description = "Check k3s cluster health (nodes, pods, events, resources)"
 run = "scripts/k3s-health.sh"
 
 [tasks.setup-secret]
-description = "Generate .secret from scripts/generate-secret.sh via gopass"
-run = "scripts/generate-secret.sh > .secret"
+description = "Generate .secret from .secret.tpl via gopass"
+run = "gopass process .secret.tpl > .secret"
 
 [tasks.deploy-traefik]
 description = "Deploy Traefik ingress controller + cert-manager with CA"

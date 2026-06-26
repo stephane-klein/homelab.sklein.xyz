@@ -100,7 +100,7 @@ $ mise install
 ### Set secret file
 
 ```sh
-$ cp .secret.skel .secret
+$ cp .secret.tpl .secret
 ```
 
 For Stéphane Klein (gopass user), generate `.secret` directly from the Gopass store:
