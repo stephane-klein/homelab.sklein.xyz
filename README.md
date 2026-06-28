@@ -62,6 +62,7 @@ Here are some service ideas I plan to deploy on my homelab.
 - [ ] **Virtual machine management**: [KubeVirt](https://kubevirt.io/) [untested]
   - [ ] **Development VM**: instance based on [sklein-devbox-chezmoi](https://github.com/stephane-klein/sklein-devbox-chezmoi) - to access OpenCode from my smartphone
 - [ ] **LLM chat interface**: [OpenWebUI](https://github.com/open-webui/open-webui) or [LibreChat](https://github.com/danny-avila/LibreChat)
+- [ ] **LLM provider proxy**: [LiteLLM](https://github.com/BerriAI/litellm) — centralizes LLM API calls (OpenAI, Anthropic, etc.), archives threads, and provides a single endpoint (self-hosted OpenRouter equivalent)
 - [ ] **XMPP instant messaging server**: [ejabberd](https://github.com/processone/ejabberd)
   - [ ] **Team messaging**: [fluux-messenger](https://github.com/processone/fluux-messenger/) - Mattermost-like group chat built on XMPP, for communities and organizations [untested]
 - [ ] **Autonomous AI agent framework**: [Hermes Agent](https://github.com/NousResearch/hermes-agent) [untested]
