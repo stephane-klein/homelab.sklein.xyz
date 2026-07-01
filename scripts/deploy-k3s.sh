@@ -109,6 +109,14 @@ sed -i "s/localhost/${K3S_SERVER_IP}/g" "$KUBECONFIG_DEST"
 echo "  Kubeconfig written to: $KUBECONFIG_DEST"
 echo ""
 
+# ============================================================
+# Step 7: Save kubeconfig to Gopass
+# ============================================================
+echo "--- Step 7: Saving kubeconfig to Gopass ---"
+gopass insert --multiline homelab/k3s.kubeconfig < "$KUBECONFIG_DEST"
+echo "  Kubeconfig saved to Gopass (homelab/k3s.kubeconfig)"
+echo ""
+
 echo ""
 echo "=== Done ==="
 echo "  Cluster is ready."

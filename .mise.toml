@@ -52,6 +52,10 @@ run = "scripts/generate-k3s-token.sh"
 description = "Check k3s cluster health (nodes, pods, events, resources)"
 run = "scripts/k3s-health.sh"
 
+[tasks.install-local-kubeconfig]
+description = "Restore k3s.kubeconfig from Gopass (homelab/k3s.kubeconfig)"
+run = "scripts/install-local-kubeconfig.sh"
+
 [tasks.setup-secret]
 description = "Generate .secret from .secret.tpl via gopass"
 run = """

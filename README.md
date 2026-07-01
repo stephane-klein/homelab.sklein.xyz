@@ -184,8 +184,10 @@ What the script does:
 2. Waits for the Kubernetes API to be ready.
 3. Installs k3s agent on `nuc-i3-gen5` — joins the server over the Netbird VPN.
 4. Retrieves the kubeconfig to `./k3s.kubeconfig` (added to `.gitignore`).
+5. Saves the kubeconfig to Gopass (`homelab/k3s.kubeconfig`).
 
 ```sh
+$ mise run install-local-kubeconfig    # Restore from Gopass
 $ mise run k3s-health
 [k3s-health] $ bash scripts/k3s-health.sh
 === k3s Cluster Health Check ===
