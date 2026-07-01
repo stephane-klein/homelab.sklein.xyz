@@ -176,6 +176,10 @@ run = "scripts/deploy-homepage.sh"
 description = "Destroy Homepage"
 run = "scripts/destroy-homepage.sh"
 
+[tasks.assign-static-ipv6]
+description = "Add static IPv6 address ::1000 to nuc-i7-gen11 via nmcli"
+run = "nuc-i7-gen11/scripts/assign-static-ipv6.sh"
+
 [tasks.deploy-exporters]
 description = "Deploy kube-state-metrics, node-exporter, vmagent"
 run = "scripts/deploy-exporters.sh"

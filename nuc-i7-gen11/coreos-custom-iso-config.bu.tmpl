@@ -87,6 +87,24 @@ systemd:
         [Install]
         WantedBy=multi-user.target
 
+    - name: configure-static-ipv6.service
+      enabled: true
+      contents: |
+        [Unit]
+        Description=Add static IPv6 address ::1000 on enp89s0
+        After=network-online.target
+        Wants=network-online.target
+        ConditionPathExists=!/var/lib/configure-static-ipv6.stamp
+
+        [Service]
+        Type=oneshot
+        RemainAfterExit=yes
+        ExecStart=/bin/bash -c 'PREFIX=$(ip -6 addr show scope global | grep -oP "inet6 \K[0-9a-f:]+" | grep -v "^fd" | head -1 | cut -d: -f1-4); nmcli con modify "Wired connection 2" ipv6.addresses "${PREFIX}::1000/64"; nmcli con modify "Wired connection 2" ipv6.method auto; nmcli con up "Wired connection 2"'
+        ExecStart=/bin/touch /var/lib/configure-static-ipv6.stamp
+
+        [Install]
+        WantedBy=multi-user.target
+
 passwd:
   users:
     - name: root

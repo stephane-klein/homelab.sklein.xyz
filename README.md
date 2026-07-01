@@ -18,6 +18,7 @@ Deployed services:
 
 - **Network**
   - [Netbird](https://github.com/netbirdio/netbird) VPN mesh (managed by OpenTofu)
+  - Static IPv6 `::1000` on `nuc-i7-gen11` for public internet ingress
 - **Kubernetes cluster**
   - [k3s](https://github.com/k3s-io/k3s) multi-node
   - [Traefik](https://github.com/traefik/traefik) (ingress controller)
@@ -342,6 +343,23 @@ $ mise run push-authelia-config
 ```
 
 > See [`playground/README.md`](./playground/README.md) for an Authelia authentication demo.
+
+## IPv6 ingress exposure
+
+A static IPv6 address (`::1000`) is assigned to `nuc-i7-gen11` to make the
+Traefik ingress reachable from the Internet over IPv6. The address is
+derived from the server's prefix (first 4 hextets of the global unicast
+address), which is dynamically detected.
+
+The static address is configured at first boot via a systemd oneshot unit
+in the CoreOS Butane config (`nuc-i7-gen11/coreos-custom-iso-config.bu.tmpl`).
+For already-provisioned servers, run:
+
+```sh
+$ mise run assign-static-ipv6
+```
+
+This SSHes into `nuc-i7-gen11` and adds the address via `nmcli`.
 
 ## External Secrets Operator
 
