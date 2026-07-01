@@ -26,3 +26,15 @@ resources:
 
 nodeSelector:
   kubernetes.io/hostname: nuc-i3-gen5.homelab.stephane-klein.info
+
+ingress:
+  enabled: true
+  className: traefik
+  host: "toggl.sklein.internal"
+  path: /
+  annotations:
+    cert-manager.io/cluster-issuer: homelab-ca
+  tls:
+    - secretName: toggl-pg-mirror-tls
+      hosts:
+        - toggl.sklein.internal
