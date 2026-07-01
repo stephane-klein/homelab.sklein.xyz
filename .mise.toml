@@ -61,6 +61,9 @@ description = "Generate .secret from .secret.tpl via gopass"
 run = """
 gopass process .secret.tpl > .secret
 gopass process .opencode/vibeguard.config.json.tpl > .opencode/vibeguard.config.json
+mkdip -p certs/ca
+gopass cat homelab/certs/ca/ca.crt > certs/ca/ca.crt
+gopass cat homelab/certs/ca/ca.key > certs/ca/ca.key
 """
 
 [tasks.deploy-traefik]
