@@ -17,3 +17,7 @@ resource "netbird_group" "user_devices" {
     data.netbird_peer.t14s.id,
   ]
 }
+
+resource "netbird_group" "dev_devices" {
+  name = "dev-devices"
+}

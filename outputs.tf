@@ -15,4 +15,10 @@ output "cnpg_backups_bucket_name" {
   description = "Object Storage bucket for CNPG backups"
 }
 
+output "setup_key_dummy1" {
+  value       = netbird_setup_key.dummy1.key
+  sensitive   = true
+  description = "Netbird setup key for dummy1"
+}
+
 

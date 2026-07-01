@@ -25,6 +25,7 @@ resource "netbird_dns_zone" "sklein_internal" {
   distribution_groups  = [
     netbird_group.homelab_servers.id,
     netbird_group.user_devices.id,
+    netbird_group.dev_devices.id,
   ]
 }
 

@@ -26,7 +26,10 @@ resource "netbird_policy" "user_device_access" {
     enabled       = true
     protocol      = "all"
     sources       = [netbird_group.user_devices.id]
-    destinations  = [netbird_group.homelab_servers.id]
+    destinations  = [
+        netbird_group.homelab_servers.id,
+        netbird_group.dev_devices.id,
+    ]
   }
 }
 
@@ -42,7 +45,10 @@ resource "netbird_policy" "ssh_access" {
     enabled       = true
     protocol      = "netbird-ssh"
     sources       = [netbird_group.user_devices.id]
-    destinations  = [netbird_group.homelab_servers.id]
+    destinations  = [
+        netbird_group.homelab_servers.id,
+        netbird_group.dev_devices.id,
+    ]
 
     authorized_groups = {
       (netbird_group.user_devices.id) = ["stephane"]
