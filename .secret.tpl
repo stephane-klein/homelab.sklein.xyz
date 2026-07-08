@@ -28,3 +28,5 @@ HINDSIGHT_MCP_TOKEN="{{ getpw "hindsight/mcp_token" }}"
 HINDSIGHT_API_EMBEDDINGS_DEEPSEEK_API_KEY="{{ getpw "hindsight/deepinfra/apikey" }}"
 HINDSIGHT_API_RERANKER_OPENROUTER_API_KEY="{{ getpw "hindsight/openrouter" }}"
 
+# Cloudflare API Token for Let's Encrypt DNS-01 and external-dns
+CLOUDFLARE_API_TOKEN="{{ getpw "homelab/cloudflare/stephane-klein.info/api-token" }}"

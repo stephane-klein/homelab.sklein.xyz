@@ -3,7 +3,8 @@ set -euo pipefail
 
 cd "$(dirname "$0")/../"
 
-echo "=== Destroying Traefik ==="
+echo "=== Destroying Traefik (internal + public) ==="
+helm uninstall traefik-public --namespace traefik 2>/dev/null || true
 helm uninstall traefik --namespace traefik 2>/dev/null || true
 kubectl delete namespace traefik --ignore-not-found=true
 

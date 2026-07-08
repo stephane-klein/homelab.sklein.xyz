@@ -67,11 +67,19 @@ gopass cat homelab/certs/ca/ca.key > certs/ca/ca.key
 """
 
 [tasks.deploy-traefik]
-description = "Deploy Traefik ingress controller + cert-manager with CA"
+description = "Deploy cert-manager + internal Traefik (Netbird-only)"
 run = "scripts/deploy-traefik.sh"
 
+[tasks.deploy-traefik-public]
+description = "Deploy public-facing Traefik on IPv6 ::1000"
+run = "scripts/deploy-traefik-public.sh"
+
+[tasks.destroy-traefik-public]
+description = "Destroy public-facing Traefik"
+run = "scripts/destroy-traefik-public.sh"
+
 [tasks.destroy-traefik]
-description = "Destroy Traefik ingress controller + cert-manager"
+description = "Destroy internal + public Traefik + cert-manager"
 run = "scripts/destroy-traefik.sh"
 
 [tasks.disable-servicelb]
@@ -199,6 +207,18 @@ run = "scw object bucket list 1>/dev/null 2>&1 && echo 'ok'"
 [tasks.deploy-external-secrets]
 description = "Deploy external-secrets operator"
 run = "scripts/deploy-external-secrets.sh"
+
+[tasks.deploy-cert-manager-issuer-public]
+description = "Deploy Let's Encrypt ClusterIssuer (DNS-01) for public services"
+run = "scripts/deploy-cert-manager-issuer-public.sh"
+
+[tasks.deploy-external-dns]
+description = "Deploy external-dns to auto-create Cloudflare DNS records for public Ingresses"
+run = "scripts/deploy-external-dns.sh"
+
+[tasks.destroy-external-dns]
+description = "Destroy external-dns"
+run = "scripts/destroy-external-dns.sh"
 
 [tasks.deploy-toggl-pg-mirror]
 description = "Deploy toggl-pg-mirror (syncs Toggl time entries to PostgreSQL)"

@@ -6,6 +6,14 @@ run = "scripts/deploy-whoami.sh"
 description = "Destroy whoami test app"
 run = "scripts/destroy-whoami.sh"
 
+[tasks.deploy-whoami-public]
+description = "Deploy whoami public test app at https://whoami.ipv6.ingress.homelab.public.stephane-klein.info"
+run = "scripts/deploy-whoami-public.sh"
+
+[tasks.destroy-whoami-public]
+description = "Destroy whoami-public test app"
+run = "scripts/destroy-whoami-public.sh"
+
 [tasks.deploy-authelia-demo]
 description = "Deploy whoami demo app protected by Authelia"
 run = "scripts/deploy-authelia-demo.sh"

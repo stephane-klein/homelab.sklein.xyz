@@ -18,11 +18,12 @@ Deployed services:
 
 - **Network**
   - [Netbird](https://github.com/netbirdio/netbird) VPN mesh (managed by OpenTofu)
-  - Static IPv6 `::1000` on `nuc-i7-gen11` for public internet ingress
 - **Kubernetes cluster**
   - [k3s](https://github.com/k3s-io/k3s) multi-node
-  - [Traefik](https://github.com/traefik/traefik) (ingress controller)
-  - [cert-manager](https://github.com/cert-manager/cert-manager) (TLS certificates)
+  - [Traefik](https://github.com/traefik/traefik) — internal (Netbird VPN, `traefik` ingressClass)
+  - [Traefik](https://github.com/traefik/traefik) — public (IPv6, `traefik-public` ingressClass)
+  - [cert-manager](https://github.com/cert-manager/cert-manager) (TLS: private CA + Let's Encrypt DNS-01 via Cloudflare)
+  - [external-dns](https://github.com/kubernetes-sigs/external-dns) (automatic AAAA in Cloudflare for public Ingress)
   - [Authelia](https://github.com/authelia/authelia) (SSO authentication)
   - [CloudNativePG](https://cloudnative-pg.io/) (PostgreSQL operator with backup to Scaleway Object Storage)
   - [External Secrets Operator](https://external-secrets.io/) (cross-namespace secret sharing)
@@ -220,6 +221,79 @@ nuc-i7-gen11.homelab.stephane-klein.info   99m          1%       1579Mi         
 === Done ===
 ```
 
+## Two Ingress controllers: internal vs public
+
+| Component | Internal | Public |
+|---|---|---|
+| Traefik instance | `traefik` | `traefik-public` |
+| IngressClass | `traefik` (default) | `traefik-public` |
+| Bind address | Netbird IP `100.91.106.71` | Public IPv6 `2001:861:8b91:6620::1000` |
+| TLS issuer | Private CA (`homelab-ca`) | Let's Encrypt (`letsencrypt-public`) |
+| DNS | Netbird `*.sklein.internal` | Cloudflare `*.ipv6.ingress.homelab.public.stephane-klein.info` |
+
+I chose two separate Traefik instances rather than a single one with a two-entryPoint mechanism,
+to prevent accidentally exposing internal services to the Internet.
+Using two IngressClasses makes the opt-in explicit.
+
+Here is how to expose an HTTP service on the VPN only:
+
+```yaml
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: myapp
+  annotations:
+    cert-manager.io/cluster-issuer: homelab-ca
+spec:
+  ingressClassName: traefik
+  tls:
+  - hosts:
+    - myapp.sklein.internal
+    secretName: myapp-tls
+  rules:
+  - host: myapp.sklein.internal
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: myapp
+            port:
+              number: 80
+```
+
+or on the public ingress:
+
+```yaml
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: myapp-public
+  annotations:
+    cert-manager.io/cluster-issuer: letsencrypt-public
+spec:
+  ingressClassName: traefik-public
+  tls:
+  - hosts:
+    - myapp.ipv6.ingress.homelab.public.stephane-klein.info
+    secretName: myapp-public-tls
+  rules:
+  - host: myapp.ipv6.ingress.homelab.public.stephane-klein.info
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: myapp
+            port:
+              number: 80
+```
+
+External-dns automatically creates the AAAA record in Cloudflare, and
+cert-manager obtains a Let's Encrypt certificate via DNS-01.
+
 ## Private CA for internal services
 
 A private Certificate Authority is used to issue trusted TLS certificates for internal
@@ -248,11 +322,11 @@ $ sudo update-ca-trust
 The CA is now trusted system-wide, including Firefox (uses the system trust store)
 and Chromium/Chrome.
 
-## Ingress controller (Traefik)
+## Internal (Netbird VPN) Ingress
 
-[Traefik](https://traefik.io/) is the ingress controller. It listens on ports 80 and 443
-via `hostPort` on `nuc-i7-gen11`. No LoadBalancer or additional nftables rules are needed.
-The Netbird DNS wildcard `*.sklein.internal` (configured in `netbird-dns.tf`) resolves
+A [Traefik](https://traefik.io/) ingress controller for services exposed only on the private Netbird VPN. Services exposed on this ingress are not accessible from the Internet.
+
+This ingress runs on `nuc-i7-gen11`. The Netbird DNS wildcard `*.sklein.internal` (configured in `netbird-dns.tf`) resolves
 all subdomains to the ingress node.
 
 ### Deploy
@@ -291,38 +365,6 @@ and restarts the k3s server. The cluster is briefly unavailable (~30s).
 > Test the ingress connectivity with a whoami application —
 > see [`playground/README.md`](./playground/README.md).
 
-### Deploying your own apps
-
-Any workload can be exposed by creating an `Ingress` resource with a host under
-`*.sklein.internal` (e.g. `myapp.sklein.internal`). cert-manager automatically
-issues a TLS certificate signed by the private CA.
-
-```yaml
-apiVersion: networking.k8s.io/v1
-kind: Ingress
-metadata:
-  name: myapp
-  annotations:
-    cert-manager.io/cluster-issuer: homelab-ca
-spec:
-  ingressClassName: traefik
-  tls:
-  - hosts:
-    - myapp.sklein.internal
-    secretName: myapp-tls
-  rules:
-  - host: myapp.sklein.internal
-    http:
-      paths:
-      - path: /
-        pathType: Prefix
-        backend:
-          service:
-            name: myapp
-            port:
-              number: 80
-```
-
 ### Authentication with Authelia
 
 [Authelia](https://www.authelia.com/) protects apps by requiring
@@ -344,7 +386,27 @@ $ mise run push-authelia-config
 
 > See [`playground/README.md`](./playground/README.md) for an Authelia authentication demo.
 
-## IPv6 ingress exposure
+## Public Internet Ingress
+
+### Overview
+
+A second Traefik instance (`traefik-public`) runs on `nuc-i7-gen11` and
+listens on the public IPv6 address `2001:861:8b91:6620::1000`. It is completely separate
+from the internal Traefik — opt-in via `ingressClassName: traefik-public`.
+
+No port redirection is configured on the Bouygues BBox: only ports 80
+and 443 are open towards the `::1000` address. The BBox firewall blocks
+everything else.
+
+### Prerequisites
+
+`CLOUDFLARE_API_TOKEN` must be present in `.secret` (a Cloudflare API token
+with DNS edit permission for `stephane-klein.info`). This token is used by:
+
+- **cert-manager** — DNS-01 challenge for Let's Encrypt
+- **external-dns** — automatic creation of AAAA records
+
+### Static IPv6 address
 
 A static IPv6 address (`::1000`) is assigned to `nuc-i7-gen11` to make the
 Traefik ingress reachable from the Internet over IPv6. The address is
@@ -360,6 +422,37 @@ $ mise run assign-static-ipv6
 ```
 
 This SSHes into `nuc-i7-gen11` and adds the address via `nmcli`.
+
+### Deploy
+
+Components are independent and can be deployed in any order:
+
+```sh
+$ mise run deploy-traefik-public
+$ mise run deploy-cert-manager-issuer-public
+$ mise run deploy-external-dns
+```
+
+This installs:
+
+- **traefik-public** in the `traefik` namespace — hostNetwork on `[::1000]:80/443`,
+  `ingressClassName: traefik-public`
+- **ClusterIssuer `letsencrypt-public`** in `cert-manager` — ACME DNS-01 via
+  Cloudflare API, Let's Encrypt production endpoint
+- **external-dns** in the `external-dns` namespace — watches Ingress resources and
+  creates AAAA records in Cloudflare, targeting `2001:861:8b91:6620::1000`
+
+### Test
+
+A whoami deployment can be used to verify the whole chain.
+See [`playground/README.md`](./playground/README.md), section *1 bis. Public connectivity test — whoami-public*.
+
+### Destroy
+
+```sh
+$ mise run destroy-traefik-public
+$ mise run destroy-external-dns
+```
 
 ## External Secrets Operator
 

@@ -22,7 +22,8 @@
       { "value": "{{ getpw "homelab/scaleway/CNPG_BACKUPS_SECRET_KEY" }}" }
       { "value": "{{ getpw "hindsight/llm_api_key" }}" },
       { "value": "{{ getpw "hindsight/mcp_token" }}" },
-      { "value": "{{ getpw "hindsight/deepinfra/apikey" }}" }
+      { "value": "{{ getpw "hindsight/deepinfra/apikey" }}" },
+      { "value": "{{ getpw "homelab/cloudflare/stephane-klein.info/api-token" }}" }
     ]
   }
 }

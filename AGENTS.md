@@ -53,11 +53,29 @@ installed post-OS via the official `get.k3s.io` script, driven by
   interface. systemd units have `After=netbird.service` so the cluster only
   starts after the VPN is up.
 - **Built-in components disabled** — embedded Traefik and ServiceLB are turned
-  off; a standalone Traefik deployed via Helm serves as the Ingress controller.
+  off; two standalone Traefik instances deployed via Helm serve as ingress
+  controllers (internal on Netbird VPN, public on IPv6).
+  See [Internal (Netbird VPN) Ingress](#internal-netbird-vpn-ingress) and
+  [Public Internet Ingress](#public-internet-ingress) sections in README.md.
+- **Two ingress controllers** — one internal on the Netbird VPN IP
+  (`traefik` ingressClass, private CA) and one public on the static
+  IPv6 address `::1000` (`traefik-public` ingressClass, Let's Encrypt via
+  Cloudflare DNS-01, external-dns for automatic AAAA records).
+  **Default opt-in:** services use `ingressClassName: traefik` (internal);
+  public exposure requires explicit `ingressClassName: traefik-public`.
 - **Deployment pattern** — **Helmfile is preferred over raw `helm upgrade
   --install`** whenever possible (see [why](https://notes.sklein.xyz/2025-05-01_1622/)). New workloads should use Helmfile. Existing
   `helm upgrade --install` scripts are candidates for migration. See the
   [Helmfile](#helmfile) section below.
+
+### Public Internet Ingress
+
+The public-facing Traefik (`traefik-public`) binds on the static IPv6
+address `2001:861:8b91:6620::1000` via hostNetwork. Services opt-in with
+`ingressClassName: traefik-public`. TLS is automated via Let's Encrypt
+(DNS-01, Cloudflare API token in `.secret`), and DNS records are managed
+by external-dns (watches Ingress resources, creates AAAA records in
+Cloudflare for `*.ipv6.ingress.homelab.public.stephane-klein.info`).
 
 ### Perses
 
@@ -134,4 +152,7 @@ Read this file before adding a new service.
 3. `tofu output -raw setup_key_nuc_i3_gen5 >> .secret` — extract setup keys
 4. `./nuc-*/create-custom-iso.sh` — build Fedora CoreOS ISO
 5. `./scripts/deploy-k3s.sh` — install k3s (server + agent) over SSH
-6. `./scripts/deploy-traefik.sh` — deploy Traefik ingress controller and cert-manager
+6. `./scripts/deploy-traefik.sh` — deploy internal Traefik + cert-manager + private CA
+7. `./scripts/deploy-traefik-public.sh` — deploy public Traefik on IPv6
+8. `./scripts/deploy-cert-manager-issuer-public.sh` — deploy Let's Encrypt ClusterIssuer (DNS-01 via Cloudflare)
+9. `./scripts/deploy-external-dns.sh` — deploy external-dns for automatic Cloudflare DNS records

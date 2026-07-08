@@ -24,6 +24,41 @@ To remove:
 $ mise run destroy-whoami
 ```
 
+## 1 bis. Public connectivity test — whoami-public
+
+Deploy whoami on the public-facing ingress to verify Let's Encrypt + external-dns.
+
+```sh
+$ mise run deploy-whoami-public
+```
+
+Access from anywhere on the Internet (IPv6 required):
+
+```sh
+$ curl -6 https://whoami.ipv6.ingress.homelab.public.stephane-klein.info/
+```
+
+The DNS record is automatically created by external-dns in Cloudflare,
+and the TLS certificate is issued by Let's Encrypt via DNS-01.
+
+To remove:
+
+```sh
+$ mise run destroy-whoami-public
+```
+
+To check certificate status:
+
+```sh
+$ kubectl describe certificate whoami-public-tls -n traefik
+```
+
+To check external-dns logs:
+
+```sh
+$ kubectl logs -n external-dns deployment/external-dns
+```
+
 ## 2. Authelia authentication demo
 
 Deploy whoami behind Authelia ForwardAuth to see the authentication flow.
