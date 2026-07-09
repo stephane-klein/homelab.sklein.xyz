@@ -70,6 +70,10 @@ Here are some service ideas I plan to deploy on my homelab.
 - [ ] **LLM provider proxy**: [LiteLLM](https://github.com/BerriAI/litellm) — centralizes LLM API calls (OpenAI, Anthropic, etc.), archives threads, and provides a single endpoint (self-hosted OpenRouter equivalent)
 - [ ] **XMPP instant messaging server**: [ejabberd](https://github.com/processone/ejabberd)
   - [ ] **Team messaging**: [fluux-messenger](https://github.com/processone/fluux-messenger/) - Mattermost-like group chat built on XMPP, for communities and organizations [untested]
+- [ ] **Traefik dashboard**: expose the web admin UI for both `traefik` and `traefik-public` internally
+- [ ] **Ingress metrics**: configure and display metrics for both Traefik instances
+- [ ] **Migrate Perses → Grafana**: Perses has limitations and bugs that block my use cases — not mature enough for my needs yet
+- [ ] **CrowdSec + Traefik bouncer**: setup CrowdSec with a Traefik bouncer on the public ingress
 - [ ] **Autonomous AI agent framework**: [Hermes Agent](https://github.com/NousResearch/hermes-agent) [untested]
 - [ ] **Dashboard / startpage**: [Glance](https://github.com/glanceapp/glance/)
 - [ ] **Home automation platform**: [Home Assistant](https://www.home-assistant.io/) [untested]
