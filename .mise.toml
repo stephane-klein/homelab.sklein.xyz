@@ -240,6 +240,10 @@ run = "scripts/deploy-cnpg-hindsight.sh"
 description = "Destroy CNPG cluster Hindsight"
 run = "scripts/destroy-cnpg-hindsight.sh"
 
+[tasks.list-ingresses]
+description = "List all virtual hosts exposed by Ingress and IngressRoute (internal vs public)"
+run = "scripts/list-ingresses.sh"
+
 [tasks.deploy-hindsight]
 description = "Deploy Hindsight agent memory system at https://hindsight.sklein.internal"
 run = "scripts/deploy-hindsight.sh"

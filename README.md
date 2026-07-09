@@ -298,6 +298,35 @@ spec:
 External-dns automatically creates the AAAA record in Cloudflare, and
 cert-manager obtains a Let's Encrypt certificate via DNS-01.
 
+## Display all virtual hosts
+
+You can display all virtual hosts exposed with:
+
+```sh
+$ mise run list-ingresses
+[list-ingresses] $ scripts/list-ingresses.sh
+=== Internal Ingress (Netbird VPN *.sklein.internal) ===
+  node: nuc-i7-gen11.homelab.stephane-klein.info  IP: 100.91.106.71
+
+NAMESPACE         NAME                                             TYPE          HOST(S)
+----------------  -----------------------------------------------  ------------
+authelia          authelia                                         Ingress       auth.sklein.internal
+default           whoami-authelia-demo                             Ingress       whoami-authelia-demo.sklein.internal
+hindsight         hindsight                                        Ingress       hindsight.sklein.internal
+hindsight         hindsight-api                                    IngressRoute  api.hindsight.sklein.internal
+homepage          homepage                                         Ingress       homepage.sklein.internal
+litellm           litellm                                          Ingress       litellm.sklein.internal
+perses            perses                                           Ingress       perses.sklein.internal
+toggl-pg-mirror   toggl-pg-mirror                                  Ingress       toggl.sklein.internal
+victoria-metrics  victoria-metrics-victoria-metrics-single-server  Ingress       metrics.sklein.internal
+zigbee            zigbee2mqtt                                      Ingress       zigbee2mqtt.sklein.internal
+
+=== Public Ingress (IPv6 *.ipv6.ingress.homelab.public.stephane-klein.info) ===
+  node: nuc-i7-gen11.homelab.stephane-klein.info  IP: 100.91.106.71
+
+  (none)
+```
+
 ## Private CA for internal services
 
 A private Certificate Authority is used to issue trusted TLS certificates for internal
