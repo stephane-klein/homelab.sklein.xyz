@@ -1,0 +1,13 @@
+repositories: []
+releases:
+  - name: sveltekit-ssr-skeleton-myapp-test
+    namespace: sveltekit-ssr-skeleton-myapp-test
+    createNamespace: true
+    chart: oci://ghcr.io/stephane-klein/charts/my-app
+    values:
+      - values.yaml
+    set:
+      - name: oidc.clientSecret
+        value: {{ env "AUTHELIA_CLIENT_SECRET_SVELTEKIT_SSR_SKELETON" | quote }}
+      - name: adminToken
+        value: {{ env "SVELTEKIT_SSR_SKELETON_ADMIN_TOKEN" | quote }}

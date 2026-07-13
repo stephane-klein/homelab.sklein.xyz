@@ -38,6 +38,40 @@ configMap:
     local:
       enabled: true
       path: /config/db.sqlite3
+
+  identity_providers:
+    oidc:
+      enabled: true
+
+      jwks:
+        - key_id: authelia-key
+          algorithm: RS256
+          use: sig
+          key:
+            value: ""
+
+      cors:
+        allowed_origins_from_client_redirect_uris: true
+
+      clients:
+        # Test client for https://github.com/stephane-klein/sveltekit-ssr-skeleton
+        - client_id: "sveltekit-ssr-skeleton-myapp-test"
+          client_name: "SvelteKit SSR Skeleton (my-app test)"
+          client_secret:
+            value: "$pbkdf2-sha512$310000$eQbNPOqo8j9AJW8ckbyp0Q$I80alDmLfchSVqqWq/QYaNSHDEs6wek9/eX.8/9k8PcjtnInYZ8n0rCihAX/3nJQ06kXP0ZWHJ3Sshn1t8CqyQ"
+          authorization_policy: one_factor
+          redirect_uris:
+            - "https://sveltekit-ssr-skeleton-myapp-test.sklein.internal/login/oidc/callback"
+          scopes:
+            - openid
+            - profile
+            - email
+          grant_types:
+            - authorization_code
+          response_types:
+            - code
+          token_endpoint_auth_method: client_secret_basic
+
   notifier:
     disable_startup_check: true
     filesystem:

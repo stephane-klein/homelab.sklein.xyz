@@ -70,10 +70,17 @@ echo "  Creating namespace..."
 kubectl create namespace authelia --dry-run=client -o yaml | kubectl apply -f - > /dev/null
 
 echo "  Installing Authelia with Helm..."
+JWKS_TMP=$(mktemp)
+trap "rm -f '$JWKS_TMP'" EXIT
+echo "$AUTHELIA_JWKS_PRIVATE_KEY" | base64 -d > "$JWKS_TMP"
+
 helm repo add authelia https://charts.authelia.com --force-update > /dev/null
 helm upgrade --install authelia authelia/authelia \
   --namespace authelia --create-namespace \
-  -f config/authelia/values.yaml > /dev/null
+  -f config/authelia/values.yaml \
+  --set configMap.identity_providers.oidc.hmac_secret.value="$AUTHELIA_OIDC_HMAC_SECRET" \
+  --set-file configMap.identity_providers.oidc.jwks[0].key.value="$JWKS_TMP" \
+  > /dev/null
 
 echo "  Waiting for Authelia to be ready..."
 kubectl wait --for=condition=Ready pod \

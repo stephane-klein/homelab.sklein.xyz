@@ -1,0 +1,23 @@
+nodeTLSRejectUnauthorized: true
+
+cnpg:
+  clusterName: sveltekit-ssr-skeleton-db
+  namespace: sveltekit-ssr-skeleton-myapp-test
+
+ingress:
+  enabled: true
+  host: sveltekit-ssr-skeleton-myapp-test.sklein.internal
+  className: traefik
+  annotations:
+    cert-manager.io/cluster-issuer: homelab-ca
+  tls:
+    - secretName: sveltekit-ssr-skeleton-myapp-tls
+      hosts:
+        - sveltekit-ssr-skeleton-myapp-test.sklein.internal
+
+origin: https://sveltekit-ssr-skeleton-myapp-test.sklein.internal
+
+oidc:
+  enabled: true
+  issuer: https://auth.sklein.internal
+  clientId: sveltekit-ssr-skeleton-myapp-test
