@@ -225,6 +225,36 @@ nuc-i7-gen11.homelab.stephane-klein.info   99m          1%       1579Mi         
 === Done ===
 ```
 
+## Internal DNS — CoreDNS custom rewrite
+
+By default, pods in the cluster cannot resolve `*.sklein.internal` domains
+(because they are managed by Netbird DNS at `100.100.100.100`, which is not
+reachable from the cluster network). To allow pods to reach internal services
+by their domain name (e.g., `auth.sklein.internal` for OIDC discovery), a
+CoreDNS rewrite rule maps them to the corresponding k8s service DNS name.
+
+### Deploy
+
+```sh
+$ mise run deploy-coredns-custom
+```
+
+This creates a `coredns-custom` ConfigMap in `kube-system` that CoreDNS
+automatically loads via the existing `import /etc/coredns/custom/*.override`
+directive, and restarts CoreDNS.
+
+### Destroy
+
+```sh
+$ mise run destroy-coredns-custom
+```
+
+This removes the custom configuration.
+
+### Configuration
+
+The rewrite rules are defined in [`config/coredns/`](config/coredns/).
+
 ## Two Ingress controllers: internal vs public
 
 | Component | Internal | Public |

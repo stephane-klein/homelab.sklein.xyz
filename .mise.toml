@@ -252,4 +252,10 @@ run = "scripts/deploy-hindsight.sh"
 description = "Destroy Hindsight"
 run = "scripts/destroy-hindsight.sh"
 
+[tasks.deploy-coredns-custom]
+description = "Configure CoreDNS rewrite: sklein.internal → k8s service DNS"
+run = "scripts/deploy-coredns-custom.sh"
 
+[tasks.destroy-coredns-custom]
+description = "Remove CoreDNS custom rewrite rules"
+run = "scripts/destroy-coredns-custom.sh"
