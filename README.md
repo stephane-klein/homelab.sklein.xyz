@@ -357,6 +357,7 @@ hindsight         hindsight-api                                    IngressRoute 
 homepage          homepage                                         Ingress       homepage.sklein.internal
 litellm           litellm                                          Ingress       litellm.sklein.internal
 toggl-pg-mirror   toggl-pg-mirror                                  Ingress       toggl.sklein.internal
+monitoring        vmagent-victoria-metrics-agent                   Ingress       vmagent.sklein.internal
 victoria-metrics  victoria-metrics-victoria-metrics-single-server  Ingress       metrics.sklein.internal
 zigbee            zigbee2mqtt                                      Ingress       zigbee2mqtt.sklein.internal
 

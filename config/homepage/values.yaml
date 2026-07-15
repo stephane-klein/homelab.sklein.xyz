@@ -54,6 +54,10 @@ config:
             icon: si-authelia
             href: https://auth.sklein.internal
             description: SSO Authentication
+        - VMAgent:
+            icon: si-victoriametrics
+            href: https://vmagent.sklein.internal
+            description: Metrics Scraper
         - VictoriaMetrics:
             icon: si-victoriametrics
             href: https://metrics.sklein.internal

@@ -43,3 +43,21 @@ extraScrapeConfigs:
         target_label: namespace
       - source_labels: [__meta_kubernetes_pod_label_cnpg_io_cluster]
         target_label: cnpg_cluster
+
+service:
+  enabled: true
+
+ingress:
+  enabled: true
+  annotations:
+    cert-manager.io/cluster-issuer: homelab-ca
+    traefik.ingress.kubernetes.io/router.middlewares: traefik-forwardauth-authelia@kubernetescrd
+  hosts:
+    - name: vmagent.sklein.internal
+      path:
+        - /
+      port: http
+  tls:
+    - secretName: vmagent-tls
+      hosts:
+        - vmagent.sklein.internal
