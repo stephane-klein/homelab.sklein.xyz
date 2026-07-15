@@ -41,3 +41,6 @@ AUTHELIA_OIDC_HMAC_SECRET="{{ getpw "homelab/authelia/oidc/hmac-secret" }}"
 # Authelia OIDC JWKS private key (base64 encoded RSA key) — used to sign OIDC ID tokens
 # Decode with: echo "$AUTHELIA_JWKS_PRIVATE_KEY" | base64 -d
 AUTHELIA_JWKS_PRIVATE_KEY="{{ get "homelab/authelia/oidc/jwks-key" }}"
+
+# Grafana
+GRAFANA_ADMIN_PASSWORD="{{ getpw "homelab/grafana/admin/password" }}"

@@ -1,0 +1,372 @@
+{
+  "title": "Node Overview",
+  "uid": "node-overview",
+  "tags": ["node", "system"],
+  "schemaVersion": 39,
+  "version": 0,
+  "time": {
+    "from": "now-1h",
+    "to": "now"
+  },
+  "timepicker": {},
+  "refresh": "",
+  "templating": {
+    "list": []
+  },
+  "panels": [
+    {
+      "id": 1,
+      "type": "row",
+      "title": "CPU Load",
+      "gridPos": { "h": 1, "w": 24, "x": 0, "y": 0 },
+      "collapsed": false,
+      "panels": []
+    },
+    {
+      "id": 2,
+      "type": "timeseries",
+      "title": "nuc-i7-gen11 — CPU Load",
+      "datasource": "Prometheus",
+      "fieldConfig": {
+        "defaults": {
+          "custom": {
+            "lineInterpolation": "linear",
+            "spanNulls": false,
+            "showPoints": "auto",
+            "lineWidth": 1
+          }
+        },
+        "overrides": []
+      },
+      "options": {
+        "legend": {
+          "showLegend": true,
+          "displayMode": "table",
+          "placement": "bottom",
+          "calcs": ["last"]
+        },
+        "tooltip": { "mode": "multi" }
+      },
+      "targets": [
+        {
+          "expr": "node_load1{instance=\"nuc-i7-gen11.homelab.stephane-klein.info\", job=\"node-exporter\"}",
+          "legendFormat": "Load 1m",
+          "datasource": "Prometheus"
+        },
+        {
+          "expr": "node_load5{instance=\"nuc-i7-gen11.homelab.stephane-klein.info\", job=\"node-exporter\"}",
+          "legendFormat": "Load 5m",
+          "datasource": "Prometheus"
+        },
+        {
+          "expr": "node_load15{instance=\"nuc-i7-gen11.homelab.stephane-klein.info\", job=\"node-exporter\"}",
+          "legendFormat": "Load 15m",
+          "datasource": "Prometheus"
+        }
+      ],
+      "gridPos": { "h": 8, "w": 12, "x": 0, "y": 1 }
+    },
+    {
+      "id": 3,
+      "type": "timeseries",
+      "title": "nuc-i3-gen5 — CPU Load",
+      "datasource": "Prometheus",
+      "fieldConfig": {
+        "defaults": {
+          "custom": {
+            "lineInterpolation": "linear",
+            "spanNulls": false,
+            "showPoints": "auto",
+            "lineWidth": 1
+          }
+        },
+        "overrides": []
+      },
+      "options": {
+        "legend": {
+          "showLegend": true,
+          "displayMode": "table",
+          "placement": "bottom",
+          "calcs": ["last"]
+        },
+        "tooltip": { "mode": "multi" }
+      },
+      "targets": [
+        {
+          "expr": "node_load1{instance=\"nuc-i3-gen5.homelab.stephane-klein.info\", job=\"node-exporter\"}",
+          "legendFormat": "Load 1m",
+          "datasource": "Prometheus"
+        },
+        {
+          "expr": "node_load5{instance=\"nuc-i3-gen5.homelab.stephane-klein.info\", job=\"node-exporter\"}",
+          "legendFormat": "Load 5m",
+          "datasource": "Prometheus"
+        },
+        {
+          "expr": "node_load15{instance=\"nuc-i3-gen5.homelab.stephane-klein.info\", job=\"node-exporter\"}",
+          "legendFormat": "Load 15m",
+          "datasource": "Prometheus"
+        }
+      ],
+      "gridPos": { "h": 8, "w": 12, "x": 12, "y": 1 }
+    },
+    {
+      "id": 4,
+      "type": "row",
+      "title": "Memory",
+      "gridPos": { "h": 1, "w": 24, "x": 0, "y": 9 },
+      "collapsed": false,
+      "panels": []
+    },
+    {
+      "id": 5,
+      "type": "timeseries",
+      "title": "nuc-i7-gen11 — Memory",
+      "datasource": "Prometheus",
+      "fieldConfig": {
+        "defaults": {
+          "unit": "bytes",
+          "custom": {
+            "lineInterpolation": "linear",
+            "spanNulls": false,
+            "showPoints": "auto",
+            "lineWidth": 1
+          }
+        },
+        "overrides": []
+      },
+      "options": {
+        "legend": {
+          "showLegend": true,
+          "displayMode": "table",
+          "placement": "bottom",
+          "calcs": ["last"]
+        },
+        "tooltip": { "mode": "multi" }
+      },
+      "targets": [
+        {
+          "expr": "node_memory_MemTotal_bytes{instance=\"nuc-i7-gen11.homelab.stephane-klein.info\", job=\"node-exporter\"}",
+          "legendFormat": "Total",
+          "datasource": "Prometheus"
+        },
+        {
+          "expr": "node_memory_MemAvailable_bytes{instance=\"nuc-i7-gen11.homelab.stephane-klein.info\", job=\"node-exporter\"}",
+          "legendFormat": "Available",
+          "datasource": "Prometheus"
+        }
+      ],
+      "gridPos": { "h": 8, "w": 12, "x": 0, "y": 10 }
+    },
+    {
+      "id": 6,
+      "type": "timeseries",
+      "title": "nuc-i3-gen5 — Memory",
+      "datasource": "Prometheus",
+      "fieldConfig": {
+        "defaults": {
+          "unit": "bytes",
+          "custom": {
+            "lineInterpolation": "linear",
+            "spanNulls": false,
+            "showPoints": "auto",
+            "lineWidth": 1
+          }
+        },
+        "overrides": []
+      },
+      "options": {
+        "legend": {
+          "showLegend": true,
+          "displayMode": "table",
+          "placement": "bottom",
+          "calcs": ["last"]
+        },
+        "tooltip": { "mode": "multi" }
+      },
+      "targets": [
+        {
+          "expr": "node_memory_MemTotal_bytes{instance=\"nuc-i3-gen5.homelab.stephane-klein.info\", job=\"node-exporter\"}",
+          "legendFormat": "Total",
+          "datasource": "Prometheus"
+        },
+        {
+          "expr": "node_memory_MemAvailable_bytes{instance=\"nuc-i3-gen5.homelab.stephane-klein.info\", job=\"node-exporter\"}",
+          "legendFormat": "Available",
+          "datasource": "Prometheus"
+        }
+      ],
+      "gridPos": { "h": 8, "w": 12, "x": 12, "y": 10 }
+    },
+    {
+      "id": 7,
+      "type": "row",
+      "title": "Temperature (max)",
+      "gridPos": { "h": 1, "w": 24, "x": 0, "y": 18 },
+      "collapsed": false,
+      "panels": []
+    },
+    {
+      "id": 8,
+      "type": "timeseries",
+      "title": "nuc-i7-gen11 — Temperature (max)",
+      "datasource": "Prometheus",
+      "fieldConfig": {
+        "defaults": {
+          "unit": "celsius",
+          "min": 0,
+          "max": 100,
+          "custom": {
+            "lineInterpolation": "linear",
+            "spanNulls": false,
+            "showPoints": "auto",
+            "lineWidth": 1
+          }
+        },
+        "overrides": []
+      },
+      "options": {
+        "legend": {
+          "showLegend": true,
+          "displayMode": "table",
+          "placement": "bottom",
+          "calcs": ["last"]
+        },
+        "tooltip": { "mode": "multi" }
+      },
+      "targets": [
+        {
+          "expr": "max(node_hwmon_temp_celsius{instance=\"nuc-i7-gen11.homelab.stephane-klein.info\", job=\"node-exporter\", chip=~\"platform_coretemp.*\"})",
+          "legendFormat": "Max Temperature °C",
+          "datasource": "Prometheus"
+        }
+      ],
+      "gridPos": { "h": 8, "w": 12, "x": 0, "y": 19 }
+    },
+    {
+      "id": 9,
+      "type": "timeseries",
+      "title": "nuc-i3-gen5 — Temperature (max)",
+      "datasource": "Prometheus",
+      "fieldConfig": {
+        "defaults": {
+          "unit": "celsius",
+          "min": 0,
+          "max": 100,
+          "custom": {
+            "lineInterpolation": "linear",
+            "spanNulls": false,
+            "showPoints": "auto",
+            "lineWidth": 1
+          }
+        },
+        "overrides": []
+      },
+      "options": {
+        "legend": {
+          "showLegend": true,
+          "displayMode": "table",
+          "placement": "bottom",
+          "calcs": ["last"]
+        },
+        "tooltip": { "mode": "multi" }
+      },
+      "targets": [
+        {
+          "expr": "max(node_hwmon_temp_celsius{instance=\"nuc-i3-gen5.homelab.stephane-klein.info\", job=\"node-exporter\", chip=~\"platform_coretemp.*\"})",
+          "legendFormat": "Max Temperature °C",
+          "datasource": "Prometheus"
+        }
+      ],
+      "gridPos": { "h": 8, "w": 12, "x": 12, "y": 19 }
+    },
+    {
+      "id": 10,
+      "type": "row",
+      "title": "Disk /",
+      "gridPos": { "h": 1, "w": 24, "x": 0, "y": 27 },
+      "collapsed": false,
+      "panels": []
+    },
+    {
+      "id": 11,
+      "type": "timeseries",
+      "title": "nuc-i7-gen11 — Disk /",
+      "datasource": "Prometheus",
+      "fieldConfig": {
+        "defaults": {
+          "unit": "bytes",
+          "custom": {
+            "lineInterpolation": "linear",
+            "spanNulls": false,
+            "showPoints": "auto",
+            "lineWidth": 1
+          }
+        },
+        "overrides": []
+      },
+      "options": {
+        "legend": {
+          "showLegend": true,
+          "displayMode": "table",
+          "placement": "bottom",
+          "calcs": ["last"]
+        },
+        "tooltip": { "mode": "multi" }
+      },
+      "targets": [
+        {
+          "expr": "node_filesystem_size_bytes{instance=\"nuc-i7-gen11.homelab.stephane-klein.info\", job=\"node-exporter\", mountpoint=\"/var\", fstype!=\"tmpfs\"}",
+          "legendFormat": "Total",
+          "datasource": "Prometheus"
+        },
+        {
+          "expr": "node_filesystem_size_bytes{instance=\"nuc-i7-gen11.homelab.stephane-klein.info\", job=\"node-exporter\", mountpoint=\"/var\", fstype!=\"tmpfs\"} - node_filesystem_avail_bytes{instance=\"nuc-i7-gen11.homelab.stephane-klein.info\", job=\"node-exporter\", mountpoint=\"/var\", fstype!=\"tmpfs\"}",
+          "legendFormat": "Used",
+          "datasource": "Prometheus"
+        }
+      ],
+      "gridPos": { "h": 8, "w": 12, "x": 0, "y": 28 }
+    },
+    {
+      "id": 12,
+      "type": "timeseries",
+      "title": "nuc-i3-gen5 — Disk /",
+      "datasource": "Prometheus",
+      "fieldConfig": {
+        "defaults": {
+          "unit": "bytes",
+          "custom": {
+            "lineInterpolation": "linear",
+            "spanNulls": false,
+            "showPoints": "auto",
+            "lineWidth": 1
+          }
+        },
+        "overrides": []
+      },
+      "options": {
+        "legend": {
+          "showLegend": true,
+          "displayMode": "table",
+          "placement": "bottom",
+          "calcs": ["last"]
+        },
+        "tooltip": { "mode": "multi" }
+      },
+      "targets": [
+        {
+          "expr": "node_filesystem_size_bytes{instance=\"nuc-i3-gen5.homelab.stephane-klein.info\", job=\"node-exporter\", mountpoint=\"/var\", fstype!=\"tmpfs\"}",
+          "legendFormat": "Total",
+          "datasource": "Prometheus"
+        },
+        {
+          "expr": "node_filesystem_size_bytes{instance=\"nuc-i3-gen5.homelab.stephane-klein.info\", job=\"node-exporter\", mountpoint=\"/var\", fstype!=\"tmpfs\"} - node_filesystem_avail_bytes{instance=\"nuc-i3-gen5.homelab.stephane-klein.info\", job=\"node-exporter\", mountpoint=\"/var\", fstype!=\"tmpfs\"}",
+          "legendFormat": "Used",
+          "datasource": "Prometheus"
+        }
+      ],
+      "gridPos": { "h": 8, "w": 12, "x": 12, "y": 28 }
+    }
+  ]
+}

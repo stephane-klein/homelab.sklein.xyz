@@ -1,0 +1,309 @@
+{
+  "title": "Zigbee Sensors",
+  "uid": "zigbee-sensors",
+  "tags": ["zigbee", "sensors", "environment"],
+  "schemaVersion": 39,
+  "version": 0,
+  "time": {
+    "from": "now-1h",
+    "to": "now"
+  },
+  "timepicker": {},
+  "refresh": "30s",
+  "templating": {
+    "list": []
+  },
+  "panels": [
+    {
+      "id": 1,
+      "type": "row",
+      "title": "Temperature",
+      "gridPos": { "h": 1, "w": 24, "x": 0, "y": 0 },
+      "collapsed": false,
+      "panels": []
+    },
+    {
+      "id": 2,
+      "type": "timeseries",
+      "title": "Temperature (°C)",
+      "datasource": "Prometheus",
+      "fieldConfig": {
+        "defaults": {
+          "unit": "celsius",
+          "min": 0,
+          "max": 44,
+          "custom": {
+            "lineInterpolation": "linear",
+            "spanNulls": false,
+            "showPoints": "auto",
+            "lineWidth": 2
+          }
+        },
+        "overrides": [
+          {
+            "matcher": { "id": "byName", "options": "A - Intérieur" },
+            "properties": [
+              {
+                "id": "color",
+                "value": { "fixedColor": "orange", "mode": "fixed" }
+              },
+              { "id": "custom.lineWidth", "value": 2 }
+            ]
+          },
+          {
+            "matcher": { "id": "byName", "options": "B - Extérieur" },
+            "properties": [
+              {
+                "id": "color",
+                "value": { "fixedColor": "blue", "mode": "fixed" }
+              },
+              { "id": "custom.lineWidth", "value": 2 }
+            ]
+          },
+          {
+            "matcher": { "id": "byName", "options": "Max Intérieur" },
+            "properties": [
+              {
+                "id": "color",
+                "value": { "fixedColor": "red", "mode": "fixed" }
+              },
+              { "id": "custom.showPoints", "value": "never" },
+              { "id": "custom.lineWidth", "value": 1 },
+              { "id": "custom.lineInterpolation", "value": "stepBefore" }
+            ]
+          },
+          {
+            "matcher": { "id": "byName", "options": "Max Extérieur" },
+            "properties": [
+              {
+                "id": "color",
+                "value": { "fixedColor": "purple", "mode": "fixed" }
+              },
+              { "id": "custom.showPoints", "value": "never" },
+              { "id": "custom.lineWidth", "value": 1 },
+              { "id": "custom.lineInterpolation", "value": "stepBefore" }
+            ]
+          },
+          {
+            "matcher": { "id": "byName", "options": "Min Intérieur" },
+            "properties": [
+              {
+                "id": "color",
+                "value": { "fixedColor": "green", "mode": "fixed" }
+              },
+              { "id": "custom.showPoints", "value": "never" },
+              { "id": "custom.lineWidth", "value": 1 },
+              { "id": "custom.lineInterpolation", "value": "stepBefore" }
+            ]
+          },
+          {
+            "matcher": { "id": "byName", "options": "Min Extérieur" },
+            "properties": [
+              {
+                "id": "color",
+                "value": { "fixedColor": "cyan", "mode": "fixed" }
+              },
+              { "id": "custom.showPoints", "value": "never" },
+              { "id": "custom.lineWidth", "value": 1 },
+              { "id": "custom.lineInterpolation", "value": "stepBefore" }
+            ]
+          }
+        ]
+      },
+      "options": {
+        "legend": {
+          "showLegend": true,
+          "displayMode": "list",
+          "placement": "bottom",
+          "calcs": ["last"]
+        },
+        "tooltip": { "mode": "multi" }
+      },
+      "targets": [
+        {
+          "expr": "keep_last_value(zigbee_temperature{sensor=\"A - Intérieur\"})",
+          "legendFormat": "A - Intérieur",
+          "datasource": "Prometheus"
+        },
+        {
+          "expr": "keep_last_value(zigbee_temperature{sensor=\"B - Extérieur\"})",
+          "legendFormat": "B - Extérieur",
+          "datasource": "Prometheus"
+        },
+        {
+          "expr": "max_over_time(keep_last_value(zigbee_temperature{sensor=\"A - Intérieur\"})[$__range:])",
+          "legendFormat": "Max Intérieur",
+          "datasource": "Prometheus"
+        },
+        {
+          "expr": "max_over_time(keep_last_value(zigbee_temperature{sensor=\"B - Extérieur\"})[$__range:])",
+          "legendFormat": "Max Extérieur",
+          "datasource": "Prometheus"
+        },
+        {
+          "expr": "min_over_time(keep_last_value(zigbee_temperature{sensor=\"A - Intérieur\"})[$__range:])",
+          "legendFormat": "Min Intérieur",
+          "datasource": "Prometheus"
+        },
+        {
+          "expr": "min_over_time(keep_last_value(zigbee_temperature{sensor=\"B - Extérieur\"})[$__range:])",
+          "legendFormat": "Min Extérieur",
+          "datasource": "Prometheus"
+        }
+      ],
+      "gridPos": { "h": 9, "w": 24, "x": 0, "y": 1 }
+    },
+    {
+      "id": 3,
+      "type": "row",
+      "title": "Humidity",
+      "gridPos": { "h": 1, "w": 24, "x": 0, "y": 10 },
+      "collapsed": false,
+      "panels": []
+    },
+    {
+      "id": 4,
+      "type": "timeseries",
+      "title": "Humidity (%)",
+      "datasource": "Prometheus",
+      "fieldConfig": {
+        "defaults": {
+          "unit": "percent",
+          "custom": {
+            "lineInterpolation": "linear",
+            "spanNulls": false,
+            "showPoints": "auto",
+            "lineWidth": 3
+          }
+        },
+        "overrides": [
+          {
+            "matcher": { "id": "byName", "options": "A - Intérieur" },
+            "properties": [
+              {
+                "id": "color",
+                "value": { "fixedColor": "orange", "mode": "fixed" }
+              },
+              { "id": "custom.lineWidth", "value": 3 }
+            ]
+          },
+          {
+            "matcher": { "id": "byName", "options": "B - Extérieur" },
+            "properties": [
+              {
+                "id": "color",
+                "value": { "fixedColor": "blue", "mode": "fixed" }
+              },
+              { "id": "custom.lineWidth", "value": 2 }
+            ]
+          },
+          {
+            "matcher": { "id": "byName", "options": "Max Intérieur" },
+            "properties": [
+              {
+                "id": "color",
+                "value": { "fixedColor": "red", "mode": "fixed" }
+              },
+              { "id": "custom.showPoints", "value": "never" },
+              { "id": "custom.lineWidth", "value": 1 },
+              { "id": "custom.lineInterpolation", "value": "stepBefore" }
+            ]
+          }
+        ]
+      },
+      "options": {
+        "legend": {
+          "showLegend": true,
+          "displayMode": "list",
+          "placement": "bottom",
+          "calcs": ["last"]
+        },
+        "tooltip": { "mode": "multi" }
+      },
+      "targets": [
+        {
+          "expr": "keep_last_value(zigbee_humidity{sensor=\"A - Intérieur\"})",
+          "legendFormat": "A - Intérieur",
+          "datasource": "Prometheus"
+        },
+        {
+          "expr": "keep_last_value(zigbee_humidity{sensor=\"B - Extérieur\"})",
+          "legendFormat": "B - Extérieur",
+          "datasource": "Prometheus"
+        }
+      ],
+      "gridPos": { "h": 9, "w": 24, "x": 0, "y": 11 }
+    },
+    {
+      "id": 5,
+      "type": "row",
+      "title": "Battery",
+      "gridPos": { "h": 1, "w": 24, "x": 0, "y": 20 },
+      "collapsed": false,
+      "panels": []
+    },
+    {
+      "id": 6,
+      "type": "timeseries",
+      "title": "Battery (%)",
+      "datasource": "Prometheus",
+      "fieldConfig": {
+        "defaults": {
+          "unit": "percent",
+          "min": 0,
+          "max": 100,
+          "custom": {
+            "lineInterpolation": "linear",
+            "spanNulls": false,
+            "showPoints": "auto",
+            "lineWidth": 2
+          }
+        },
+        "overrides": [
+          {
+            "matcher": { "id": "byName", "options": "A - Intérieur" },
+            "properties": [
+              {
+                "id": "color",
+                "value": { "fixedColor": "orange", "mode": "fixed" }
+              },
+              { "id": "custom.lineWidth", "value": 2 }
+            ]
+          },
+          {
+            "matcher": { "id": "byName", "options": "B - Extérieur" },
+            "properties": [
+              {
+                "id": "color",
+                "value": { "fixedColor": "blue", "mode": "fixed" }
+              },
+              { "id": "custom.lineWidth", "value": 2 }
+            ]
+          }
+        ]
+      },
+      "options": {
+        "legend": {
+          "showLegend": true,
+          "displayMode": "list",
+          "placement": "bottom",
+          "calcs": ["last"]
+        },
+        "tooltip": { "mode": "multi" }
+      },
+      "targets": [
+        {
+          "expr": "keep_last_value(zigbee_battery{sensor=\"A - Intérieur\"})",
+          "legendFormat": "A - Intérieur",
+          "datasource": "Prometheus"
+        },
+        {
+          "expr": "keep_last_value(zigbee_battery{sensor=\"B - Extérieur\"})",
+          "legendFormat": "B - Extérieur",
+          "datasource": "Prometheus"
+        }
+      ],
+      "gridPos": { "h": 9, "w": 24, "x": 0, "y": 21 }
+    }
+  ]
+}

@@ -12,8 +12,8 @@
       "subcommand": "run",
       "block_args": [
         "destroy-traefik",
+        "destroy-grafana",
         "destroy-victoria-metrics",
-        "destroy-perses",
         "destroy-authelia",
         "destroy-cnpg",
         "destroy-cnpg-memex",
@@ -32,7 +32,7 @@
     { "command": "mise run destroy-traefik", "expect": "blocked", "rule": "block-mise-run-destroy" },
     { "command": "mise run destroy-cnpg-memex", "expect": "blocked", "rule": "block-mise-run-destroy" },
     { "command": "mise run destroy-zigbee", "expect": "blocked", "rule": "block-mise-run-destroy" },
-    { "command": "mise run destroy-perses", "expect": "blocked", "rule": "block-mise-run-destroy" },
+    { "command": "mise run destroy-grafana", "expect": "blocked", "rule": "block-mise-run-destroy" },
     { "command": "mise run destroy-authelia", "expect": "blocked", "rule": "block-mise-run-destroy" },
     { "command": "mise run destroy-cnpg", "expect": "blocked", "rule": "block-mise-run-destroy" },
     { "command": "mise run destroy-homepage", "expect": "blocked", "rule": "block-mise-run-destroy" },
@@ -47,7 +47,7 @@
     { "command": "mise run backup-cnpg-memex", "expect": "allowed" },
     { "command": "mise run setup-secret", "expect": "allowed" },
     { "command": "mise run deploy-cnpg-hindsight", "expect": "allowed" },
-    { "command": "mise run push-perses-dashboards", "expect": "allowed" },
+    { "command": "mise run push-grafana-dashboards", "expect": "allowed" },
     { "command": "mise version", "expect": "allowed" },
     { "command": "mise ls", "expect": "allowed" }
   ]

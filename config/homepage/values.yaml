@@ -58,8 +58,8 @@ config:
             icon: si-victoriametrics
             href: https://metrics.sklein.internal
             description: Metrics Storage
-        - Perses:
-            href: https://perses.sklein.internal
+        - Grafana:
+            href: https://grafana.sklein.internal
             description: Monitoring Dashboards
         - Hindsight:
             href: https://hindsight.sklein.internal
@@ -73,8 +73,8 @@ config:
             href: https://zigbee2mqtt.sklein.internal
             description: Zigbee Coordinator UI
         - Zigbee Dashboard:
-            href: https://perses.sklein.internal/projects/homelab/dashboards/zigbee-sensors
-            description: Temp & Humidity Dashboards
+            href: https://grafana.sklein.internal
+            description: Temp & Humidity Dashboards (Grafana)
 
     - nuc-i3-gen5:
         - CPU:

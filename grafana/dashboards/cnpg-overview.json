@@ -1,0 +1,548 @@
+{
+  "title": "CloudNativePG Cluster Overview",
+  "uid": "cnpg-overview",
+  "tags": ["cnpg", "postgresql"],
+  "schemaVersion": 39,
+  "version": 0,
+  "time": {
+    "from": "now-1h",
+    "to": "now"
+  },
+  "timepicker": {},
+  "refresh": "30s",
+  "templating": {
+    "list": [
+      {
+        "name": "namespace",
+        "type": "query",
+        "datasource": "Prometheus",
+        "query": "label_values(cnpg_pg_database_size_bytes, namespace)",
+        "refresh": 1,
+        "includeAll": false,
+        "multi": false,
+        "current": {},
+        "options": []
+      },
+      {
+        "name": "cluster",
+        "type": "query",
+        "datasource": "Prometheus",
+        "query": "label_values(cnpg_pg_database_size_bytes{namespace=\"$namespace\"}, cnpg_cluster)",
+        "refresh": 1,
+        "includeAll": false,
+        "multi": false,
+        "current": {},
+        "options": []
+      }
+    ]
+  },
+  "panels": [
+    {
+      "id": 1,
+      "type": "row",
+      "title": "Health & Overview",
+      "gridPos": { "h": 1, "w": 24, "x": 0, "y": 0 },
+      "collapsed": false,
+      "panels": []
+    },
+    {
+      "id": 2,
+      "type": "timeseries",
+      "title": "PostgreSQL Version",
+      "datasource": "Prometheus",
+      "fieldConfig": {
+        "defaults": {
+          "custom": {
+            "lineInterpolation": "linear",
+            "spanNulls": false,
+            "showPoints": "auto",
+            "lineWidth": 1
+          }
+        },
+        "overrides": []
+      },
+      "options": {
+        "legend": {
+          "showLegend": true,
+          "displayMode": "table",
+          "placement": "bottom"
+        },
+        "tooltip": { "mode": "multi" }
+      },
+      "targets": [
+        {
+          "expr": "cnpg_collector_postgres_version{namespace=\"$namespace\", cnpg_cluster=\"$cluster\"}",
+          "legendFormat": "{{pod}} — {{full}}",
+          "datasource": "Prometheus"
+        }
+      ],
+      "gridPos": { "h": 8, "w": 8, "x": 0, "y": 1 }
+    },
+    {
+      "id": 3,
+      "type": "timeseries",
+      "title": "Server Uptime",
+      "datasource": "Prometheus",
+      "fieldConfig": {
+        "defaults": {
+          "unit": "s",
+          "custom": {
+            "lineInterpolation": "linear",
+            "spanNulls": false,
+            "showPoints": "auto",
+            "lineWidth": 1
+          }
+        },
+        "overrides": []
+      },
+      "options": {
+        "legend": {
+          "showLegend": true,
+          "displayMode": "table",
+          "placement": "bottom",
+          "calcs": ["last"]
+        },
+        "tooltip": { "mode": "multi" }
+      },
+      "targets": [
+        {
+          "expr": "time() - cnpg_pg_postmaster_start_time{namespace=\"$namespace\", cnpg_cluster=\"$cluster\"}",
+          "legendFormat": "{{pod}} uptime (s)",
+          "datasource": "Prometheus"
+        }
+      ],
+      "gridPos": { "h": 8, "w": 8, "x": 8, "y": 1 }
+    },
+    {
+      "id": 4,
+      "type": "timeseries",
+      "title": "Max Transaction Duration",
+      "datasource": "Prometheus",
+      "fieldConfig": {
+        "defaults": {
+          "unit": "s",
+          "custom": {
+            "lineInterpolation": "linear",
+            "spanNulls": false,
+            "showPoints": "auto",
+            "lineWidth": 1
+          }
+        },
+        "overrides": []
+      },
+      "options": {
+        "legend": {
+          "showLegend": true,
+          "displayMode": "table",
+          "placement": "bottom",
+          "calcs": ["last"]
+        },
+        "tooltip": { "mode": "multi" }
+      },
+      "targets": [
+        {
+          "expr": "cnpg_backends_max_tx_duration_seconds{namespace=\"$namespace\", cnpg_cluster=\"$cluster\"}",
+          "legendFormat": "{{pod}} — {{datname}}",
+          "datasource": "Prometheus"
+        }
+      ],
+      "gridPos": { "h": 8, "w": 8, "x": 16, "y": 1 }
+    },
+    {
+      "id": 5,
+      "type": "timeseries",
+      "title": "Cache Hit Ratio",
+      "datasource": "Prometheus",
+      "fieldConfig": {
+        "defaults": {
+          "unit": "percentunit",
+          "min": 0,
+          "max": 1,
+          "custom": {
+            "lineInterpolation": "linear",
+            "spanNulls": false,
+            "showPoints": "auto",
+            "lineWidth": 2
+          }
+        },
+        "overrides": []
+      },
+      "options": {
+        "legend": {
+          "showLegend": true,
+          "displayMode": "table",
+          "placement": "bottom",
+          "calcs": ["last"]
+        },
+        "tooltip": { "mode": "multi" }
+      },
+      "targets": [
+        {
+          "expr": "sum(rate(cnpg_cache_hits{namespace=\"$namespace\", cnpg_cluster=\"$cluster\"}[5m])) / (sum(rate(cnpg_cache_hits{namespace=\"$namespace\", cnpg_cluster=\"$cluster\"}[5m])) + sum(rate(cnpg_cache_miss{namespace=\"$namespace\", cnpg_cluster=\"$cluster\"}[5m])))",
+          "legendFormat": "Cache hit ratio",
+          "datasource": "Prometheus"
+        }
+      ],
+      "gridPos": { "h": 8, "w": 8, "x": 0, "y": 9 }
+    },
+    {
+      "id": 6,
+      "type": "row",
+      "title": "Activity & Backups",
+      "gridPos": { "h": 1, "w": 24, "x": 0, "y": 17 },
+      "collapsed": false,
+      "panels": []
+    },
+    {
+      "id": 7,
+      "type": "timeseries",
+      "title": "Transactions",
+      "datasource": "Prometheus",
+      "fieldConfig": {
+        "defaults": {
+          "custom": {
+            "lineInterpolation": "linear",
+            "spanNulls": false,
+            "showPoints": "auto",
+            "lineWidth": 1
+          }
+        },
+        "overrides": []
+      },
+      "options": {
+        "legend": {
+          "showLegend": true,
+          "displayMode": "table",
+          "placement": "bottom"
+        },
+        "tooltip": { "mode": "multi" }
+      },
+      "targets": [
+        {
+          "expr": "rate(cnpg_pg_stat_database_xact_commit{namespace=\"$namespace\", cnpg_cluster=\"$cluster\"}[5m])",
+          "legendFormat": "Commit — {{datname}}",
+          "datasource": "Prometheus"
+        },
+        {
+          "expr": "rate(cnpg_pg_stat_database_xact_rollback{namespace=\"$namespace\", cnpg_cluster=\"$cluster\"}[5m])",
+          "legendFormat": "Rollback — {{datname}}",
+          "datasource": "Prometheus"
+        }
+      ],
+      "gridPos": { "h": 8, "w": 8, "x": 0, "y": 18 }
+    },
+    {
+      "id": 8,
+      "type": "timeseries",
+      "title": "Backends",
+      "datasource": "Prometheus",
+      "fieldConfig": {
+        "defaults": {
+          "custom": {
+            "lineInterpolation": "linear",
+            "spanNulls": false,
+            "showPoints": "auto",
+            "lineWidth": 1
+          }
+        },
+        "overrides": []
+      },
+      "options": {
+        "legend": {
+          "showLegend": true,
+          "displayMode": "table",
+          "placement": "bottom",
+          "calcs": ["last"]
+        },
+        "tooltip": { "mode": "multi" }
+      },
+      "targets": [
+        {
+          "expr": "cnpg_backends_total{namespace=\"$namespace\", cnpg_cluster=\"$cluster\"}",
+          "legendFormat": "{{pod}} — {{type}}",
+          "datasource": "Prometheus"
+        }
+      ],
+      "gridPos": { "h": 8, "w": 8, "x": 8, "y": 18 }
+    },
+    {
+      "id": 9,
+      "type": "timeseries",
+      "title": "Database Size",
+      "datasource": "Prometheus",
+      "fieldConfig": {
+        "defaults": {
+          "unit": "bytes",
+          "custom": {
+            "lineInterpolation": "linear",
+            "spanNulls": false,
+            "showPoints": "auto",
+            "lineWidth": 1
+          }
+        },
+        "overrides": []
+      },
+      "options": {
+        "legend": {
+          "showLegend": true,
+          "displayMode": "table",
+          "placement": "bottom",
+          "calcs": ["last"]
+        },
+        "tooltip": { "mode": "multi" }
+      },
+      "targets": [
+        {
+          "expr": "cnpg_pg_database_size_bytes{namespace=\"$namespace\", cnpg_cluster=\"$cluster\"}",
+          "legendFormat": "{{pod}} — {{datname}}",
+          "datasource": "Prometheus"
+        }
+      ],
+      "gridPos": { "h": 8, "w": 8, "x": 16, "y": 18 }
+    },
+    {
+      "id": 10,
+      "type": "timeseries",
+      "title": "WAL Bytes",
+      "datasource": "Prometheus",
+      "fieldConfig": {
+        "defaults": {
+          "unit": "Bps",
+          "custom": {
+            "lineInterpolation": "linear",
+            "spanNulls": false,
+            "showPoints": "auto",
+            "lineWidth": 1
+          }
+        },
+        "overrides": []
+      },
+      "options": {
+        "legend": {
+          "showLegend": true,
+          "displayMode": "table",
+          "placement": "bottom"
+        },
+        "tooltip": { "mode": "multi" }
+      },
+      "targets": [
+        {
+          "expr": "rate(cnpg_collector_wal_bytes{namespace=\"$namespace\", cnpg_cluster=\"$cluster\"}[5m])",
+          "legendFormat": "WAL rate — {{pod}}",
+          "datasource": "Prometheus"
+        }
+      ],
+      "gridPos": { "h": 8, "w": 8, "x": 0, "y": 26 }
+    },
+    {
+      "id": 11,
+      "type": "timeseries",
+      "title": "WAL Files",
+      "datasource": "Prometheus",
+      "fieldConfig": {
+        "defaults": {
+          "custom": {
+            "lineInterpolation": "linear",
+            "spanNulls": false,
+            "showPoints": "auto",
+            "lineWidth": 1
+          }
+        },
+        "overrides": []
+      },
+      "options": {
+        "legend": {
+          "showLegend": true,
+          "displayMode": "table",
+          "placement": "bottom",
+          "calcs": ["last"]
+        },
+        "tooltip": { "mode": "multi" }
+      },
+      "targets": [
+        {
+          "expr": "cnpg_collector_pg_wal{namespace=\"$namespace\", cnpg_cluster=\"$cluster\"}",
+          "legendFormat": "{{pod}}",
+          "datasource": "Prometheus"
+        }
+      ],
+      "gridPos": { "h": 8, "w": 8, "x": 8, "y": 26 }
+    },
+    {
+      "id": 12,
+      "type": "timeseries",
+      "title": "WAL Archive Status",
+      "datasource": "Prometheus",
+      "fieldConfig": {
+        "defaults": {
+          "custom": {
+            "lineInterpolation": "linear",
+            "spanNulls": false,
+            "showPoints": "auto",
+            "lineWidth": 1
+          }
+        },
+        "overrides": []
+      },
+      "options": {
+        "legend": {
+          "showLegend": true,
+          "displayMode": "table",
+          "placement": "bottom"
+        },
+        "tooltip": { "mode": "multi" }
+      },
+      "targets": [
+        {
+          "expr": "cnpg_collector_pg_wal_archive_status{namespace=\"$namespace\", cnpg_cluster=\"$cluster\"}",
+          "legendFormat": "{{pod}} — {{status}}",
+          "datasource": "Prometheus"
+        }
+      ],
+      "gridPos": { "h": 8, "w": 8, "x": 16, "y": 26 }
+    },
+    {
+      "id": 13,
+      "type": "row",
+      "title": "WAL & Archive Status",
+      "gridPos": { "h": 1, "w": 24, "x": 0, "y": 34 },
+      "collapsed": false,
+      "panels": []
+    },
+    {
+      "id": 14,
+      "type": "timeseries",
+      "title": "Archiver Archived Count",
+      "datasource": "Prometheus",
+      "fieldConfig": {
+        "defaults": {
+          "custom": {
+            "lineInterpolation": "linear",
+            "spanNulls": false,
+            "showPoints": "auto",
+            "lineWidth": 1
+          }
+        },
+        "overrides": []
+      },
+      "options": {
+        "legend": {
+          "showLegend": true,
+          "displayMode": "table",
+          "placement": "bottom"
+        },
+        "tooltip": { "mode": "multi" }
+      },
+      "targets": [
+        {
+          "expr": "rate(cnpg_pg_stat_archiver_archived_count{namespace=\"$namespace\", cnpg_cluster=\"$cluster\"}[5m])",
+          "legendFormat": "Archived rate — {{pod}}",
+          "datasource": "Prometheus"
+        }
+      ],
+      "gridPos": { "h": 8, "w": 12, "x": 0, "y": 35 }
+    },
+    {
+      "id": 15,
+      "type": "timeseries",
+      "title": "Archiver Failed Count",
+      "datasource": "Prometheus",
+      "fieldConfig": {
+        "defaults": {
+          "custom": {
+            "lineInterpolation": "linear",
+            "spanNulls": false,
+            "showPoints": "auto",
+            "lineWidth": 1
+          }
+        },
+        "overrides": []
+      },
+      "options": {
+        "legend": {
+          "showLegend": true,
+          "displayMode": "table",
+          "placement": "bottom"
+        },
+        "tooltip": { "mode": "multi" }
+      },
+      "targets": [
+        {
+          "expr": "rate(cnpg_pg_stat_archiver_failed_count{namespace=\"$namespace\", cnpg_cluster=\"$cluster\"}[5m])",
+          "legendFormat": "Failed rate — {{pod}}",
+          "datasource": "Prometheus"
+        }
+      ],
+      "gridPos": { "h": 8, "w": 12, "x": 12, "y": 35 }
+    },
+    {
+      "id": 16,
+      "type": "timeseries",
+      "title": "Seconds Since Last Archival",
+      "datasource": "Prometheus",
+      "fieldConfig": {
+        "defaults": {
+          "unit": "s",
+          "custom": {
+            "lineInterpolation": "linear",
+            "spanNulls": false,
+            "showPoints": "auto",
+            "lineWidth": 1
+          }
+        },
+        "overrides": []
+      },
+      "options": {
+        "legend": {
+          "showLegend": true,
+          "displayMode": "table",
+          "placement": "bottom",
+          "calcs": ["last"]
+        },
+        "tooltip": { "mode": "multi" }
+      },
+      "targets": [
+        {
+          "expr": "cnpg_pg_stat_archiver_seconds_since_last_archival{namespace=\"$namespace\", cnpg_cluster=\"$cluster\"}",
+          "legendFormat": "{{pod}}",
+          "datasource": "Prometheus"
+        }
+      ],
+      "gridPos": { "h": 8, "w": 12, "x": 0, "y": 43 }
+    },
+    {
+      "id": 17,
+      "type": "timeseries",
+      "title": "Last Available Backup",
+      "datasource": "Prometheus",
+      "fieldConfig": {
+        "defaults": {
+          "custom": {
+            "lineInterpolation": "linear",
+            "spanNulls": false,
+            "showPoints": "auto",
+            "lineWidth": 1
+          }
+        },
+        "overrides": []
+      },
+      "options": {
+        "legend": {
+          "showLegend": true,
+          "displayMode": "table",
+          "placement": "bottom",
+          "calcs": ["last"]
+        },
+        "tooltip": { "mode": "multi" }
+      },
+      "targets": [
+        {
+          "expr": "cnpg_collector_last_available_backup_timestamp{namespace=\"$namespace\", cnpg_cluster=\"$cluster\"}",
+          "legendFormat": "{{pod}}",
+          "datasource": "Prometheus"
+        }
+      ],
+      "gridPos": { "h": 8, "w": 12, "x": 12, "y": 43 }
+    }
+  ]
+}

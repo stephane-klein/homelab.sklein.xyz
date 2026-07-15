@@ -77,16 +77,15 @@ address `2001:861:8b91:6620::1000` via hostNetwork. Services opt-in with
 by external-dns (watches Ingress resources, creates AAAA records in
 Cloudflare for `*.ipv6.ingress.homelab.public.stephane-klein.info`).
 
-### Perses
+### Grafana
 
-[Perses](https://perses.dev/) is a dashboard visualization tool deployed as a
-k3s workload via `scripts/deploy-perses.sh` and exposed at
-`https://perses.sklein.internal` (protected by Authelia — all `*.sklein.internal`
-subdomains are behind `ForwardAuth`). Scripts interact with the Perses API
-bypassing Authelia via `kubectl port-forward -n perses svc/perses`, since the
-internal k8s service does not require authentication. Dashboards are
-provisioned from YAML files in `perses/dashboards/` via ConfigMaps labeled
-`perses.dev/resource: "true"`.
+[Grafana](https://grafana.com/) is a dashboard visualization tool deployed via
+Helmfile (`helmfile/helmfile.yaml.gotmpl`) at `https://grafana.sklein.internal`
+(protected by Authelia — all `*.sklein.internal` subdomains are behind
+`ForwardAuth`). Scripts interact with the Grafana API bypassing Authelia via
+`kubectl port-forward -n grafana svc/grafana`, since the internal k8s service
+does not require authentication. Dashboards are provisioned from JSON files in
+`grafana/dashboards/` via ConfigMaps labeled `grafana_dashboard: "1"`.
 
 ### Secret detection with gitleaks
 
@@ -115,11 +114,11 @@ mise run setup-jj-alias
 ## Config directory
 
 Service-specific configuration files live in `config/<service>/` (e.g.,
-`config/perses/values.yaml`). Services using Helmfile have their definition in
+`config/authelia/`). Services using Helmfile have their definition in
 `helmfile/helmfile.yaml.gotmpl` and values in `helmfile/values/`. All services
 deploy as k3s workloads via Helm. The `scripts/` directory contains only
-executable scripts. Scripts reference config via relative paths:
-`-f config/perses/values.yaml` or `helmfile -f helmfile/helmfile.yaml.gotmpl`.
+executable scripts. Scripts reference config via relative paths or invoke
+`helmfile -f helmfile/helmfile.yaml.gotmpl`.
 
 ### Helmfile
 

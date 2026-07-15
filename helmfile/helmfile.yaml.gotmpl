@@ -5,6 +5,8 @@ repositories:
     url: https://sintef.github.io/mosquitto-helm-chart
   - name: zigbee2mqtt
     url: https://charts.zigbee2mqtt.io
+  - name: grafana
+    url: https://grafana.github.io/helm-charts
 
 releases:
   - name: memex
@@ -59,3 +61,11 @@ releases:
     version: 0.8.3
     values:
       - values/hindsight.yaml
+
+  - name: grafana
+    namespace: grafana
+    createNamespace: true
+    chart: grafana/grafana
+    version: 10.5.15
+    values:
+      - values/grafana.yaml

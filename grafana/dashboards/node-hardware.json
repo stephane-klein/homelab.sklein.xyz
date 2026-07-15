@@ -1,0 +1,242 @@
+{
+  "title": "Node Hardware Monitoring",
+  "uid": "node-hardware",
+  "tags": ["node", "hardware", "temperature"],
+  "schemaVersion": 39,
+  "version": 0,
+  "time": {
+    "from": "now-1h",
+    "to": "now"
+  },
+  "timepicker": {},
+  "refresh": "",
+  "templating": {
+    "list": [
+      {
+        "name": "instance",
+        "type": "query",
+        "datasource": "Prometheus",
+        "query": "label_values(node_uname_info{job=\"node-exporter\", sysname!=\"Darwin\"}, instance)",
+        "refresh": 1,
+        "includeAll": true,
+        "multi": false,
+        "current": {},
+        "options": []
+      }
+    ]
+  },
+  "panels": [
+    {
+      "id": 1,
+      "type": "row",
+      "title": "CPU Temperature",
+      "gridPos": { "h": 1, "w": 24, "x": 0, "y": 0 },
+      "collapsed": false,
+      "panels": []
+    },
+    {
+      "id": 2,
+      "type": "timeseries",
+      "title": "CPU Core Temperatures",
+      "description": "Per-core temperatures from coretemp sensors",
+      "datasource": "Prometheus",
+      "fieldConfig": {
+        "defaults": {
+          "unit": "celsius",
+          "custom": {
+            "lineInterpolation": "linear",
+            "spanNulls": false,
+            "showPoints": "auto",
+            "lineWidth": 1
+          }
+        },
+        "overrides": []
+      },
+      "options": {
+        "legend": {
+          "showLegend": true,
+          "displayMode": "table",
+          "placement": "bottom",
+          "calcs": ["last"]
+        },
+        "tooltip": { "mode": "multi" }
+      },
+      "targets": [
+        {
+          "expr": "node_hwmon_temp_celsius{job=\"node-exporter\", chip=~\"platform_coretemp.*\", instance=~\"$instance\"}",
+          "legendFormat": "{{nodename}} - {{sensor}}",
+          "datasource": "Prometheus"
+        },
+        {
+          "expr": "max by (instance) (node_hwmon_temp_celsius{job=\"node-exporter\", chip=~\"platform_coretemp.*\", instance=~\"$instance\"})",
+          "legendFormat": "Max - {{nodename}}",
+          "datasource": "Prometheus"
+        },
+        {
+          "expr": "avg by (instance) (node_hwmon_temp_celsius{job=\"node-exporter\", chip=~\"platform_coretemp.*\", instance=~\"$instance\"})",
+          "legendFormat": "Avg - {{nodename}}",
+          "datasource": "Prometheus"
+        }
+      ],
+      "gridPos": { "h": 10, "w": 24, "x": 0, "y": 1 }
+    },
+    {
+      "id": 3,
+      "type": "row",
+      "title": "NVMe & Thermal Zones",
+      "gridPos": { "h": 1, "w": 24, "x": 0, "y": 11 },
+      "collapsed": false,
+      "panels": []
+    },
+    {
+      "id": 4,
+      "type": "timeseries",
+      "title": "NVMe Temperature",
+      "description": "SSD disk temperature",
+      "datasource": "Prometheus",
+      "fieldConfig": {
+        "defaults": {
+          "unit": "celsius",
+          "custom": {
+            "lineInterpolation": "linear",
+            "spanNulls": false,
+            "showPoints": "auto",
+            "lineWidth": 1
+          }
+        },
+        "overrides": []
+      },
+      "options": {
+        "legend": {
+          "showLegend": true,
+          "displayMode": "table",
+          "placement": "bottom",
+          "calcs": ["last"]
+        },
+        "tooltip": { "mode": "multi" }
+      },
+      "targets": [
+        {
+          "expr": "node_hwmon_temp_celsius{job=\"node-exporter\", chip=~\"nvme.*\", instance=~\"$instance\"}",
+          "legendFormat": "{{nodename}} - {{chip}}",
+          "datasource": "Prometheus"
+        }
+      ],
+      "gridPos": { "h": 8, "w": 12, "x": 0, "y": 12 }
+    },
+    {
+      "id": 5,
+      "type": "timeseries",
+      "title": "Thermal Zones",
+      "description": "ACPI and package thermal zone temperatures",
+      "datasource": "Prometheus",
+      "fieldConfig": {
+        "defaults": {
+          "unit": "celsius",
+          "custom": {
+            "lineInterpolation": "linear",
+            "spanNulls": false,
+            "showPoints": "auto",
+            "lineWidth": 1
+          }
+        },
+        "overrides": []
+      },
+      "options": {
+        "legend": {
+          "showLegend": true,
+          "displayMode": "table",
+          "placement": "bottom",
+          "calcs": ["last"]
+        },
+        "tooltip": { "mode": "multi" }
+      },
+      "targets": [
+        {
+          "expr": "node_thermal_zone_temp{job=\"node-exporter\", instance=~\"$instance\"}",
+          "legendFormat": "{{nodename}} - {{type}} zone {{zone}}",
+          "datasource": "Prometheus"
+        }
+      ],
+      "gridPos": { "h": 8, "w": 12, "x": 12, "y": 12 }
+    },
+    {
+      "id": 6,
+      "type": "row",
+      "title": "CPU Performance",
+      "gridPos": { "h": 1, "w": 24, "x": 0, "y": 20 },
+      "collapsed": false,
+      "panels": []
+    },
+    {
+      "id": 7,
+      "type": "timeseries",
+      "title": "CPU Frequency",
+      "description": "Current CPU scaling frequency per core",
+      "datasource": "Prometheus",
+      "fieldConfig": {
+        "defaults": {
+          "unit": "hertz",
+          "custom": {
+            "lineInterpolation": "linear",
+            "spanNulls": false,
+            "showPoints": "auto",
+            "lineWidth": 1
+          }
+        },
+        "overrides": []
+      },
+      "options": {
+        "legend": {
+          "showLegend": true,
+          "displayMode": "table",
+          "placement": "bottom",
+          "calcs": ["last"]
+        },
+        "tooltip": { "mode": "multi" }
+      },
+      "targets": [
+        {
+          "expr": "node_cpu_scaling_frequency_hertz{job=\"node-exporter\", instance=~\"$instance\"}",
+          "legendFormat": "{{nodename}} - CPU {{cpu}}",
+          "datasource": "Prometheus"
+        }
+      ],
+      "gridPos": { "h": 8, "w": 12, "x": 0, "y": 21 }
+    },
+    {
+      "id": 8,
+      "type": "timeseries",
+      "title": "CPU Core Throttling",
+      "description": "Rate of CPU core throttling events",
+      "datasource": "Prometheus",
+      "fieldConfig": {
+        "defaults": {
+          "custom": {
+            "lineInterpolation": "linear",
+            "spanNulls": false,
+            "showPoints": "auto",
+            "lineWidth": 1
+          }
+        },
+        "overrides": []
+      },
+      "options": {
+        "legend": {
+          "showLegend": true,
+          "displayMode": "table",
+          "placement": "bottom"
+        },
+        "tooltip": { "mode": "multi" }
+      },
+      "targets": [
+        {
+          "expr": "rate(node_cpu_core_throttles_total{job=\"node-exporter\", instance=~\"$instance\"}[$__rate_interval])",
+          "legendFormat": "{{nodename}} - CPU {{cpu}}",
+          "datasource": "Prometheus"
+        }
+      ],
+      "gridPos": { "h": 8, "w": 12, "x": 12, "y": 21 }
+    }
+  ]
+}

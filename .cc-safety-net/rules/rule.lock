@@ -15,7 +15,7 @@
       "path": "kubectl-rules",
       "name": "kubectl-rules",
       "version": "1.0.0",
-      "digest": "sha256:39e7f1d40e4c4225578445d59dfd1d32341772adb64cbe23d478bd4a21326200"
+      "digest": "sha256:ba151774734742e1b638eb41555e4379046db5ebc9af160108ec05d34d69d253"
     },
     {
       "spec": "mise-rules",
@@ -23,7 +23,7 @@
       "path": "mise-rules",
       "name": "mise-rules",
       "version": "1.0.0",
-      "digest": "sha256:81a878e57741301b8f5bcfae1518948e4a6112da34913d011dba1fd7915be24b"
+      "digest": "sha256:7f9044e9292f6f799e6435b6b0fde1e4efbe0cab0cca0c2c7c4272633c0002ce"
     },
     {
       "spec": "tofu-rules",

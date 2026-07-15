@@ -46,8 +46,7 @@ Deployed services:
   - [vmagent](https://github.com/VictoriaMetrics/VictoriaMetrics) (metric scraping)
   - [kube-state-metrics](https://github.com/kubernetes/kube-state-metrics) (cluster state metrics)
   - [prometheus-node-exporter](https://github.com/prometheus/node_exporter) (per-node system metrics)
-  - [Perses](https://github.com/perses/perses) (dashboards)
-  - [Perses Operator](https://github.com/perses/perses-operator) (CRD management)
+  - [Grafana](https://github.com/grafana/grafana) (dashboards)
 
 My databases:
 
@@ -72,7 +71,7 @@ Here are some service ideas I plan to deploy on my homelab.
   - [ ] **Team messaging**: [fluux-messenger](https://github.com/processone/fluux-messenger/) - Mattermost-like group chat built on XMPP, for communities and organizations [untested]
 - [ ] **Traefik dashboard**: expose the web admin UI for both `traefik` and `traefik-public` internally
 - [ ] **Ingress metrics**: configure and display metrics for both Traefik instances
-- [ ] **Migrate Perses → Grafana**: Perses has limitations and bugs that block my use cases — not mature enough for my needs yet
+- [x] **Migrate Perses → Grafana**: Perses has limitations and bugs that block my use cases — not mature enough for my needs yet
 - [ ] **CrowdSec + Traefik bouncer**: setup CrowdSec with a Traefik bouncer on the public ingress
 - [ ] **Autonomous AI agent framework**: [Hermes Agent](https://github.com/NousResearch/hermes-agent) [untested]
 - [ ] **Dashboard / startpage**: [Glance](https://github.com/glanceapp/glance/)
@@ -346,7 +345,6 @@ hindsight         hindsight                                        Ingress      
 hindsight         hindsight-api                                    IngressRoute  api.hindsight.sklein.internal
 homepage          homepage                                         Ingress       homepage.sklein.internal
 litellm           litellm                                          Ingress       litellm.sklein.internal
-perses            perses                                           Ingress       perses.sklein.internal
 toggl-pg-mirror   toggl-pg-mirror                                  Ingress       toggl.sklein.internal
 victoria-metrics  victoria-metrics-victoria-metrics-single-server  Ingress       metrics.sklein.internal
 zigbee            zigbee2mqtt                                      Ingress       zigbee2mqtt.sklein.internal
@@ -562,11 +560,13 @@ This removes the operator and the `cnpg-system` namespace.
 
 ## Monitoring
 
-[VictoriaMetrics](https://victoriametrics.com/) (single-node) provides the metric store, [Perses](https://perses.dev/) provides the dashboards, and [vmagent](https://docs.victoriametrics.com/vmagent/) handles metric scraping.
+[VictoriaMetrics](https://victoriametrics.com/) (single-node) provides the metric store,
+[Grafana](https://grafana.com/) provides the dashboards,
+and [vmagent](https://docs.victoriametrics.com/vmagent/) handles metric scraping.
 
 Access:
 - Metrics API: `https://metrics.sklein.internal`
-- Perses dashboards: `https://perses.sklein.internal`
+- Grafana: `https://grafana.sklein.internal`
 
 ### Deploy
 
@@ -577,8 +577,8 @@ $ mise run deploy-victoria-metrics
 # 2. Exporters + vmagent (scraping)
 $ mise run deploy-exporters
 
-# 3. Perses dashboards
-$ mise run deploy-perses
+# 3. Grafana dashboards
+$ mise run deploy-grafana
 ```
 
 This installs:
@@ -587,44 +587,70 @@ This installs:
 - **kube-state-metrics** — Kubernetes cluster state metrics
 - **prometheus-node-exporter** — per-node system metrics (CPU, memory, disk)
 - **vmagent** — lightweight scrape agent, sends data to VictoriaMetrics via remote write
-- **Perses** — dashboard UI at `https://perses.sklein.internal`
-- **Perses Operator** — manages datasources and dashboards via ConfigMaps
-- **Custom dashboards** — node-hardware and node-overview, deployed from `perses/dashboards/`
+- **Grafana** — dashboard UI at `https://grafana.sklein.internal` (deployed via Helmfile)
+- **Custom dashboards** — deployed from `grafana/dashboards/`
 
 ### Clean up
 
 ```sh
-$ mise run destroy-perses
+$ mise run destroy-grafana
 $ mise run destroy-exporters
 $ mise run destroy-victoria-metrics
 ```
 
-### Dashboards
+### Grafana
 
-Dashboards are defined as YAML files in `perses/dashboards/` and synced
-to the cluster via ConfigMaps labeled `perses.dev/resource: "true"`. The Perses
-operator watches these ConfigMaps and syncs them to the Perses internal database
-under the `homelab` project.
+Grafana is deployed via Helmfile (`helmfile/helmfile.yaml.gotmpl`) with the
+official [grafana/grafana](https://github.com/grafana/helm-charts/tree/main/charts/grafana)
+Helm chart. Configuration lives in `helmfile/values/grafana.yaml`.
+
+**Deploy:**
+
+```sh
+$ mise run deploy-grafana
+```
+
+This creates the `grafana-admin` secret (admin password from `.secret`), deploys
+Grafana in the `grafana` namespace, and provisions the Prometheus datasource
+pointing to VictoriaMetrics.
+
+**Destroy:**
+
+```sh
+$ mise run destroy-grafana
+```
+
+#### Dashboards
+
+Dashboards are defined as JSON files in `grafana/dashboards/` and synced
+to the cluster via ConfigMaps labeled `grafana_dashboard: "1"`. The Grafana
+sidecar watches these ConfigMaps and imports them automatically.
 
 **Push (local → cluster):**
 
 ```sh
-$ mise run push-perses-dashboards
+$ mise run push-grafana-dashboards
 ```
 
-This creates or updates ConfigMaps from each `perses/dashboards/*.yaml` and
-removes dashboards that no longer exist locally. No need to redeploy Perses.
+This creates or updates ConfigMaps from each `grafana/dashboards/*.json` and
+removes dashboards that no longer exist locally. No need to redeploy Grafana.
 
-**Pull (UI → local):**
+**Edit dashboards with OpenCode:**
 
-After editing dashboards in the Perses UI, pull them back to YAML:
+There are two ways to update a dashboard:
 
-```sh
-$ mise run pull-perses-dashboards
-```
+1. **Direct changes** — Ask OpenCode to modify the JSON file in
+   `grafana/dashboards/` (e.g., add a panel, change a query, adjust colors).
+   OpenCode reads the file, applies the change, and you push with
+   `mise run push-grafana-dashboards`.
 
-This reaches Perses internally via `kubectl port-forward` (bypassing Authelia)
-and saves each dashboard to `perses/dashboards/<name>.yaml`.
+2. **Live edit + export** — Edit the dashboard directly in the Grafana UI
+   (`https://grafana.sklein.internal`), then export the JSON:
+   Dashboard settings → **JSON Model** → copy the full JSON. Paste it to
+   OpenCode and ask it to apply the changes to the corresponding file in
+   `grafana/dashboards/`. This avoids manually editing the JSON while
+   preserving its field order. Then push with
+   `mise run push-grafana-dashboards`.
 
 ## Homepage — Application Dashboard
 
@@ -659,7 +685,7 @@ Temperature and humidity monitoring via Zigbee sensors, deployed in the `zigbee`
 
 **Access:**
 - Zigbee2MQTT UI: `https://zigbee2mqtt.sklein.internal`
-- Metrics dashboard: `zigbee-sensors` in Perses (`https://perses.sklein.internal`)
+- Metrics dashboard: `Zigbee Sensors` in Grafana (`https://grafana.sklein.internal`)
 
 **Deploy:**
 

@@ -1,0 +1,47 @@
+admin:
+  existingSecret: grafana-admin
+
+datasources:
+  datasources.yaml:
+    apiVersion: 1
+    datasources:
+      - name: Prometheus
+        type: prometheus
+        url: http://victoria-metrics-victoria-metrics-single-server.victoria-metrics.svc:8428
+        access: proxy
+        isDefault: true
+
+sidecar:
+  dashboards:
+    enabled: true
+    label: grafana_dashboard
+    labelValue: "1"
+
+ingress:
+  enabled: true
+  ingressClassName: traefik
+  annotations:
+    cert-manager.io/cluster-issuer: homelab-ca
+    traefik.ingress.kubernetes.io/router.middlewares: traefik-forwardauth-authelia@kubernetescrd
+  path: /
+  pathType: Prefix
+  hosts:
+    - grafana.sklein.internal
+  tls:
+    - secretName: grafana-tls
+      hosts:
+        - grafana.sklein.internal
+
+grafana.ini:
+  users:
+    default_language: fr-FR
+
+initChownData:
+  enabled: false
+
+persistence:
+  enabled: true
+  size: 2Gi
+
+nodeSelector:
+  kubernetes.io/hostname: nuc-i7-gen11.homelab.stephane-klein.info

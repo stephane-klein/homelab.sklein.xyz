@@ -94,22 +94,6 @@ run = "scripts/deploy-victoria-metrics.sh"
 description = "Destroy VictoriaMetrics"
 run = "scripts/destroy-victoria-metrics.sh"
 
-[tasks.deploy-perses]
-description = "Deploy Perses at https://perses.sklein.internal"
-run = "scripts/deploy-perses.sh"
-
-[tasks.destroy-perses]
-description = "Destroy Perses"
-run = "scripts/destroy-perses.sh"
-
-[tasks.pull-perses-dashboards]
-description = "Pull dashboards from Perses API to perses/dashboards/"
-run = "scripts/pull-perses-dashboards.sh"
-
-[tasks.push-perses-dashboards]
-description = "Push dashboards from perses/dashboards/ to cluster"
-run = "scripts/push-perses-dashboards.sh"
-
 [tasks.deploy-authelia]
 description = "Deploy Authelia at https://auth.sklein.internal"
 run = "scripts/deploy-authelia.sh"
@@ -259,3 +243,19 @@ run = "scripts/deploy-coredns-custom.sh"
 [tasks.destroy-coredns-custom]
 description = "Remove CoreDNS custom rewrite rules"
 run = "scripts/destroy-coredns-custom.sh"
+
+[tasks.deploy-grafana]
+description = "Deploy Grafana at https://grafana.sklein.internal"
+run = "scripts/deploy-grafana.sh"
+
+[tasks.destroy-grafana]
+description = "Destroy Grafana"
+run = "scripts/destroy-grafana.sh"
+
+[tasks.push-grafana-dashboards]
+description = "Push dashboards from grafana/dashboards/ to cluster"
+run = "scripts/push-grafana-dashboards.sh"
+
+[tasks.configure-grafana-admin]
+description = "Configure Grafana admin profile (name, timezone, language)"
+run = "scripts/configure-grafana-admin.sh"
