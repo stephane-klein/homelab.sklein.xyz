@@ -5,29 +5,38 @@ Test deployment of [sveltekit-ssr-skeleton](https://github.com/stephane-klein/sv
 ## Deploy
 
 ```sh
-$ helmfile -f helmfile.yaml.gotmpl apply
+$ mise run deploy-sveltekit-ssr-skeleton
 ```
+
+This creates the `sveltekit-ssr-skeleton-myapp-secrets` Secret from Gopass
+(AUTHELIA_CLIENT_SECRET, MY_APP_ADMIN_TOKEN, SMTP_PASS) and applies
+`helmfile.yaml`.
 
 Create an OIDC user:
 
 ```bash
 $ curl -k -X POST \
-    -H "Authorization: Bearer ${SVELTEKIT_SSR_SKELETON_ADMIN_TOKEN}" \
+    -H "Authorization: Bearer $(gopass show -o homelab/sveltekit_ssr_skeleton/ADMIN_TOKEN)" \
     -H "Content-Type: application/json" \
     -d '{"email":"contact@stephane-klein.info","display_name":"Stéphane Klein","oidc_issuer":"https://auth.sklein.internal/","oidc_subject":"stephane"}' \
     https://sveltekit-ssr-skeleton-myapp-test.sklein.internal/api/v1/admin/users | jq
 ```
+
+## Test SMTP
+
+```sh
+$ mise run test-sveltekit-ssr-skeleton-smtp
+```
+
+Sends a test email via `smtp.fastmail.com:465` using SMTP parameters from `values.yaml` (password retrieved from Gopass).
 
 ## URLs
 
 - App: https://sveltekit-ssr-skeleton-myapp-test.sklein.internal
 - OIDC issuer: https://auth.sklein.internal
 
-
-
-
 ## Destroy
 
 ```sh
-$ helmfile -f helmfile.yaml.gotmpl destroy
+$ helmfile -f helmfile.yaml destroy
 ```

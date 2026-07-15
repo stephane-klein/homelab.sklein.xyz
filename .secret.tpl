@@ -31,10 +31,6 @@ HINDSIGHT_API_RERANKER_OPENROUTER_API_KEY="{{ getpw "hindsight/openrouter" }}"
 # Cloudflare API Token for Let's Encrypt DNS-01 and external-dns
 CLOUDFLARE_API_TOKEN="{{ getpw "homelab/cloudflare/stephane-klein.info/api-token" }}"
  
-# https://github.com/stephane-klein/sveltekit-ssr-skeleton — OIDC client_secret for Authelia
-AUTHELIA_CLIENT_SECRET_SVELTEKIT_SSR_SKELETON="{{ getpw "homelab/authelia/client-secret-sveltekit-ssr-skeleton"}}"
-SVELTEKIT_SSR_SKELETON_ADMIN_TOKEN="{{ getpw "homelab/sveltekit_ssr_skeleton/ADMIN_TOKEN" }}"
-
 # Authelia OIDC HMAC secret — used to sign OIDC tokens
 AUTHELIA_OIDC_HMAC_SECRET="{{ getpw "homelab/authelia/oidc/hmac-secret" }}"
 

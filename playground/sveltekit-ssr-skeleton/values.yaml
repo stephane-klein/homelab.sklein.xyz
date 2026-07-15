@@ -21,3 +21,23 @@ oidc:
   enabled: true
   issuer: https://auth.sklein.internal
   clientId: sveltekit-ssr-skeleton-myapp-test
+
+metrics:
+  enabled: true
+  grafanaDashboard:
+    enabled: true
+
+optimizeForMemorySize: true
+
+seed:
+  enabled: true
+
+smtp:
+  host: "smtp.fastmail.com"
+  port: 465
+  secure: true
+  user: "stephane_klein@fastmail.com"
+  # SMTP password — passed directly as env var.
+  from: contact@stephane-klein.info
+  # Default recipient for the send-test-mail admin endpoint
+  testTo: "contact@stephane-klein.info"
