@@ -8,7 +8,8 @@ echo "=== Deploying external-secrets ==="
 helm repo add external-secrets https://charts.external-secrets.io --force-update > /dev/null
 
 helm upgrade --install external-secrets external-secrets/external-secrets \
-  --namespace external-secrets --create-namespace > /dev/null
+  --namespace external-secrets --create-namespace \
+  --values config/external-secrets/helm-values.yaml > /dev/null
 
 echo "  Waiting for external-secrets to be ready..."
 kubectl wait --for=condition=Available deployment \
