@@ -47,7 +47,9 @@ Key choices:
 installed post-OS via the official `get.k3s.io` script, driven by
 `scripts/deploy-k3s.sh`.
 
-- **nuc-i7-gen11** — control-plane (server) with embedded etcd
+- **nuc-i7-gen11** — control-plane (server), k3s single-server mode with the
+  default **kine/SQLite** datastore
+  (`/var/lib/rancher/k3s/server/db/state.db`), not embedded etcd
 - **nuc-i3-gen5** — worker (agent)
 - **Netbird-local networking** — k3s binds on the Netbird VPN IP (`wt0`)
   interface. systemd units have `After=netbird.service` so the cluster only

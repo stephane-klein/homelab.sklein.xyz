@@ -169,6 +169,12 @@ A multi-node [k3s](https://k3s.io/) cluster spans the two servers:
 | `nuc-i7-gen11` | **Server** (control-plane) | 32 GB RAM, 1 To SSD |
 | `nuc-i3-gen5` | **Agent** (worker) | 8 GB RAM, 120 Go SSD |
 
+> **Datastore:** the cluster runs in k3s **single-server mode** — the
+> control-plane uses the default **kine/SQLite** datastore
+> (`/var/lib/rancher/k3s/server/db/state.db`), not embedded etcd. Cluster
+> state, including all Kubernetes Secrets, is stored plaintext in this file.
+> k3s secrets encryption (`--secrets-encryption`) is **not enabled**.
+
 ### Generate the K3S token
 
 ```sh
