@@ -5,6 +5,9 @@ cd "$(dirname "$0")/../"
 
 # Required env: K3S_TOKEN (loaded via mise from .secret)
 # Optional env with defaults: SSH_USER, K3S_VERSION
+#
+# Secrets encryption at rest is enabled on the server (secrets-encryption: true
+# in config.yaml).
 
 SSH_USER="${SSH_USER:-stephane}"
 K3S_VERSION="${K3S_VERSION:-v1.36.1+k3s1}"

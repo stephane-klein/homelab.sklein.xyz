@@ -50,6 +50,12 @@ installed post-OS via the official `get.k3s.io` script, driven by
 - **nuc-i7-gen11** — control-plane (server), k3s single-server mode with the
   default **kine/SQLite** datastore
   (`/var/lib/rancher/k3s/server/db/state.db`), not embedded etcd
+- **Secrets encryption at rest** — `secrets-encryption: true` is set in the k3s
+  config. The AES-CBC key lives in the datastore bootstrap data and in
+  `cred/encryption-config.json` on the control-plane. Control-plane backups
+  (`./scripts/backup-k3s-control-plane.sh` → `backups/`) plus the cluster token
+  (`homelab/k3s_token`) are how the cluster can be restored
+  (`./scripts/restore-k3s-control-plane.sh`).
 - **nuc-i3-gen5** — worker (agent)
 - **Netbird-local networking** — k3s binds on the Netbird VPN IP (`wt0`)
   interface. systemd units have `After=netbird.service` so the cluster only

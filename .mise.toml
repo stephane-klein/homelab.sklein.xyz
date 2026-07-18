@@ -160,6 +160,14 @@ run = "scripts/backup-cnpg-memex.sh"
 description = "Delete a CNPG Memex backup by name"
 run = "scripts/delete-cnpg-memex-backup.sh"
 
+[tasks.backup-k3s-control-plane]
+description = "Backup k3s control-plane state (state.db + cred/ + tls/) to backups/"
+run = "scripts/backup-k3s-control-plane.sh"
+
+[tasks.restore-k3s-control-plane]
+description = "Restore k3s control-plane state from the latest backup (requires K3S_TOKEN, destructive)"
+run = "scripts/restore-k3s-control-plane.sh"
+
 [tasks.deploy-homepage]
 description = "Deploy Homepage at https://homepage.sklein.internal"
 run = "scripts/deploy-homepage.sh"

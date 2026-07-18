@@ -172,8 +172,11 @@ A multi-node [k3s](https://k3s.io/) cluster spans the two servers:
 > **Datastore:** the cluster runs in k3s **single-server mode** — the
 > control-plane uses the default **kine/SQLite** datastore
 > (`/var/lib/rancher/k3s/server/db/state.db`), not embedded etcd. Cluster
-> state, including all Kubernetes Secrets, is stored plaintext in this file.
-> k3s secrets encryption (`--secrets-encryption`) is **not enabled**.
+> state, including all Kubernetes Secrets, is stored in this file.
+> **k3s secrets encryption (`--secrets-encryption`) is enabled** — Secrets are
+> encrypted at rest with an AES-CBC key that k3s generates on first start and
+> stores both in the datastore bootstrap data and in
+> `cred/encryption-config.json` on the control-plane node.
 
 ### Generate the K3S token
 
@@ -193,7 +196,7 @@ $ ./scripts/deploy-k3s.sh
 What the script does:
 
 1. Installs k3s control-plane on `nuc-i7-gen11` — binds on the Netbird VPN IP (`wt0`),
-   disables Traefik.
+   disables Traefik, enables secrets encryption at rest (`secrets-encryption: true`).
 2. Waits for the Kubernetes API to be ready.
 3. Installs k3s agent on `nuc-i3-gen5` — joins the server over the Netbird VPN.
 4. Retrieves the kubeconfig to `./k3s.kubeconfig` (added to `.gitignore`).
@@ -863,6 +866,11 @@ $ mise run deploy-toggl-pg-mirror
 ```
 
 Config: `helmfile/values/toggl-pg-mirror.yaml` 
+
+## Documentation
+
+- [`docs/runbooks/`](docs/runbooks/) — operational runbooks (maintenance, recovery, one-shot procedures)
+- [`docs/ops-log.md`](docs/ops-log.md) — chronological log of one-off operational actions
 
 ## Contribution
 

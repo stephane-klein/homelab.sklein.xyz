@@ -15,6 +15,7 @@ sudo tee /etc/rancher/k3s/config.yaml > /dev/null << CONFIGEOF
 bind-address: ${NETBIRD_IP}
 advertise-address: ${NETBIRD_IP}
 node-ip: ${NETBIRD_IP}
+secrets-encryption: true
 disable:
   - traefik
 write-kubeconfig-mode: "0644"
