@@ -26,9 +26,9 @@ resource "netbird_policy" "user_device_access" {
     enabled       = true
     protocol      = "all"
     sources       = [netbird_group.user_devices.id]
-    destinations  = [
-        netbird_group.homelab_servers.id,
-        netbird_group.dev_devices.id,
+    destinations = [
+      netbird_group.homelab_servers.id,
+      netbird_group.dev_devices.id,
     ]
   }
 }
@@ -45,13 +45,29 @@ resource "netbird_policy" "ssh_access" {
     enabled       = true
     protocol      = "netbird-ssh"
     sources       = [netbird_group.user_devices.id]
-    destinations  = [
-        netbird_group.homelab_servers.id,
-        netbird_group.dev_devices.id,
+    destinations = [
+      netbird_group.homelab_servers.id,
+      netbird_group.dev_devices.id,
     ]
 
     authorized_groups = {
       (netbird_group.user_devices.id) = ["stephane"]
     }
+  }
+}
+
+resource "netbird_policy" "fp5_to_t14s" {
+  name        = "FP5 to t14s Access"
+  description = "Allow FP5 to access t14s"
+  enabled     = true
+
+  rule {
+    name          = "All Protocols"
+    action        = "accept"
+    bidirectional = false
+    enabled       = true
+    protocol      = "all"
+    sources       = [netbird_group.fp5_device.id]
+    destinations  = [netbird_group.t14s_device.id]
   }
 }
