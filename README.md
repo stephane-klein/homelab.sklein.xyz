@@ -83,6 +83,8 @@ Here are some service ideas I plan to deploy on my homelab.
 - [ ] **File synchronization relay**: [syncthing](https://syncthing.net)
 - [ ] **Backup server**: [Borg](https://www.borgbackup.org/) - TimeMachine-like backups for workstations via [Pika Backup](https://apps.gnome.org/PikaBackup/)
 - [ ] **Email & message archiving**: [msgvault](https://www.msgvault.io/) — archive Fastmail (IMAP) and Gmail (Google API) locally, with fast keyword search and optional semantic search [untested]
+- [ ] **CVE vulnerability scanning**: [Trivy](https://github.com/aquasecurity/trivy) - notified of required security updates [untested]
+- [ ] **Automated dependency updates**: [Renovate](https://github.com/renovatebot/renovate) - automated updates of container images (not security related) [untested]
 
 I'm not sure I will actually deploy and use all these services. Some will likely be changed or dropped as I experiment.
 
