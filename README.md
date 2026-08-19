@@ -870,6 +870,8 @@ Config: `helmfile/values/toggl-pg-mirror.yaml`
 
 ## Documentation
 
+- [`docs/decisions/`](docs/decisions/) — Architecture Decision Records (ADR) following the MADR convention. To create one, ask the agent to use the `.opencode/skills/new-decision/` skill.
+- [`docs/agents/`](docs/agents/) — operational notes for AI agents (OpenCode, etc.), loaded on demand.
 - [`docs/runbooks/`](docs/runbooks/) — operational runbooks (maintenance, recovery, one-shot procedures)
 - [`docs/ops-log.md`](docs/ops-log.md) — chronological log of one-off operational actions
 

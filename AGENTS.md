@@ -163,3 +163,10 @@ Read this file before adding a new service.
 7. `./scripts/deploy-traefik-public.sh` — deploy public Traefik on IPv6
 8. `./scripts/deploy-cert-manager-issuer-public.sh` — deploy Let's Encrypt ClusterIssuer (DNS-01 via Cloudflare)
 9. `./scripts/deploy-external-dns.sh` — deploy external-dns for automatic Cloudflare DNS records
+
+## Supplementary Documentation
+
+- [`docs/agents/`](docs/agents/) — operational snapshots of subsystems (loaded on demand by the agent)
+- [`docs/decisions/`](docs/decisions/) — architecture decision records
+- [`docs/runbooks/`](docs/runbooks/) — operational runbooks (maintenance, recovery, one-shot procedures)
+- `.opencode/skills/new-decision/` — skill for creating new decision records
