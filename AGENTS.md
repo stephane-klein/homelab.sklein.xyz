@@ -119,14 +119,15 @@ mise run setup-git-hooks
 mise run setup-jj-alias
 ```
 
-## Config directory
+## Application layout
 
-Service-specific configuration files live in `config/<service>/` (e.g.,
-`config/authelia/`). Services using Helmfile have their definition in
-`helmfile/helmfile.yaml.gotmpl` and values in `helmfile/values/`. All services
+Each application lives in its own self-contained directory under `apps/<app>/`
+(helmfile, values, deploy/destroy scripts, mise tasks, README). See
+[`docs/agents/helmfile-apps.md`](docs/agents/helmfile-apps.md) for the full
+pattern. Legacy services not yet migrated still use
+`helmfile/helmfile.yaml.gotmpl` with values in `helmfile/values/`. All services
 deploy as k3s workloads via Helm. The `scripts/` directory contains only
-executable scripts. Scripts reference config via relative paths or invoke
-`helmfile -f helmfile/helmfile.yaml.gotmpl`.
+executable scripts.
 
 ### Helmfile
 
@@ -134,9 +135,10 @@ executable scripts. Scripts reference config via relative paths or invoke
 is for Docker — a declarative way to define, version, and apply Helm releases.
 It is the preferred deployment method over raw `helm upgrade --install`.
 
-- Definitions live in `helmfile/helmfile.yaml.gotmpl` (Go-templated).
-- Values live in `helmfile/values/<release>.yaml`.
-- Scripts invoke it as `helmfile -f helmfile/helmfile.yaml.gotmpl apply`.
+New applications define their own `apps/<app>/helmfile.yaml` (single release)
+with `values.yaml` alongside. Deploy/destroy run as
+`helmfile -f apps/<app>/helmfile.yaml apply|destroy`. See
+[`docs/agents/helmfile-apps.md`](docs/agents/helmfile-apps.md).
 
 ### Authelia
 
@@ -146,11 +148,6 @@ Traefik via a `ForwardAuth` middleware. It runs as a k3s workload in the
 lives in `config/authelia/`. Access control rules use a wildcard
 (`*.sklein.internal`, `one_factor`) so any new subdomain is automatically
 protected.
-
-### .opencode/skills/new-service-checklist/SKILL.md
-
-Checklist to follow when deploying a new service with Helmfile in this project.
-Read this file before adding a new service.
 
 ### Provisioning workflow
 
@@ -167,6 +164,7 @@ Read this file before adding a new service.
 ## Supplementary Documentation
 
 - [`docs/agents/`](docs/agents/) — operational snapshots of subsystems (loaded on demand by the agent)
+- [`docs/agents/helmfile-apps.md`](docs/agents/helmfile-apps.md) — per-application Helmfile deployment pattern
 - [`docs/decisions/`](docs/decisions/) — architecture decision records
 - [`docs/runbooks/`](docs/runbooks/) — operational runbooks (maintenance, recovery, one-shot procedures)
 - `.opencode/skills/new-decision/` — skill for creating new decision records
