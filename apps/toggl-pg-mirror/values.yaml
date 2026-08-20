@@ -7,10 +7,19 @@ cnpg:
   secretName: memex-cluster-app
   copySecretName: memex-app
 
-toggl:
-  existingSecret:
-    name: toggl-api-token
-    key: token
+existingSecret:
+  name: toggl-pg-mirror
+  togglTokenKey: toggl-token
+  adminTokenKey: admin-token
+  smtpPassKey: smtp-password
+
+smtp:
+  host: "smtp.fastmail.com"
+  port: 465
+  secure: true
+  user: "stephane_klein@fastmail.com"
+  from: contact@stephane-klein.info
+  testTo: "contact@stephane-klein.info"
 
 eso:
   enabled: true

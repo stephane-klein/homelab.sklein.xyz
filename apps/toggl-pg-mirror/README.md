@@ -11,7 +11,8 @@ This application depends on shared infrastructure deployed elsewhere:
 - The `memex` CloudNativePG cluster (in the `memex` namespace) for PostgreSQL.
 - The `external-secrets` operator and the `kubernetes-cnpg-memex`
   ClusterSecretStore, used to read the database credentials.
-- The `toggl-api-token` Secret (created by the deploy script from Gopass).
+- The `toggl-pg-mirror` Secret (created by the deploy script from Gopass),
+  holding three keys: `toggl-token`, `admin-token` and `smtp-password`.
 
 ## Deploy
 
@@ -21,7 +22,7 @@ $ mise run deploy-toggl-pg-mirror
 
 The script waits for the external-secrets operator, ensures the
 ClusterSecretStore, creates the `toggl-pg-mirror` namespace and the
-`toggl-api-token` Secret from Gopass, then applies the local helmfile.
+`toggl-pg-mirror` Secret from Gopass, then applies the local helmfile.
 
 ## Destroy
 
