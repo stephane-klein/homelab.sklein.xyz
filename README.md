@@ -48,6 +48,15 @@ Deployed services:
   - [prometheus-node-exporter](https://github.com/prometheus/node_exporter) (per-node system metrics)
   - [Grafana](https://github.com/grafana/grafana) (dashboards)
 
+## Applications
+
+Each application is a self-contained directory under
+[`apps/`](./apps/). The migration from the monolithic
+`helmfile/helmfile.yaml.gotmpl` is in progress (see
+[ADR 001](docs/decisions/2026-08_001-per-app-helmfile-directories.md)).
+
+- [`apps/toggl-pg-mirror/`](./apps/toggl-pg-mirror/) — mirrors Toggl time entries to PostgreSQL
+
 My databases:
 
 - Memex
@@ -866,7 +875,7 @@ sync daemon. Tables are stored in the `toggl` schema.
 $ mise run deploy-toggl-pg-mirror
 ```
 
-Config: `helmfile/values/toggl-pg-mirror.yaml` 
+Config: [`apps/toggl-pg-mirror/values.yaml`](apps/toggl-pg-mirror/values.yaml)
 
 ## Documentation
 

@@ -216,7 +216,11 @@ run = "scripts/destroy-external-dns.sh"
 
 [tasks.deploy-toggl-pg-mirror]
 description = "Deploy toggl-pg-mirror (syncs Toggl time entries to PostgreSQL)"
-run = "scripts/deploy-toggl-pg-mirror.sh"
+run = "apps/toggl-pg-mirror/scripts/deploy.sh"
+
+[tasks.destroy-toggl-pg-mirror]
+description = "Destroy toggl-pg-mirror"
+run = "apps/toggl-pg-mirror/scripts/destroy.sh"
 
 [tasks.deploy-zigbee]
 description = "Deploy Mosquitto + Zigbee2MQTT + MQTT bridge in k3s for temperature monitoring"

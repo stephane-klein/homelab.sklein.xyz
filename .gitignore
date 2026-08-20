@@ -9,3 +9,4 @@ certs/
 *.lock.hcl
 k3s.kubeconfig
 backups/
+.helmfile/

@@ -1,0 +1,11 @@
+[tasks.deploy-toggl-pg-mirror]
+description = "Deploy toggl-pg-mirror (syncs Toggl time entries to PostgreSQL)"
+run = "scripts/deploy.sh"
+
+[tasks.destroy-toggl-pg-mirror]
+description = "Destroy toggl-pg-mirror"
+run = "scripts/destroy.sh"
+
+[tasks.diff-toggl-pg-mirror]
+description = "Show the helm diff for toggl-pg-mirror and report drift"
+run = "scripts/diff.sh"
