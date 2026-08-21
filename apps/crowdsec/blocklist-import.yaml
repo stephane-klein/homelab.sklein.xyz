@@ -1,0 +1,92 @@
+# CrowdSec blocklist-import CronJob — injects external threat feeds into LAPI.
+# Deployed in the `crowdsec` namespace so it can reach the LAPI service.
+
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: blocklist-import-config
+  namespace: crowdsec
+data:
+  # LAPI is reachable from the cluster via its Service.
+  CROWDSEC_LAPI_URL: "http://crowdsec-service.crowdsec.svc.cluster.local:8080"
+  CROWDSEC_MACHINE_ID: "blocklist-import"
+  # Decision defaults
+  DECISION_DURATION: "24h"
+  DECISION_TYPE: "ban"
+  DECISION_ORIGIN: "blocklist-import"
+  DECISION_REASON: "external_blocklist"
+  DECISION_SCENARIO: "external/blocklist"
+  # Processing
+  BATCH_SIZE: "1000"
+  LOG_LEVEL: "INFO"
+  # Save alert quota (free tier = 500 alerts/month) and stay off telemetry.
+  CONSOLIDATE_ALERTS: "true"
+  TELEMETRY_ENABLED: "false"
+  METRICS_ENABLED: "false"
+  # Protect GitHub ranges from being blocked.
+  ALLOWLIST_GITHUB: "true"
+  # Prudent subset of feeds (enabled).
+  ENABLE_IPSUM: "true"
+  ENABLE_SPAMHAUS: "true"
+  ENABLE_FIREHOL: "true"
+  ENABLE_ABUSE_CH: "true"
+  ENABLE_BLOCKLIST_DE: "true"
+  ENABLE_EMERGING_THREATS: "true"
+  # Disabled initially (false-positive / volume reasons).
+  ENABLE_TOR: "false"
+  ENABLE_SCANNERS: "false"
+  ENABLE_STOPFORUMSPAM: "false"
+  ENABLE_CI_ARMY: "false"
+  ENABLE_BOTVRIJ: "false"
+  ENABLE_GREENSNOW: "false"
+  ENABLE_BINARY_DEFENSE: "false"
+  ENABLE_BRUTEFORCE_BLOCKER: "false"
+  ENABLE_DSHIELD: "false"
+  ENABLE_ABUSE_IPDB: "false"
+  ENABLE_CYBERCRIME_TRACKER: "false"
+  ENABLE_MONTY_SECURITY_C2: "false"
+  ENABLE_VXVAULT: "false"
+  ENABLE_SENTINEL: "false"
+---
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: blocklist-import
+  namespace: crowdsec
+spec:
+  schedule: "0 */6 * * *"
+  concurrencyPolicy: Forbid
+  successfulJobsHistoryLimit: 2
+  failedJobsHistoryLimit: 2
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          restartPolicy: OnFailure
+          containers:
+            - name: blocklist-import
+              image: ghcr.io/wolffcatskyy/crowdsec-blocklist-import:3.7.1
+              envFrom:
+                - configMapRef:
+                    name: blocklist-import-config
+              env:
+                # Credentials are read from the mounted secret (never inline).
+                - name: CROWDSEC_LAPI_KEY_FILE
+                  value: /secrets/lapi-key
+                - name: CROWDSEC_MACHINE_PASSWORD_FILE
+                  value: /secrets/machine-password
+              volumeMounts:
+                - name: credentials
+                  mountPath: /secrets
+                  readOnly: true
+              resources:
+                requests:
+                  cpu: 50m
+                  memory: 64Mi
+                limits:
+                  cpu: 500m
+                  memory: 256Mi
+          volumes:
+            - name: credentials
+              secret:
+                secretName: blocklist-import-credentials

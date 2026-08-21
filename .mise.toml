@@ -242,6 +242,14 @@ run = "scripts/destroy-cnpg-hindsight.sh"
 description = "List all virtual hosts exposed by Ingress and IngressRoute (internal vs public)"
 run = "scripts/list-ingresses.sh"
 
+[tasks.deploy-crowdsec]
+description = "Deploy CrowdSec LAPI + agent + blocklist-import CronJob"
+run = "apps/crowdsec/scripts/deploy.sh"
+
+[tasks.destroy-crowdsec]
+description = "Destroy CrowdSec (destructive: wipes LAPI decisions)"
+run = "apps/crowdsec/scripts/destroy.sh"
+
 [tasks.deploy-hindsight]
 description = "Deploy Hindsight agent memory system at https://hindsight.sklein.internal"
 run = "scripts/deploy-hindsight.sh"

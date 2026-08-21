@@ -1,0 +1,11 @@
+repositories:
+  - name: crowdsec
+    url: https://crowdsecurity.github.io/helm-charts
+releases:
+  - name: crowdsec
+    namespace: crowdsec
+    createNamespace: true
+    chart: crowdsec/crowdsec
+    version: 0.24.0
+    values:
+      - values.yaml

@@ -1,0 +1,35 @@
+# CrowdSec LAPI + agent: protects the public Traefik (traefik-public) ingress
+container_runtime: containerd
+
+lapi:
+  replicas: 1
+  persistentVolume:
+    data:
+      enabled: true
+      size: 1Gi
+
+agent:
+  acquisition:
+    # Read the access logs of the public Traefik pod (release name is
+    # traefik-public, hence podName traefik-public-*).
+    - namespace: traefik
+      podName: traefik-public-*
+      program: traefik
+  # Install the Traefik parser + generic HTTP scenarios. The single collection
+  # crowdsecurity/traefik pulls in the traefik-logs parser (filter matches
+  # program startsWith 'traefik') and crowdsecurity/base-http-scenarios.
+  env:
+    - name: COLLECTIONS
+      value: "crowdsecurity/traefik"
+
+config:
+  config.yaml.local: |
+    api:
+      server:
+        auto_registration:
+          enabled: true
+          token: "${REGISTRATION_TOKEN}"
+          allowed_ranges:
+            - "127.0.0.1/32"
+            # k3s default pod CIDR — adapt if the cluster uses a custom one
+            - "10.42.0.0/16"

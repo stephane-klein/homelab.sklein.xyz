@@ -1,0 +1,22 @@
+# CrowdSec file-provider dynamic config for traefik-public.
+# Mounted at /config/crowdsec.yml (ConfigMap `crowdsec-dynamic` in ns traefik)
+# and enabled via --providers.file.filename=/config/crowdsec.yml.
+# The middleware is attached globally to the websecure entrypoint through
+# --entryPoints.websecure.http.middlewares=crowdsec@file (see
+# scripts/deploy-traefik-public.sh), so every public request is checked.
+http:
+  middlewares:
+    crowdsec:
+      plugin:
+        crowdsec-bouncer:
+          enabled: true
+          # stream mode: decision cache refreshed from LAPI every
+          # updateIntervalSeconds — recommended for performance.
+          crowdsecMode: stream
+          updateIntervalSeconds: 60
+          # block traffic until the first stream sync completes on startup
+          streamStartupBlock: true
+          crowdsecLapiScheme: http
+          crowdsecLapiHost: crowdsec-service.crowdsec.svc.cluster.local:8080
+          # key read from the mounted secret (never inline in the ConfigMap)
+          crowdsecLapiKeyFile: /config/crowdsec-key

@@ -25,6 +25,7 @@ Deployed services:
   - [cert-manager](https://github.com/cert-manager/cert-manager) (TLS: private CA + Let's Encrypt DNS-01 via Cloudflare)
   - [external-dns](https://github.com/kubernetes-sigs/external-dns) (automatic AAAA in Cloudflare for public Ingress)
   - [Authelia](https://github.com/authelia/authelia) (SSO authentication)
+  - [CrowdSec](https://github.com/crowdsecurity/crowdsec) (IP reputation / IPS for the public Traefik ingress)
   - [CloudNativePG](https://cloudnative-pg.io/) (PostgreSQL operator with backup to Scaleway Object Storage)
   - [External Secrets Operator](https://external-secrets.io/) (cross-namespace secret sharing)
 - **Environment monitoring**
@@ -56,6 +57,7 @@ Each application is a self-contained directory under
 [ADR 001](docs/decisions/2026-08_001-per-app-helmfile-directories.md)).
 
 - [`apps/toggl-pg-mirror/`](./apps/toggl-pg-mirror/) — mirrors Toggl time entries to PostgreSQL
+- [`apps/crowdsec/`](./apps/crowdsec/) — CrowdSec [LAPI](https://docs.crowdsec.net/docs/local_api/intro/) + agent (protects the public Traefik ingress), including the blocklist-import CronJob for external threat feeds
 
 My databases:
 
@@ -81,7 +83,7 @@ Here are some service ideas I plan to deploy on my homelab.
 - [ ] **Traefik dashboard**: expose the web admin UI for both `traefik` and `traefik-public` internally
 - [ ] **Ingress metrics**: configure and display metrics for both Traefik instances
 - [x] **Migrate Perses → Grafana**: Perses has limitations and bugs that block my use cases — not mature enough for my needs yet
-- [ ] **CrowdSec + Traefik bouncer**: setup CrowdSec with a Traefik bouncer on the public ingress
+- [x] **CrowdSec + Traefik bouncer**: setup CrowdSec with a Traefik bouncer on the public ingress
 - [ ] **Autonomous AI agent framework**: [Hermes Agent](https://github.com/NousResearch/hermes-agent) [untested]
 - [ ] **Dashboard / startpage**: [Glance](https://github.com/glanceapp/glance/)
 - [ ] **Home automation platform**: [Home Assistant](https://www.home-assistant.io/) [untested]
@@ -283,6 +285,7 @@ The rewrite rules are defined in [`config/coredns/`](config/coredns/).
 | Bind address | Netbird IP `100.91.106.71` | Public IPv6 `2001:861:8b91:6620::1000` |
 | TLS issuer | Private CA (`homelab-ca`) | Let's Encrypt (`letsencrypt-public`) |
 | DNS | Netbird `*.sklein.internal` | Cloudflare `*.ipv6.ingress.homelab.public.stephane-klein.info` |
+| IP reputation / IPS | — | CrowdSec (stream, global sur `websecure`) |
 
 I chose two separate Traefik instances rather than a single one with a two-entryPoint mechanism,
 to prevent accidentally exposing internal services to the Internet.
@@ -535,6 +538,18 @@ See [`playground/README.md`](./playground/README.md), section *1 bis. Public con
 $ mise run destroy-traefik-public
 $ mise run destroy-external-dns
 ```
+
+## CrowdSec
+
+[CrowdSec](https://www.crowdsec.net/) protects the **public** Traefik ingress
+(`traefik-public`, IPv6 `2001:861:8b91:6620::1000`) from malicious traffic. It
+runs as a k3s workload in the `crowdsec` namespace ([LAPI](https://docs.crowdsec.net/docs/local_api/intro/) + agent) and blocks
+requests by IP reputation. The bouncer runs as a Traefik **plugin** in **stream
+mode** attached globally to the `websecure` entrypoint, so every public request
+is checked without touching each Ingress.
+
+See **[`apps/crowdsec/README.md`](apps/crowdsec/README.md)** for deployment, testing,
+status, blocklist import, and destroy instructions.
 
 ## External Secrets Operator
 

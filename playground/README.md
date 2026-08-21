@@ -41,6 +41,9 @@ $ curl -6 https://whoami.ipv6.ingress.homelab.public.stephane-klein.info/
 The DNS record is automatically created by external-dns in Cloudflare,
 and the TLS certificate is issued by Let's Encrypt via DNS-01.
 
+This public endpoint is protected by CrowdSec: requests from malicious IPs
+are blocked by the bouncer (see [CrowdSec](../apps/crowdsec/README.md)).
+
 To remove:
 
 ```sh

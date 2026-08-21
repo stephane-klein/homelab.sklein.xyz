@@ -1,0 +1,74 @@
+# Helm values for the public Traefik release `traefik-public` (IPv6 ::1000).
+# The entrypoint addresses and redirections are injected dynamically by
+# scripts/deploy-traefik-public.sh (additionalArguments) because they depend on
+# the detected PUBLIC_IPV6.
+
+hostNetwork: true
+
+# hostNetwork with fixed ports cannot roll out with RollingUpdate (the new pod
+# cannot bind the ports until the old pod is gone). Recreate avoids the
+# rollout deadlock.
+updateStrategy:
+  type: Recreate
+
+deployment:
+  dnsPolicy: ClusterFirstWithHostNet
+  replicas: 1
+  # Pod volumes for the CrowdSec dynamic config and bouncer key
+  additionalVolumes:
+    - name: crowdsec-dynamic
+      configMap:
+        name: crowdsec-dynamic
+    - name: crowdsec-key
+      secret:
+        secretName: crowdsec-bouncer-key
+
+# Mount the CrowdSec file-provider config and the bouncer key into the main
+# Traefik container (top-level chart key, not under `deployment`).
+additionalVolumeMounts:
+  - name: crowdsec-dynamic
+    mountPath: /config/crowdsec.yml
+    subPath: crowdsec.yml
+    readOnly: true
+  - name: crowdsec-key
+    mountPath: /config/crowdsec-key
+    subPath: key
+    readOnly: true
+
+ports:
+  traefik:
+    port: 9001
+  web: null
+  websecure: null
+  metrics: null
+
+ingressClass:
+  enabled: true
+  isDefaultClass: false
+  name: traefik-public
+
+nodeSelector:
+  node-role.kubernetes.io/ingress: "true"
+
+service:
+  enabled: false
+
+podSecurityContext: null
+securityContext:
+  allowPrivilegeEscalation: true
+  capabilities:
+    add:
+      - NET_BIND_SERVICE
+    drop: []
+  readOnlyRootFilesystem: true
+
+providers:
+  kubernetesCRD:
+    enabled: false
+
+# CrowdSec bouncer Traefik plugin (static config)
+experimental:
+  plugins:
+    crowdsec-bouncer:
+      moduleName: github.com/maxlerebourg/crowdsec-bouncer-traefik-plugin
+      version: v1.4.5
