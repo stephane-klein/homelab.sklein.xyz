@@ -7,7 +7,7 @@ Test and learning deployments to get familiar with the homelab.
 Deploy a minimal whoami application to verify the ingress works.
 
 ```sh
-$ mise run deploy-whoami
+$ mise run //playground:deploy-whoami
 ```
 
 Access from any Netbird peer:
@@ -21,7 +21,7 @@ You should see the whoami response (request headers and pod name).
 To remove:
 
 ```sh
-$ mise run destroy-whoami
+$ mise run //playground:destroy-whoami
 ```
 
 ## 1 bis. Public connectivity test — whoami-public
@@ -29,7 +29,7 @@ $ mise run destroy-whoami
 Deploy whoami on the public-facing ingress to verify Let's Encrypt + external-dns.
 
 ```sh
-$ mise run deploy-whoami-public
+$ mise run //playground:deploy-whoami-public
 ```
 
 Access from anywhere on the Internet (IPv6 required):
@@ -47,7 +47,7 @@ are blocked by the bouncer (see [CrowdSec](../apps/crowdsec/README.md)).
 To remove:
 
 ```sh
-$ mise run destroy-whoami-public
+$ mise run //playground:destroy-whoami-public
 ```
 
 To check certificate status:
@@ -67,7 +67,7 @@ $ kubectl logs -n external-dns deployment/external-dns
 Deploy whoami behind Authelia ForwardAuth to see the authentication flow.
 
 ```sh
-$ mise run deploy-authelia-demo
+$ mise run //playground:deploy-authelia-demo
 ```
 
 Access `https://whoami-authelia-demo.sklein.internal`. You should be
@@ -76,13 +76,13 @@ redirected to `https://auth.sklein.internal` for login.
 To remove:
 
 ```sh
-$ mise run destroy-authelia-demo
+$ mise run //playground:destroy-authelia-demo
 ```
 
 ## 3. Create CloudNativePG Dummy database cluster on k3s
 
 ```sh
-$ mise run deploy-cnpg-dummy-cluster
+$ mise run //playground:deploy-cnpg-dummy-cluster
 === Deploying CloudNativePG dummy cluster ===
   Waiting for postgres instance to be ready...
 
@@ -92,7 +92,7 @@ $ mise run deploy-cnpg-dummy-cluster
   Password: kubectl get secret -n cnpg-demo dummy-app -o jsonpath='{.data.password}' | base64 -d
   User: app
 
-  Destroy with: mise run destroy-cnpg-dummy-cluster
+  Destroy with: mise run //playground:destroy-cnpg-dummy-cluster
 ```
 
 ```sh
@@ -109,7 +109,7 @@ Scaleway S3 at 04:00 UTC.
 To connect interactively:
 
 ```sh
-$ mise run enter-in-k3s-dummy-database
+$ mise run //playground:enter-in-k3s-dummy-database
 ```
 
 ## 4. Populate the dummy database
@@ -122,7 +122,7 @@ Two local SQL files define the schema and sample data:
 Import them into the CNPG cluster:
 
 ```sh
-$ mise run import-db-schema-and-fixtures-from-local-files-to-k3s-dummy-cnpg-cluster
+$ mise run //playground:import-db-schema-and-fixtures-from-local-files-to-k3s-dummy-cnpg-cluster
 === Importing schema ===
 CREATE TABLE
 CREATE INDEX
@@ -170,14 +170,14 @@ experimentation and backup-restore drills.
 ### Start and stop PostgreSQL container
 
 ```sh
-$ mise run start-local-postgres
-$ mise run stop-local-postgres
+$ mise run //playground:start-local-postgres
+$ mise run //playground:stop-local-postgres
 ```
 
 ### Connect interactively
 
 ```sh
-$ mise run enter-in-local-db
+$ mise run //playground:enter-in-local-db
 ```
 
 This opens a `psql` session as `app` on the `app` database.
@@ -188,7 +188,7 @@ Dump the `dummydb` database from the running CNPG cluster and restore it into
 the local `app` database:
 
 ```sh
-$ mise run copy-db-from-k3s-dummy-cnpg-cluster-to-local-podman-postgres
+$ mise run //playground:copy-db-from-k3s-dummy-cnpg-cluster-to-local-podman-postgres
 ```
 
 This runs `pg_dump -Fc` on the CNPG primary (`dummy-1`), then
@@ -199,7 +199,7 @@ This runs `pg_dump -Fc` on the CNPG primary (`dummy-1`), then
 Drop and recreate the `app` database:
 
 ```sh
-$ mise run clean-db-on-local-podman-postgres
+$ mise run //playground:clean-db-on-local-podman-postgres
 ```
 
 ## 6. Restore a backup from Scaleway Object Storage to the local database
@@ -211,13 +211,13 @@ these backups into your local PostgreSQL instance.
 ### Trigger a fresh S3 backup
 
 ```sh
-$ mise run force-cnpg-backup
+$ mise run //playground:force-cnpg-backup
 ```
 
 ### List backups on Scaleway Object Storage
 
 ```sh
-$ mise run list-backups-on-scaleway-s3
+$ mise run //playground:list-backups-on-scaleway-s3
 [list-backups-on-scaleway-s3] $ scripts/list-barman-backups.sh
 === Barman backups for dummy ===
 
@@ -233,7 +233,7 @@ $ mise run list-backups-on-scaleway-s3
 ### Extract a logical dump from the latest backup
 
 ```sh
-$ mise run dump-db-from-scaleway-dummy-cnpg-barman-s3-backup-to-file
+$ mise run //playground:dump-db-from-scaleway-dummy-cnpg-barman-s3-backup-to-file
 [dump-db-from-scaleway-dummy-cnpg-barman…] $ scripts/dump-db-from-barman-s3-to-file.sh
 === Dumping database dummydb from barman S3 backup ===
   S3 URL: s3://homelab-cnpg-backups/dummy
@@ -260,13 +260,13 @@ Write-ahead log reset
   Size: 4.0K
 
   Import with:
-    mise run restore-dump-to-local-podman-postgres dumps/dummydb_20260622T135813.dump
+    mise run //playground:restore-dump-to-local-podman-postgres dumps/dummydb_20260622T135813.dump
 ```
 
 ### Restore the dump file into the local database
 
 ```sh
-$ mise run restore-dump-to-local-podman-postgres dumps/dummydb_20260622T135813.dump
+$ mise run //playground:restore-dump-to-local-podman-postgres dumps/dummydb_20260622T135813.dump
 [restore-dump-to-local-podman-postgres] $ scripts/restore-dump-to-local.sh $@ dumps/dummydb_20260622T135813.dump
 === Restoring dump to local PostgreSQL (app) ===
   Dump file: dumps/dummydb_20260622T135813.dump
@@ -278,11 +278,11 @@ $ mise run restore-dump-to-local-podman-postgres dumps/dummydb_20260622T135813.d
 
 === Done ===
   Dump restored to database app.
-  Connect with: mise enter-in-local-db
+  Connect with: mise //playground:enter-in-local-db
 ```
 
 ```sh
-$ mise enter-in-local-db
+$ mise //playground:enter-in-local-db
 [enter-in-local-db] $ podman exec -e PGPASSWORD=app -it pg-dummy-local psql -U app -d app -h 127.0.0.1
 psql (18.4 (Debian 18.4-1.pgdg13+1))
 Type "help" for help.
@@ -307,7 +307,7 @@ If you just want to overwrite your local database with the latest backup
 data, run a single command:
 
 ```sh
-$ mise run restore-db-from-scaleway-dummy-cnpg-barman-s3-backup-to-local-podman-postgres
+$ mise run //playground:restore-db-from-scaleway-dummy-cnpg-barman-s3-backup-to-local-podman-postgres
 === Restoring database dummydb from barman S3 backup to local app ===
   S3 URL: s3://homelab-cnpg-backups/dummy
   CNPG image: ghcr.io/cloudnative-pg/postgresql:18.3-system-trixie
@@ -345,7 +345,7 @@ CREATE DATABASE
 
 === Done ===
   Database dummydb restored to local PostgreSQL (app).
-  Connect with: mise enter-in-local-db
+  Connect with: mise //playground:enter-in-local-db
 ```
 
 
@@ -354,13 +354,13 @@ CREATE DATABASE
 Stop the container and delete its named volume (all data is lost):
 
 ```sh
-$ mise run teardown-local-postgres
+$ mise run //playground:teardown-local-postgres
 ```
 
 ## Destroy CloudNativePG dummy database cluster on k3s
 
 ```sh
-$ mise run destroy-cnpg-dummy-cluster
+$ mise run //playground:destroy-cnpg-dummy-cluster
 ```
 
 ## Delete all backups from Scaleway Object Storage
@@ -369,7 +369,7 @@ This permanently removes ALL S3 objects (base backups and WAL archives) for
 the `dummy` cluster from the Scaleway bucket.
 
 ```sh
-$ mise run delete-all-barman-backups
+$ mise run //playground:delete-all-barman-backups
 === Delete ALL S3 objects for dummy ===
   S3 URL: s3://homelab-cnpg-backups/dummy
   Endpoint: https://s3.fr-par.scw.cloud

@@ -1,19 +1,19 @@
-[tasks.deploy-crowdsec]
+[tasks.deploy]
 description = "Deploy CrowdSec LAPI + agent + blocklist-import CronJob"
 run = "scripts/deploy.sh"
 
-[tasks.destroy-crowdsec]
+[tasks.destroy]
 description = "Destroy CrowdSec (destructive: wipes LAPI decisions)"
 run = "scripts/destroy.sh"
 
-[tasks.crowdsec-status]
+[tasks.status]
 description = "Show CrowdSec status (bouncers, decisions, alerts, ingestion)"
 run = "scripts/status.sh"
 
-[tasks.run-blocklist-import-now]
+[tasks."blocklist-import:run"]
 description = "Force an immediate run of the blocklist-import CronJob (external threat feeds)"
 run = "scripts/run-blocklist-import-now.sh"
 
-[tasks.blocklist-import-status]
+[tasks."blocklist-import:status"]
 description = "Show blocklist-import status (imported decisions count + CronJob state)"
 run = "scripts/blocklist-import-status.sh"

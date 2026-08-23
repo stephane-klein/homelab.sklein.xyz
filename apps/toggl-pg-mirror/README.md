@@ -17,7 +17,7 @@ This application depends on shared infrastructure deployed elsewhere:
 ## Deploy
 
 ```sh
-$ mise run deploy-toggl-pg-mirror
+$ mise run //apps/toggl-pg-mirror:deploy
 ```
 
 The script waits for the external-secrets operator, ensures the
@@ -27,7 +27,7 @@ ClusterSecretStore, creates the `toggl-pg-mirror` namespace and the
 ## Destroy
 
 ```sh
-$ mise run destroy-toggl-pg-mirror
+$ mise run //apps/toggl-pg-mirror:destroy
 ```
 
 Runs `helmfile -f helmfile.yaml destroy` (scoped to this application only).

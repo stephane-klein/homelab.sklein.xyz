@@ -1,8 +1,8 @@
-[tasks.deploy-sveltekit-ssr-skeleton]
+[tasks.deploy]
 description = "Create sveltekit secrets from gopass, then apply the helmfile"
 run = "scripts/deploy.sh"
 
-[tasks.test-sveltekit-ssr-skeleton-smtp]
+[tasks.test-smtp]
 description = "Test SMTP parameters from values.yaml against Fastmail (sends a real email)"
 run = """
 HOST=$(yq '.smtp.host' values.yaml)
@@ -19,5 +19,5 @@ swaks --server "${HOST}:${PORT}" \
       --auth-password "$(gopass show -o fastmail.com/sveltekit-ssr-skeleton-myapp-test/smtp-password)" \
       --to "$TO" \
       --from "$FROM" \
-      --body "SMTP test from mise task test-sveltekit-ssr-skeleton-smtp"
+      --body "SMTP test from mise task test-smtp"
 """

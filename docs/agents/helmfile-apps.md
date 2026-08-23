@@ -12,13 +12,16 @@ Each application lives in its own directory `apps/<app>/`:
 - `values.yaml` — Helm values
 - `scripts/deploy.sh` — create namespace/secrets from Gopass, then `helmfile apply`
 - `scripts/destroy.sh` — `helmfile destroy`
-- `.mise.toml` — `deploy-<app>` / `destroy-<app>` tasks
+- `.mise.toml` — short-named tasks (`deploy`, `destroy`, `diff`, …)
 - `README.md` — deployment instructions and dependencies
 
 ## Deploy workflow
 
-`scripts/deploy.sh` is run via `mise run deploy-<app>` (e.g.
-`mise run deploy-toggl-pg-mirror`):
+The root `.mise.toml` enables mise monorepo mode (`monorepo_root = true`), so app
+tasks live in each app's `.mise.toml` and are namespaced as
+`//apps/<app>:<task>`. `scripts/deploy.sh` is run via `mise run //apps/<app>:deploy`
+(e.g. `mise run //apps/toggl-pg-mirror:deploy`, or from inside the app with
+`mise :deploy`):
 
 1. `cd "$(dirname "$0")/../"`
 2. Ensure the namespace exists (`kubectl create namespace ... --dry-run=client -o yaml | kubectl apply -f -`)

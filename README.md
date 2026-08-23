@@ -887,7 +887,7 @@ Toggl time-tracking data into the Memex PostgreSQL database via a periodic
 sync daemon. Tables are stored in the `toggl` schema.
 
 ```sh
-$ mise run deploy-toggl-pg-mirror
+$ mise run //apps/toggl-pg-mirror:deploy
 ```
 
 Config: [`apps/toggl-pg-mirror/values.yaml`](apps/toggl-pg-mirror/values.yaml)

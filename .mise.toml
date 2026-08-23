@@ -1,3 +1,12 @@
+monorepo_root = true
+
+[monorepo]
+config_roots = [
+    "apps/*",
+    "playground/*",
+    "playground"
+]
+
 [env]
 _.file = [
   ".secret",
@@ -214,14 +223,6 @@ run = "scripts/deploy-external-dns.sh"
 description = "Destroy external-dns"
 run = "scripts/destroy-external-dns.sh"
 
-[tasks.deploy-toggl-pg-mirror]
-description = "Deploy toggl-pg-mirror (syncs Toggl time entries to PostgreSQL)"
-run = "apps/toggl-pg-mirror/scripts/deploy.sh"
-
-[tasks.destroy-toggl-pg-mirror]
-description = "Destroy toggl-pg-mirror"
-run = "apps/toggl-pg-mirror/scripts/destroy.sh"
-
 [tasks.deploy-zigbee]
 description = "Deploy Mosquitto + Zigbee2MQTT + MQTT bridge in k3s for temperature monitoring"
 run = "scripts/deploy-zigbee.sh"
@@ -241,14 +242,6 @@ run = "scripts/destroy-cnpg-hindsight.sh"
 [tasks.list-ingresses]
 description = "List all virtual hosts exposed by Ingress and IngressRoute (internal vs public)"
 run = "scripts/list-ingresses.sh"
-
-[tasks.deploy-crowdsec]
-description = "Deploy CrowdSec LAPI + agent + blocklist-import CronJob"
-run = "apps/crowdsec/scripts/deploy.sh"
-
-[tasks.destroy-crowdsec]
-description = "Destroy CrowdSec (destructive: wipes LAPI decisions)"
-run = "apps/crowdsec/scripts/destroy.sh"
 
 [tasks.deploy-hindsight]
 description = "Deploy Hindsight agent memory system at https://hindsight.sklein.internal"

@@ -32,7 +32,7 @@ written to stdout). Redeploying `traefik-public` restarts the pod and activates
 them.
 
 ```sh
-$ mise run deploy-crowdsec
+$ mise run //apps/crowdsec:deploy
 ```
 
 This also provisions the **blocklist-import** CronJob (see
@@ -72,7 +72,7 @@ Display the current CrowdSec state (registered bouncers, active decisions,
 recent alerts, LAPI/stream metrics and Traefik log ingestion):
 
 ```sh
-$ mise run crowdsec-status
+$ mise run //apps/crowdsec:status
 ```
 
 ## Blocklist import
@@ -96,14 +96,14 @@ bouncer then enforces. This avoids the paid console blocklists.
 Check the import status (number of imported decisions + CronJob state):
 
 ```sh
-$ mise run blocklist-import-status
+$ mise run //apps/crowdsec:blocklist-import:status
 ```
 
 Force an immediate run of the CronJob (e.g. after changing the feeds) and
 watch its logs:
 
 ```sh
-$ mise run run-blocklist-import-now
+$ mise run //apps/crowdsec:blocklist-import:run
 ```
 
 ## Destroy
@@ -113,7 +113,7 @@ $ mise run run-blocklist-import-now
 > (project safety rule).
 
 ```sh
-$ mise run destroy-crowdsec
+$ mise run //apps/crowdsec:destroy
 ```
 
 ## Dependencies

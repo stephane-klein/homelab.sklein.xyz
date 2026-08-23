@@ -5,7 +5,7 @@ Test deployment of [sveltekit-ssr-skeleton](https://github.com/stephane-klein/sv
 ## Deploy
 
 ```sh
-$ mise run deploy-sveltekit-ssr-skeleton
+$ mise run //playground/sveltekit-ssr-skeleton:deploy
 ```
 
 This creates the `sveltekit-ssr-skeleton-myapp-secrets` Secret from Gopass
@@ -25,7 +25,7 @@ $ curl -k -X POST \
 ## Test SMTP
 
 ```sh
-$ mise run test-sveltekit-ssr-skeleton-smtp
+$ mise run //playground/sveltekit-ssr-skeleton:test-smtp
 ```
 
 Sends a test email via `smtp.fastmail.com:465` using SMTP parameters from `values.yaml` (password retrieved from Gopass).
