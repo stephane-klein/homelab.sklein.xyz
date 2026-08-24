@@ -29,6 +29,6 @@ echo "=== Sync users ==="
 curl -fsS -X PUT -H "Authorization: Bearer $(gopass show -o toggl.sklein.internal/admin-token)" \
     -H "Content-Type: application/json" \
     --data-binary "$(gopass cat toggl.sklein.internal/users.json)" \
-    https://toggl.sklein.internal/api/v1/admin/users/sync | jq
+    https://memex.ipv6.ingress.homelab.public.stephane-klein.info/api/v1/admin/users/sync | jq
 
 echo "=== Done ==="

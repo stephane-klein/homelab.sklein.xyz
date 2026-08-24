@@ -38,12 +38,16 @@ nodeSelector:
 
 ingress:
   enabled: true
-  className: traefik
-  host: "toggl.sklein.internal"
+  className: traefik-public
+  hosts:
+    - "memex.ipv6.ingress.homelab.public.stephane-klein.info"
+    - "memex.sklein.xyz"
   path: /
   annotations:
-    cert-manager.io/cluster-issuer: homelab-ca
+    cert-manager.io/cluster-issuer: letsencrypt-public
+    external-dns.alpha.kubernetes.io/target: "2001:861:8b91:6620::1000"
   tls:
-    - secretName: toggl-pg-mirror-tls
+    - secretName: toggl-pg-mirror-tls-public
       hosts:
-        - toggl.sklein.internal
+        - memex.ipv6.ingress.homelab.public.stephane-klein.info
+        - memex.sklein.xyz

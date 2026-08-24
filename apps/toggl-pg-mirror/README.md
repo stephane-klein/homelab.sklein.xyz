@@ -34,4 +34,4 @@ Runs `helmfile -f helmfile.yaml destroy` (scoped to this application only).
 
 ## URL
 
-- App: https://toggl.sklein.internal
+- App: https://memex.ipv6.ingress.homelab.public.stephane-klein.info (et https://memex.sklein.xyz)
