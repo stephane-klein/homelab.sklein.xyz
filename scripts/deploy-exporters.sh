@@ -5,6 +5,10 @@ cd "$(dirname "$0")/../"
 
 NAMESPACE="monitoring"
 
+echo "=== Ensuring namespace $NAMESPACE ==="
+kubectl create namespace "$NAMESPACE" --dry-run=client -o yaml | kubectl apply -f - > /dev/null
+
+echo ""
 echo "=== Deploying kube-state-metrics ==="
 helm repo add prometheus-community https://prometheus-community.github.io/helm-charts --force-update > /dev/null
 helm upgrade --install kube-state-metrics prometheus-community/kube-state-metrics \
@@ -21,6 +25,11 @@ helm upgrade --install node-exporter prometheus-community/prometheus-node-export
   --namespace "$NAMESPACE" > /dev/null
 
 echo ""
+echo "=== Deploying process-exporter (per-process CPU/memory) ==="
+kubectl apply -f config/process-exporter/process-exporter.yaml > /dev/null
+kubectl rollout status daemonset/process-exporter -n "$NAMESPACE" --timeout=120s > /dev/null
+
+echo ""
 echo "=== Deploying vmagent ==="
 helm upgrade --install vmagent vm/victoria-metrics-agent \
   --namespace "$NAMESPACE" \
@@ -34,4 +43,4 @@ kubectl wait --for=condition=Available deployment \
 
 echo ""
 echo "=== Done ==="
-echo "  kube-state-metrics, node-exporter, vmagent deployed"
+echo "  kube-state-metrics, node-exporter, process-exporter, vmagent deployed"

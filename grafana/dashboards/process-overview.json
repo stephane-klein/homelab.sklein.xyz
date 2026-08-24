@@ -1,0 +1,127 @@
+{
+  "title": "Process Overview",
+  "uid": "process-overview",
+  "tags": ["process", "system"],
+  "schemaVersion": 39,
+  "version": 0,
+  "time": {
+    "from": "now-6h",
+    "to": "now"
+  },
+  "timepicker": {},
+  "refresh": "",
+  "templating": {
+    "list": [
+      {
+        "name": "nodename",
+        "label": "Node",
+        "type": "query",
+        "datasource": "Prometheus",
+        "query": "label_values(namedprocess_namegroup_cpu_seconds_total, nodename)",
+        "includeAll": true,
+        "allValue": ".*",
+        "current": { "text": "All", "value": "$__all" },
+        "multi": true
+      },
+      {
+        "name": "process",
+        "label": "Process",
+        "type": "query",
+        "datasource": "Prometheus",
+        "query": "label_values(namedprocess_namegroup_cpu_seconds_total{groupname!=\"\"}, groupname)",
+        "includeAll": true,
+        "allValue": ".*",
+        "current": { "text": "All", "value": "$__all" },
+        "multi": true
+      }
+    ]
+  },
+  "panels": [
+    {
+      "id": 1,
+      "type": "row",
+      "title": "CPU Usage (cores)",
+      "gridPos": { "h": 1, "w": 24, "x": 0, "y": 0 },
+      "collapsed": false,
+      "panels": []
+    },
+    {
+      "id": 2,
+      "type": "timeseries",
+      "title": "CPU by process (cores)",
+      "datasource": "Prometheus",
+      "fieldConfig": {
+        "defaults": {
+          "unit": "short",
+          "custom": {
+            "lineInterpolation": "linear",
+            "spanNulls": false,
+            "showPoints": "auto",
+            "lineWidth": 1
+          }
+        },
+        "overrides": []
+      },
+      "options": {
+        "legend": {
+          "showLegend": true,
+          "displayMode": "table",
+          "placement": "right",
+          "calcs": ["last", "max"]
+        },
+        "tooltip": { "mode": "multi" }
+      },
+      "targets": [
+        {
+          "expr": "sum(rate(namedprocess_namegroup_cpu_seconds_total{nodename=~\"$nodename\", groupname=~\"$process\"}[5m])) by (groupname, nodename)",
+          "legendFormat": "{{groupname}} ({{nodename}})",
+          "datasource": "Prometheus"
+        }
+      ],
+      "gridPos": { "h": 10, "w": 24, "x": 0, "y": 1 }
+    },
+    {
+      "id": 3,
+      "type": "row",
+      "title": "Memory Usage",
+      "gridPos": { "h": 1, "w": 24, "x": 0, "y": 11 },
+      "collapsed": false,
+      "panels": []
+    },
+    {
+      "id": 4,
+      "type": "timeseries",
+      "title": "Resident memory by process (bytes)",
+      "datasource": "Prometheus",
+      "fieldConfig": {
+        "defaults": {
+          "unit": "bytes",
+          "custom": {
+            "lineInterpolation": "linear",
+            "spanNulls": false,
+            "showPoints": "auto",
+            "lineWidth": 1
+          }
+        },
+        "overrides": []
+      },
+      "options": {
+        "legend": {
+          "showLegend": true,
+          "displayMode": "table",
+          "placement": "right",
+          "calcs": ["last", "max"]
+        },
+        "tooltip": { "mode": "multi" }
+      },
+      "targets": [
+        {
+          "expr": "sum(namedprocess_namegroup_memory_bytes{nodename=~\"$nodename\", groupname=~\"$process\", memtype=\"resident\"}) by (groupname, nodename)",
+          "legendFormat": "{{groupname}} ({{nodename}})",
+          "datasource": "Prometheus"
+        }
+      ],
+      "gridPos": { "h": 10, "w": 24, "x": 0, "y": 12 }
+    }
+  ]
+}

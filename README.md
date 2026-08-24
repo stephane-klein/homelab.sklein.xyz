@@ -622,9 +622,14 @@ This installs:
 - **VictoriaMetrics** — single-node TSDB, retention 30d, PVC 10Gi
 - **kube-state-metrics** — Kubernetes cluster state metrics
 - **prometheus-node-exporter** — per-node system metrics (CPU, memory, disk)
+- **prometheus-process-exporter** — per-process CPU/memory metrics
 - **vmagent** — lightweight scrape agent, sends data to VictoriaMetrics via remote write
 - **Grafana** — dashboard UI at `https://grafana.sklein.internal` (deployed via Helmfile)
 - **Custom dashboards** — deployed from `grafana/dashboards/`
+
+Per-container CPU/memory comes from the kubelet cAdvisor scrape (`container_*`
+metrics with `pod`/`namespace` labels) that vmagent does by default — no extra
+exporter needed.
 
 ### Clean up
 
@@ -661,6 +666,16 @@ $ mise run destroy-grafana
 Dashboards are defined as JSON files in `grafana/dashboards/` and synced
 to the cluster via ConfigMaps labeled `grafana_dashboard: "1"`. The Grafana
 sidecar watches these ConfigMaps and imports them automatically.
+
+**Dashboards:**
+
+- **Process Overview** (`process-overview.json`) — CPU and memory per process,
+  filterable by node, from `process-exporter` (`namedprocess_namegroup_*`).
+  Useful to trace a historical CPU spike back to a specific process (e.g. a
+  CrowdSec `blocklist-import` run).
+- **Pod Overview** (`pod-overview.json`) — CPU and memory per pod/container,
+  filterable by node and namespace, from the kubelet cAdvisor scrape
+  (`container_*` metrics).
 
 **Push (local → cluster):**
 
