@@ -22,6 +22,12 @@ deployment:
     - name: crowdsec-key
       secret:
         secretName: crowdsec-bouncer-key
+    # Persistent volume for the CrowdSec bouncer plugin. Traefik downloads and
+    # compiles the plugin into /plugins-storage at startup; a PVC (instead of the
+    # default emptyDir) lets the compiled plugin survive pod restarts.
+    - name: plugins
+      persistentVolumeClaim:
+        claimName: traefik-public-plugins
 
 # Mount the CrowdSec file-provider config and the bouncer key into the main
 # Traefik container (top-level chart key, not under `deployment`).
@@ -34,6 +40,11 @@ additionalVolumeMounts:
     mountPath: /config/crowdsec-key
     subPath: key
     readOnly: true
+  # Mount the persistent plugin storage (PVC) so Traefik can download and
+  # compile the CrowdSec bouncer plugin. Required because the chart only
+  # auto-mounts the plugins volume when it provides it itself (emptyDir).
+  - name: plugins
+    mountPath: /plugins-storage
 
 ports:
   traefik:
@@ -72,3 +83,16 @@ experimental:
     crowdsec-bouncer:
       moduleName: github.com/maxlerebourg/crowdsec-bouncer-traefik-plugin
       version: v1.4.5
+
+extraObjects:
+  - apiVersion: v1
+    kind: PersistentVolumeClaim
+    metadata:
+      name: traefik-public-plugins
+      namespace: traefik
+    spec:
+      accessModes:
+        - ReadWriteOnce
+      resources:
+        requests:
+          storage: 100Mi
