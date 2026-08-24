@@ -7,5 +7,9 @@ releases:
     createNamespace: true
     chart: crowdsec/crowdsec
     version: 0.24.0
+    # Patch the agent register init container to be idempotent. This is a Helm 4
+    # post-renderer plugin (see helm-plugins/crowdsec-agent-register). Install it
+    # with: helm plugin install ./apps/crowdsec/helm-plugins/crowdsec-agent-register
+    postRenderer: crowdsec-agent-register
     values:
       - values.yaml

@@ -11,6 +11,11 @@ BI_PWD="homelab/crowdsec/blocklist-import/machine-password"
 echo "=== Ensuring namespace $NAMESPACE ==="
 kubectl create namespace "$NAMESPACE" --dry-run=client -o yaml | kubectl apply -f - > /dev/null
 
+echo "=== Ensuring Helm post-renderer plugin (crowdsec-agent-register) ==="
+if ! helm plugin list 2>/dev/null | grep -q "crowdsec-agent-register"; then
+  helm plugin install helm-plugins/crowdsec-agent-register
+fi
+
 echo "=== Deploying CrowdSec (LAPI + agent) ==="
 helmfile -f helmfile.yaml apply
 

@@ -22,6 +22,15 @@ requests by IP reputation.
   attached **globally** to the `websecure` entrypoint via the file provider, so
   every public request is checked without touching each Ingress.
 
+> **Agent registration is patched to be idempotent.** The upstream chart's
+> `wait-for-lapi-and-register` init container does a non-idempotent
+> `cscli lapi register --machine "$USERNAME"`, which fails (403 "already exist")
+> on pod recreation because DaemonSet pod names are stable per node, leaving the
+> agent stuck in init BackOff. A Helm 4 post-renderer plugin
+> (`helm-plugins/crowdsec-agent-register`) rewrites that command to delete an
+> existing machine before registering. `scripts/deploy.sh` installs the plugin
+> automatically if missing.
+
 ## Deploy
 
 Order matters: CrowdSec first (so we can generate the key), then Traefik.
