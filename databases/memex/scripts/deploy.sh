@@ -11,6 +11,7 @@ kubectl create namespace "$NAMESPACE" --dry-run=client -o yaml | kubectl apply -
 echo "=== Creating toggl_mcp_reader password secret ==="
 kubectl create secret generic toggl-mcp-reader \
   -n "$NAMESPACE" \
+  --from-literal=username=toggl_mcp_reader \
   --from-literal=password="$(gopass show -o toggl.sklein.internal/mcp-reader-postgres-password)" \
   --dry-run=client -o yaml | kubectl apply -f - > /dev/null
 

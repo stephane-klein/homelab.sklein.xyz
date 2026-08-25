@@ -21,3 +21,15 @@ run = "scripts/backup.sh"
 [tasks.delete-backup]
 description = "Delete a CNPG Memex backup by name"
 run = "scripts/delete-backup.sh"
+
+[tasks.enter-in-postgres-with-memex-user]
+description = "Enter an interactive psql session as the memex user"
+run = "scripts/enter-in-postgres-with-memex-user.sh"
+
+[tasks.enter-in-postgres-with-toggl_mcp_reader-user]
+description = "Enter an interactive psql session as the toggl_mcp_reader user"
+run = "scripts/enter-in-postgres-with-toggl_mcp_reader-user.sh"
+
+[tasks.doctor]
+description = "Check the role configuration in the memex cluster"
+run = "scripts/doctor.sh"
