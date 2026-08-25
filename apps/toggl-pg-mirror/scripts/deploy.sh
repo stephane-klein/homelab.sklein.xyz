@@ -19,6 +19,7 @@ kubectl create secret generic toggl-pg-mirror \
   --from-literal=toggl-token="$(gopass show -o toggl/stephane-klein/api-token)" \
   --from-literal=admin-token="$(gopass show -o toggl.sklein.internal/admin-token)" \
   --from-literal=smtp-password="$(gopass show -o toggl.sklein.internal/fastmail-smtp)" \
+  --from-literal=mcp-reader-postgres-password="$(gopass show -o toggl.sklein.internal/mcp-reader-postgres-password)" \
   --dry-run=client -o yaml | kubectl apply -f -
 
 echo "=== Deploying toggl-pg-mirror ==="
