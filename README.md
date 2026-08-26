@@ -61,7 +61,7 @@ Each application is a self-contained directory under
 
 My databases:
 
-- Memex
+- [`databases/memex/`](./databases/memex/) — Memex knowledge database
 
 ## Roadmap
 
@@ -770,48 +770,11 @@ Databases deployed with CloudNativePG:
 
 ### Memex
 
-Deploy `Memex`:
+CloudNativePG cluster backing the Memex knowledge database
+(https://memex.sklein.xyz), deployed on `nuc-i3-gen5` with S3 backups.
 
-```sh
-$ mise run deploy-cnpg-memex
-```
-
-Get the password:
-
-```sh
-$ kubectl get secret memex-cluster-memex -n memex \
-    -o jsonpath='{.data.password}' | base64 -d
-```
-
-Connect:
-
-```sh
-$ kubectl cnpg psql memex-cluster -n memex
-```
-
-List backups:
-
-```sh
-$ mise run list-cnpg-memex-backups
-```
-
-Trigger an immediate backup:
-
-```sh
-$ mise run backup-cnpg-memex
-```
-
-Delete a backup (by name):
-
-```sh
-$ mise run delete-cnpg-memex-backup <backup-name>
-```
-
-Destroy:
-
-```sh
-$ mise run destroy-cnpg-memex
-```
+See **[`databases/memex/README.md`](databases/memex/README.md)** for deployment,
+password, connect, and backup instructions.
 
 ### Hindsight
 

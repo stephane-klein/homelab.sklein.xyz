@@ -1,0 +1,23 @@
+[tasks.deploy]
+description = "Deploy CNPG cluster Memex"
+run = "scripts/deploy.sh"
+
+[tasks.destroy]
+description = "Destroy CNPG cluster Memex"
+run = "scripts/destroy.sh"
+
+[tasks.diff]
+description = "Show the helm diff for Memex and report drift"
+run = "scripts/diff.sh"
+
+[tasks.list-backups]
+description = "List CNPG Memex backups"
+run = "scripts/list-backups.sh"
+
+[tasks.backup]
+description = "Trigger immediate CNPG Memex backup"
+run = "scripts/backup.sh"
+
+[tasks.delete-backup]
+description = "Delete a CNPG Memex backup by name"
+run = "scripts/delete-backup.sh"

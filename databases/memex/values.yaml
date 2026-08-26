@@ -41,4 +41,5 @@ backups:
       schedule: "0 0 0 * * *"
       backupOwnerReference: self
   secret:
-    create: true
+    create: false
+    name: memex-cluster-backup-s3-creds

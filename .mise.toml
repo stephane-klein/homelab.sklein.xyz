@@ -3,6 +3,7 @@ monorepo_root = true
 [monorepo]
 config_roots = [
     "apps/*",
+    "databases/*",
     "playground/*",
     "playground"
 ]
@@ -129,14 +130,6 @@ run = "scripts/deploy-cnpg.sh"
 description = "Destroy CloudNativePG operator"
 run = "scripts/destroy-cnpg.sh"
 
-[tasks.deploy-cnpg-memex]
-description = "Deploy CNPG cluster Memex via helmfile"
-run = "scripts/deploy-cnpg-memex.sh"
-
-[tasks.destroy-cnpg-memex]
-description = "Destroy CNPG cluster Memex"
-run = "scripts/destroy-cnpg-memex.sh"
-
 [tasks.list-hindsight-backups]
 description = "List Hindsight logical backups (S3 + jobs)"
 run = "scripts/list-hindsight-backups.sh"
@@ -158,18 +151,6 @@ usage = '''
 arg "<file>" help="Backup filename (default: latest)" default=""
 '''
 run = "scripts/try-restore-hindsight-backup.sh"
-
-[tasks.list-cnpg-memex-backups]
-description = "List CNPG Memex backups"
-run = "scripts/list-cnpg-memex-backups.sh"
-
-[tasks.backup-cnpg-memex]
-description = "Trigger immediate CNPG Memex backup"
-run = "scripts/backup-cnpg-memex.sh"
-
-[tasks.delete-cnpg-memex-backup]
-description = "Delete a CNPG Memex backup by name"
-run = "scripts/delete-cnpg-memex-backup.sh"
 
 [tasks.backup-k3s-control-plane]
 description = "Backup k3s control-plane state (state.db + cred/ + tls/) to backups/"

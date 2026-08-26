@@ -8,7 +8,8 @@ sync daemon. Tables are stored in the `toggl` schema.
 
 This application depends on shared infrastructure deployed elsewhere:
 
-- The `memex` CloudNativePG cluster (in the `memex` namespace) for PostgreSQL.
+- The [`memex` CloudNativePG cluster](../databases/memex/README.md) (in the
+  `memex` namespace) for PostgreSQL.
 - The `external-secrets` operator and the `kubernetes-cnpg-memex`
   ClusterSecretStore, used to read the database credentials.
 - The `toggl-pg-mirror` Secret (created by the deploy script from Gopass),

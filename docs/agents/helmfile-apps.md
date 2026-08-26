@@ -15,6 +15,12 @@ Each application lives in its own directory `apps/<app>/`:
 - `.mise.toml` — short-named tasks (`deploy`, `destroy`, `diff`, …)
 - `README.md` — deployment instructions and dependencies
 
+Managed databases (CloudNativePG clusters) follow the same self-contained
+pattern under `databases/<db>/` (e.g. `databases/memex/`), with tasks
+namespaced `//databases/<db>:<task>`. Secrets such as S3 backup credentials are
+created by `scripts/deploy.sh` with `kubectl create secret` after
+`helmfile apply` (so Helm does not delete them on upgrade).
+
 ## Deploy workflow
 
 The root `.mise.toml` enables mise monorepo mode (`monorepo_root = true`), so app

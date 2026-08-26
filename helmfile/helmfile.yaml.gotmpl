@@ -13,19 +13,6 @@ repositories:
     url: https://grafana.github.io/helm-charts
 
 releases:
-  - name: memex
-    namespace: memex
-    createNamespace: true
-    chart: cnpg/cluster
-    version: 0.7.0
-    values:
-      - values/cnpg-memex.yaml
-    set:
-      - name: backups.s3.accessKey
-        value: {{ env "CNPG_BACKUPS_ACCESS_KEY" | quote }}
-      - name: backups.s3.secretKey
-        value: {{ env "CNPG_BACKUPS_SECRET_KEY" | quote }}
-
   - name: mosquitto
     namespace: zigbee
     createNamespace: true
