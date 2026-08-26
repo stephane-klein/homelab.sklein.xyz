@@ -11,6 +11,9 @@ CloudNativePG PostgreSQL cluster backing the Memex knowledge database
 - `homelab/scaleway/CNPG_BACKUPS_ACCESS_KEY` and
   `homelab/scaleway/CNPG_BACKUPS_SECRET_KEY` in Gopass, used to create the
   `memex-cluster-backup-s3-creds` Secret.
+- `toggl.sklein.internal/mcp-reader-postgres-password` in Gopass, used to
+  create the `toggl-mcp-reader` Secret backing the managed `toggl_mcp_reader`
+  role.
 
 ## Deploy
 
@@ -18,9 +21,10 @@ CloudNativePG PostgreSQL cluster backing the Memex knowledge database
 $ mise run //databases/memex:deploy
 ```
 
-The script ensures the `memex` namespace, applies the local helmfile, then
-creates the S3 backup credentials Secret (idempotent) from Gopass. The
-secret is created after `helmfile apply` so Helm does not delete it on upgrade.
+The script ensures the `memex` namespace, creates the `toggl-mcp-reader`
+password Secret (idempotent) from Gopass, applies the local helmfile, then
+creates the S3 backup credentials Secret (idempotent) from Gopass. Secrets are
+created with `kubectl apply` so Helm does not delete them on upgrade.
 
 ## Destroy
 

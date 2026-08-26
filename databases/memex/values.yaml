@@ -25,6 +25,11 @@ cluster:
       max_wal_size: "256MB"
       min_wal_size: "64MB"
       wal_compression: "on"
+  roles:
+    - name: toggl_mcp_reader
+      login: true
+      passwordSecret:
+        name: toggl-mcp-reader
 
 backups:
   enabled: true

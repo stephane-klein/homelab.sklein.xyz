@@ -8,6 +8,12 @@ NAMESPACE="memex"
 echo "=== Ensuring namespace ==="
 kubectl create namespace "$NAMESPACE" --dry-run=client -o yaml | kubectl apply -f - > /dev/null
 
+echo "=== Creating toggl_mcp_reader password secret ==="
+kubectl create secret generic toggl-mcp-reader \
+  -n "$NAMESPACE" \
+  --from-literal=password="$(gopass show -o toggl.sklein.internal/mcp-reader-postgres-password)" \
+  --dry-run=client -o yaml | kubectl apply -f - > /dev/null
+
 echo "=== Deploying CNPG cluster: memex ==="
 helmfile -f helmfile.yaml apply
 
