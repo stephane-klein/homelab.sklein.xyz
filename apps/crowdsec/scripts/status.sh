@@ -11,8 +11,9 @@ echo "--- Bouncers ---"
 kubectl -n "$NS" exec "$LAPI" -- cscli bouncers list
 echo ""
 
-echo "--- Active decisions ---"
-kubectl -n "$NS" exec "$LAPI" -- cscli decisions list
+echo "--- Active decisions (excluding external blocklist imports) ---"
+kubectl -n "$NS" exec "$LAPI" -- cscli decisions list --origin cscli -l 20
+kubectl -n "$NS" exec "$LAPI" -- cscli decisions list --origin crowdsec -l 10
 echo ""
 
 echo "--- Recent alerts ---"
