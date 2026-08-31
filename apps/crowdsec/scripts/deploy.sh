@@ -56,6 +56,10 @@ echo "  Deploying blocklist-import CronJob (every 6h, purge before import)..."
 kubectl apply -f blocklist-import.yaml
 
 echo ""
+echo "=== Deploying alerts exporter (Grafana 'CrowdSec blocked IPs') ==="
+"$(dirname "$0")/deploy-crowdsec-alerts-exporter.sh"
+
+echo ""
 echo "=== Done ==="
 echo "  CrowdSec LAPI + agent deployed in namespace $NAMESPACE"
 echo "  blocklist-import CronJob deployed (external threat feeds, every 6h)"

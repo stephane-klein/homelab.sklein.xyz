@@ -84,6 +84,38 @@ recent alerts, LAPI/stream metrics and Traefik log ingestion):
 $ mise run //apps/crowdsec:status
 ```
 
+## Visualize blocked IPs in Grafana
+
+A dedicated dashboard, [CrowdSec blocked IPs](https://grafana.sklein.internal/d/crowdsec-blocked-ips),
+shows the source IPs that triggered a CrowdSec detection (per-IP table with
+scenario, country and last alert time, plus total counters).
+
+How it works:
+
+- A small **exporter** (`crowdsec-alerts-exporter`, `alerts-exporter.yaml`)
+  authenticates to the LAPI (dedicated `crowdsec-exporter` machine, credentials
+  in gopass `homelab/crowdsec/alerts-exporter/machine-password`) and reads
+  `GET /v1/alerts`. It only keeps alerts with a real `source.ip` — the
+  blocklist-import aggregate alerts (`source.value="0.0.0.0"`) are skipped — so
+  the dashboard shows actual detections, not the external blocklist.
+- Metrics exposed on `:9300/metrics`: `crowdsec_alert_last_seen{ip, scenario,
+  action, country}` (gauge, last alert timestamp) and `crowdsec_alerts_total`
+  (counter). Scraped by **vmagent** (`config/exporters/values.yaml`) into
+  **VictoriaMetrics**. The exporter also exposes `crowdsec_feed_ips{feed,
+  ip_version}` — the number of entries (IP or CIDR range) each enabled feed
+  contains (raw feed size, not the exact imported count; refreshed every 6 h).
+- Dashboard JSON: `grafana/dashboards/crowdsec-blocked-ips.json`, pushed with
+  `scripts/push-grafana-dashboards.sh`.
+
+Deploy/update the exporter (also run automatically by `scripts/deploy.sh`):
+
+```sh
+$ ./apps/crowdsec/scripts/deploy-crowdsec-alerts-exporter.sh
+```
+
+Note: the table is empty until the agent detects an attack — that is the point
+(it lists the IPs that actually tried to reach the ingress and were banned).
+
 ## Blocklist import
 
 The `blocklist-import` **CronJob** runs

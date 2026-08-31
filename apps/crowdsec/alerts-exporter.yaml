@@ -1,0 +1,322 @@
+# CrowdSec alerts exporter — exposes per-IP blocked-alert metrics for Prometheus.
+# Queries the LAPI (machine auth) for recent alerts, keeps only real detections
+# (source.ip present; blocklist-import aggregate alerts have value "0.0.0.0" and
+# are skipped) and serves them in Prometheus text format on :9300/metrics.
+# Scraped by vmagent (see config/exporters/values.yaml) and visualized in Grafana
+# (grafana/dashboards/crowdsec-blocked-ips.json).
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: crowdsec-alerts-exporter
+  namespace: crowdsec
+data:
+  exporter.py: |
+    #!/usr/bin/env python3
+    """CrowdSec alerts exporter (stdlib only, no external deps)."""
+    import ipaddress
+    import json
+    import os
+    import time
+    import urllib.parse
+    import urllib.request
+    from datetime import datetime
+    from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
+    from threading import Lock, Thread
+
+    LAPI_URL = os.environ.get("LAPI_URL", "http://crowdsec-service.crowdsec.svc.cluster.local:8080")
+    MACHINE_ID = os.environ.get("MACHINE_ID", "")
+    MACHINE_PASSWORD = os.environ.get("MACHINE_PASSWORD", "")
+    ALERT_LIMIT = int(os.environ.get("ALERT_LIMIT", "500"))
+    REFRESH_INTERVAL = int(os.environ.get("REFRESH_INTERVAL", "60"))
+    FEED_REFRESH_INTERVAL = int(os.environ.get("FEED_REFRESH_INTERVAL", "21600"))
+    LISTEN = os.environ.get("LISTEN", "0.0.0.0:9300")
+
+    _lock = Lock()
+    _last_seen = {}
+    _alerts_total = {}
+    _last_refresh = 0.0
+    _feed_ips = {}
+    _feed_last_refresh = 0.0
+
+    # feed name -> list of (url, comment_char, extract_field). Kept in sync with
+    # the enabled feeds in blocklist-import.yaml.
+    FEED_GROUPS = [
+        ("Spamhaus DROP", [("https://www.spamhaus.org/drop/drop.txt", ";", 0)]),
+        ("Blocklist.de", [
+            ("https://lists.blocklist.de/lists/all.txt", "#", None),
+            ("https://lists.blocklist.de/lists/ssh.txt", "#", None),
+            ("https://lists.blocklist.de/lists/apache.txt", "#", None),
+            ("https://lists.blocklist.de/lists/mail.txt", "#", None),
+        ]),
+        ("abuse.ch", [
+            ("https://feodotracker.abuse.ch/downloads/ipblocklist.txt", "#", None),
+            ("https://urlhaus.abuse.ch/downloads/text_online/", "#", None),
+        ]),
+        ("Emerging Threats", [("https://rules.emergingthreats.net/blockrules/compromised-ips.txt", "#", 0)]),
+        ("IPsum", [
+            ("https://raw.githubusercontent.com/stamparm/ipsum/master/levels/3.txt", "#", None),
+            ("https://raw.githubusercontent.com/stamparm/ipsum/master/levels/4.txt", "#", None),
+        ]),
+        ("FireHOL", [
+            ("https://raw.githubusercontent.com/firehol/blocklist-ipsets/master/firehol_level1.netset", "#", None),
+            ("https://raw.githubusercontent.com/firehol/blocklist-ipsets/master/firehol_level2.netset", "#", None),
+            ("https://raw.githubusercontent.com/firehol/blocklist-ipsets/master/firehol_level3.netset", "#", None),
+        ]),
+    ]
+
+
+    def _unix(ts):
+        if not ts:
+            return 0
+        try:
+            return int(datetime.fromisoformat(ts.replace("Z", "+00:00")).timestamp())
+        except ValueError:
+            return 0
+
+
+    def _api(path, token=None, data=None):
+        headers = {"Content-Type": "application/json"}
+        if token:
+            headers["Authorization"] = "Bearer " + token
+        req = urllib.request.Request(LAPI_URL + path, data=data, headers=headers)
+        with urllib.request.urlopen(req, timeout=15) as resp:
+            return json.loads(resp.read().decode())
+
+
+    def _login():
+        body = json.dumps({"machine_id": MACHINE_ID, "password": MACHINE_PASSWORD}).encode()
+        return _api("/v1/watchers/login", data=body)["token"]
+
+
+    def refresh():
+        global _last_seen, _alerts_total, _last_refresh
+        try:
+            token = _login()
+            alerts = _api("/v1/alerts?limit=%d" % ALERT_LIMIT, token=token)
+        except Exception as exc:
+            print("[exporter] refresh failed: %s" % exc, flush=True)
+            return
+
+        seen = {}
+        total = {}
+        for alert in alerts:
+            if alert.get("simulated"):
+                continue
+            source = alert.get("source") or {}
+            ip = source.get("ip")
+            if not ip:
+                continue
+            scenario = alert.get("scenario", "")
+            country = source.get("cn") or ""
+            actions = {d.get("type", "ban") for d in (alert.get("decisions") or [])} or {"ban"}
+            ts = _unix(alert.get("created_at") or alert.get("start_at"))
+            for action in actions:
+                key = (ip, scenario, action, country)
+                seen[key] = max(seen.get(key, 0), ts)
+            total[scenario] = total.get(scenario, 0) + 1
+
+        with _lock:
+            _last_seen = seen
+            _alerts_total = total
+            _last_refresh = time.time()
+        print("[exporter] refreshed: %d (ip,scenario) pairs, %d scenarios" % (len(seen), len(total)), flush=True)
+
+
+    def _esc(value):
+        return value.replace("\\", "\\\\").replace('"', '\\"')
+
+
+    def render_metrics():
+        lines = [
+            "# HELP crowdsec_alert_last_seen Unix timestamp (seconds) of the last CrowdSec alert for a source IP.",
+            "# TYPE crowdsec_alert_last_seen gauge",
+        ]
+        with _lock:
+            for (ip, scenario, action, country), ts in sorted(_last_seen.items()):
+                labels = 'ip="%s",scenario="%s",action="%s",country="%s"' % tuple(_esc(x) for x in (ip, scenario, action, country))
+                lines.append("crowdsec_alert_last_seen{%s} %d" % (labels, ts))
+            lines.append("# HELP crowdsec_alerts_total Total number of CrowdSec alerts per scenario.")
+            lines.append("# TYPE crowdsec_alerts_total counter")
+            for scenario, count in sorted(_alerts_total.items()):
+                lines.append("crowdsec_alerts_total{scenario=\"%s\"} %d" % (_esc(scenario), count))
+            lines.append("# HELP crowdsec_exporter_last_refresh Unix timestamp of the last successful LAPI refresh.")
+            lines.append("# TYPE crowdsec_exporter_last_refresh gauge")
+            lines.append("crowdsec_exporter_last_refresh %d" % int(_last_refresh))
+            lines.append("# HELP crowdsec_feed_ips Number of entries (IP or CIDR range) each imported feed contains.")
+            lines.append("# TYPE crowdsec_feed_ips gauge")
+            for (feed, version), count in sorted(_feed_ips.items()):
+                lines.append("crowdsec_feed_ips{feed=\"%s\",ip_version=\"%s\"} %d" % (_esc(feed), version, count))
+        return "\n".join(lines) + "\n"
+
+    def _parse_entry(line):
+        try:
+            ip = ipaddress.ip_address(line)
+            return "v4" if ip.version == 4 else "v6"
+        except ValueError:
+            pass
+        try:
+            ipaddress.ip_network(line, strict=False)
+            return "range"
+        except ValueError:
+            pass
+        if line.startswith("http"):
+            host = urllib.parse.urlparse(line).hostname
+            if host:
+                try:
+                    ip = ipaddress.ip_address(host)
+                    return "v4" if ip.version == 4 else "v6"
+                except ValueError:
+                    pass
+        return None
+
+    def refresh_feeds():
+        global _feed_ips, _feed_last_refresh
+        with _lock:
+            new = dict(_feed_ips)
+        any_ok = False
+        for feed, sources in FEED_GROUPS:
+            local = {}
+            feed_ok = False
+            for url, comment, field in sources:
+                try:
+                    req = urllib.request.Request(url, headers={"User-Agent": "crowdsec-alerts-exporter/1.0"})
+                    resp = urllib.request.urlopen(req, timeout=20)
+                    text = resp.read().decode("utf-8", errors="ignore")
+                    resp.close()
+                except Exception as exc:
+                    print("[exporter] feed fetch failed (%s): %s" % (url, exc), flush=True)
+                    continue
+                feed_ok = True
+                for raw in text.splitlines():
+                    line = raw.strip()
+                    if not line or (comment and line.startswith(comment)):
+                        continue
+                    if field is not None:
+                        parts = line.split()
+                        if not parts:
+                            continue
+                        line = parts[field]
+                    version = _parse_entry(line)
+                    if version:
+                        key = (feed, version)
+                        local[key] = local.get(key, 0) + 1
+            if feed_ok:
+                any_ok = True
+                for k in [k for k in new if k[0] == feed]:
+                    del new[k]
+                new.update(local)
+        with _lock:
+            if any_ok:
+                _feed_ips = new
+                _feed_last_refresh = time.time()
+        print("[exporter] feeds refreshed (%d entries)" % sum(new.values()), flush=True)
+
+    def _loop_feeds():
+        while True:
+            refresh_feeds()
+            time.sleep(FEED_REFRESH_INTERVAL)
+
+
+    class Handler(BaseHTTPRequestHandler):
+        def do_GET(self):
+            if self.path == "/metrics":
+                body = render_metrics().encode()
+                self.send_response(200)
+                self.send_header("Content-Type", "text/plain; version=0.0.4")
+                self.send_header("Content-Length", str(len(body)))
+                self.end_headers()
+                self.wfile.write(body)
+            else:
+                self.send_response(404)
+                self.end_headers()
+
+        def log_message(self, fmt, *args):
+            pass
+
+
+    def _loop():
+        while True:
+            refresh()
+            time.sleep(REFRESH_INTERVAL)
+
+
+    def main():
+        Thread(target=_loop, daemon=True).start()
+        Thread(target=_loop_feeds, daemon=True).start()
+        host, port = LISTEN.rsplit(":", 1)
+        server = ThreadingHTTPServer((host, int(port)), Handler)
+        print("[exporter] listening on %s" % LISTEN, flush=True)
+        server.serve_forever()
+
+
+    if __name__ == "__main__":
+        main()
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: crowdsec-alerts-exporter
+  namespace: crowdsec
+  labels:
+    app.kubernetes.io/name: crowdsec-alerts-exporter
+spec:
+  selector:
+    app.kubernetes.io/name: crowdsec-alerts-exporter
+  ports:
+    - name: metrics
+      port: 9300
+      targetPort: 9300
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: crowdsec-alerts-exporter
+  namespace: crowdsec
+  labels:
+    app.kubernetes.io/name: crowdsec-alerts-exporter
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: crowdsec-alerts-exporter
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: crowdsec-alerts-exporter
+    spec:
+      containers:
+        - name: exporter
+          image: python:3.13-alpine
+          command: ["python", "/app/exporter.py"]
+          env:
+            - name: LAPI_URL
+              value: "http://crowdsec-service.crowdsec.svc.cluster.local:8080"
+            - name: MACHINE_ID
+              valueFrom:
+                secretKeyRef:
+                  name: crowdsec-exporter-credentials
+                  key: machine-id
+            - name: MACHINE_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: crowdsec-exporter-credentials
+                  key: machine-password
+            - name: FEED_REFRESH_INTERVAL
+              value: "21600"
+          volumeMounts:
+            - name: script
+              mountPath: /app
+          ports:
+            - containerPort: 9300
+              name: metrics
+          resources:
+            requests:
+              cpu: 50m
+              memory: 64Mi
+            limits:
+              cpu: 200m
+              memory: 128Mi
+      volumes:
+        - name: script
+          configMap:
+            name: crowdsec-alerts-exporter
