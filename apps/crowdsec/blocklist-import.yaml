@@ -1,6 +1,42 @@
 # CrowdSec blocklist-import CronJob — injects external threat feeds into LAPI.
 # Deployed in the `crowdsec` namespace so it can reach the LAPI service.
+# Before each import, an initContainer purges the expired decisions from the
+# LAPI SQLite DB (which never auto-purges them — see docs/issues/4613). It runs
+# via kubectl exec into the LAPI pod, hence the ServiceAccount + RBAC below.
 
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: crowdsec-purge
+  namespace: crowdsec
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: crowdsec-purge
+  namespace: crowdsec
+rules:
+  - apiGroups: [""]
+    resources: ["pods", "pods/exec"]
+    verbs: ["get", "list", "create"]
+  - apiGroups: ["apps"]
+    resources: ["deployments"]
+    verbs: ["get"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: crowdsec-purge
+  namespace: crowdsec
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: crowdsec-purge
+subjects:
+  - kind: ServiceAccount
+    name: crowdsec-purge
+    namespace: crowdsec
+---
 apiVersion: v1
 kind: ConfigMap
 metadata:
@@ -23,9 +59,16 @@ data:
   CONSOLIDATE_ALERTS: "true"
   TELEMETRY_ENABLED: "false"
   METRICS_ENABLED: "false"
-  # Protect GitHub ranges from being blocked.
+  # Auto-fetch GitHub ranges.
   ALLOWLIST_GITHUB: "true"
-  # Prudent subset of feeds (enabled).
+  # Safety cap: keeps the LAPI SQLite datastore responsive. The bouncer stream
+  # and every decisions query degrade badly with hundreds of thousands of rows.
+  # Raised to 80000 so IPsum + FireHOL are actually imported (the tool fills
+  # the cap in feed order; at 50000 only IPsum would enter).
+  MAX_DECISIONS: "80000"
+  # Feed subset. All major feeds enabled; the purge-before-import (initContainer)
+  # keeps the expired-decisions backlog bounded, which is what broke the bouncer
+  # sync before (not the active decision count).
   ENABLE_IPSUM: "true"
   ENABLE_SPAMHAUS: "true"
   ENABLE_FIREHOL: "true"
@@ -63,6 +106,24 @@ spec:
       template:
         spec:
           restartPolicy: OnFailure
+          serviceAccountName: crowdsec-purge
+          initContainers:
+            - name: purge
+              image: bitnami/kubectl:latest
+              command:
+                - /bin/sh
+                - -c
+                - |
+                  set -e
+                  kubectl exec -i -n crowdsec deploy/crowdsec-lapi -- sh -s <<'EOF'
+                  command -v sqlite3 >/dev/null 2>&1 || apk add --no-cache sqlite >/dev/null 2>&1
+                  DB=/var/lib/crowdsec/data/crowdsec.db
+                  BEFORE=$(sqlite3 "$DB" "SELECT count(*) FROM decisions;")
+                  ACTIVE=$(sqlite3 "$DB" "SELECT count(*) FROM decisions WHERE until > datetime('now','utc');")
+                  sqlite3 "$DB" "DELETE FROM decisions WHERE until < datetime('now','utc');"
+                  AFTER=$(sqlite3 "$DB" "SELECT count(*) FROM decisions;")
+                  echo "purged expired decisions: $BEFORE -> $AFTER (active: $ACTIVE)"
+                  EOF
           containers:
             - name: blocklist-import
               image: ghcr.io/wolffcatskyy/crowdsec-blocklist-import:3.7.1

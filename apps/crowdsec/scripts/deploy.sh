@@ -52,7 +52,7 @@ kubectl create secret generic blocklist-import-credentials \
   --from-literal=machine-password="$MACHINE_PWD" \
   --dry-run=client -o yaml | kubectl apply -f - > /dev/null
 
-echo "  Deploying blocklist-import CronJob (every 6h)..."
+echo "  Deploying blocklist-import CronJob (every 6h, purge before import)..."
 kubectl apply -f blocklist-import.yaml
 
 echo ""

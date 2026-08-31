@@ -96,9 +96,20 @@ bouncer then enforces. This avoids the paid console blocklists.
 - **Credentials**: a LAPI machine + bouncer, registered automatically on first
   deploy and stored in gopass (`homelab/crowdsec/blocklist-import/*`), injected
   via the `blocklist-import-credentials` Secret (`_FILE` env, never inline).
-- **Prudent feed subset by default**: IPsum, Spamhaus DROP, FireHOL, abuse.ch,
-  Blocklist.de, Emerging Threats enabled; Tor, scanners, StopForumSpam and the
-  other large/aggressive feeds disabled. Toggle via `ENABLE_*`.
+- **Feed subset by default**: all major feeds enabled — Spamhaus DROP, abuse.ch,
+  Blocklist.de, Emerging Threats, IPsum and FireHOL. The active set stays
+  manageable because `MAX_DECISIONS` caps it and the purge-before-import keeps
+  the expired-decisions backlog bounded (the backlog, not the active count, is
+  what broke the bouncer sync — see [Maintenance](#maintenance)). Tor, scanners,
+  StopForumSpam and the other large/aggressive feeds remain disabled. Toggle via
+  `ENABLE_*`.
+- **The owner's own IPs are deliberately NOT allowlisted** — a future block
+  (e.g. a feed range covering them) is immediately visible instead of silently
+  masked. If it happens, remove the decision and run `mise run
+  //apps/crowdsec:purge`.
+- **`MAX_DECISIONS=80000`** caps the total number of decisions, keeping the LAPI
+  SQLite datastore responsive (high enough for IPsum + FireHOL to be actually
+  imported; the current active set is ~55k decisions).
 - **Safe before enabling for real**: set `DRY_RUN: "true"` in the ConfigMap,
   create a one-off Job and check the logs, then revert.
 
@@ -114,6 +125,31 @@ watch its logs:
 ```sh
 $ mise run //apps/crowdsec:blocklist-import:run
 ```
+
+## Maintenance
+
+The LAPI never purges expired decisions from its SQLite database. They
+accumulate with each `blocklist-import` run, bloat the DB, and eventually make
+the bouncer startup stream scan the whole backlog (see
+[crowdsecurity/crowdsec#4613](https://github.com/crowdsecurity/crowdsec/issues/4613)),
+which breaks the bouncer sync and — with `streamStartupBlock: true` — blocks all
+traffic with HTTP 403.
+
+**The purge runs automatically before every `blocklist-import` run**: an
+initContainer (`blocklist-import.yaml`, ServiceAccount `crowdsec-purge`) deletes
+the expired rows via `kubectl exec` into the LAPI pod (the PVC is RWO, so the
+purge must run inside the pod). It does not `VACUUM` — that would lock the DB
+and disrupt the bouncer sync.
+
+Compact the database file occasionally (frees disk space; the purge-before-import
+already keeps the row count bounded):
+
+```sh
+$ mise run //apps/crowdsec:purge
+```
+
+Run it e.g. monthly or as soon as the DB grows. It only removes decisions whose
+expiration (`until`) is already in the past; active decisions are untouched.
 
 ## Destroy
 

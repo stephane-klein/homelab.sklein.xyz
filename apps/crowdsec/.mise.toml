@@ -17,3 +17,7 @@ run = "scripts/run-blocklist-import-now.sh"
 [tasks."blocklist-import:status"]
 description = "Show blocklist-import status (imported decisions count + CronJob state)"
 run = "scripts/blocklist-import-status.sh"
+
+[tasks.purge]
+description = "Purge expired decisions from the LAPI SQLite DB (prevents bloat and bouncer sync breakage)"
+run = "scripts/purge-decisions.sh"
