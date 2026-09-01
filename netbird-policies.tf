@@ -56,6 +56,38 @@ resource "netbird_policy" "ssh_access" {
   }
 }
 
+resource "netbird_policy" "incus_servers_access" {
+  name        = "Incus to Homelab Servers"
+  description = "Bidirectional access between incus group and homelab servers"
+  enabled     = true
+
+  rule {
+    name          = "Incus to Homelab Servers"
+    action        = "accept"
+    bidirectional = true
+    enabled       = true
+    protocol      = "all"
+    sources       = [netbird_group.incus.id]
+    destinations  = [netbird_group.homelab_servers.id]
+  }
+}
+
+resource "netbird_policy" "incus_user_devices_access" {
+  name        = "Incus to User Devices"
+  description = "Bidirectional access between incus group and user devices"
+  enabled     = true
+
+  rule {
+    name          = "Incus to User Devices"
+    action        = "accept"
+    bidirectional = true
+    enabled       = true
+    protocol      = "all"
+    sources       = [netbird_group.incus.id]
+    destinations  = [netbird_group.user_devices.id]
+  }
+}
+
 resource "netbird_policy" "fp5_to_t14s" {
   name        = "FP5 to t14s Access"
   description = "Allow FP5 to access t14s"

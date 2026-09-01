@@ -21,4 +21,10 @@ output "setup_key_dummy1" {
   description = "Netbird setup key for dummy1"
 }
 
+output "setup_key_incus" {
+  value       = netbird_setup_key.incus.key
+  sensitive   = true
+  description = "Netbird setup key for incus machines"
+}
+
 

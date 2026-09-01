@@ -149,11 +149,19 @@ $ tofu apply
 
 This manages the following resources:
 
-- **Groups**: `homelab-servers` (the two NUCs) and `user-devices` (laptop, phone)
+- **Groups**:
+  - `homelab-servers` — the two NUCs
+  - `user-devices` — laptop, phone
+  - `incus` — LXC containers and QEMU VMs managed by [Incus](https://linuxcontainers.org/incus/)
 - **Peers**: SSH enabled on servers via Netbird SSH proxy (no manual SSH key distribution)
 - **Policies**: unidirectional access — user devices can reach servers, servers cannot
-  initiate connections to user devices
-- **Setup keys**: generated for ISO builds
+  initiate connections to user devices; `incus` has bidirectional access to all peers
+- **Setup keys**: generated for ISO builds, plus `incus` (reusable, joins the `incus`
+  group automatically)
+
+To join the `incus` group, retrieve the key with `tofu output -raw setup_key_incus`
+(stored in `gopass show netbird/setup-keys/incus-auto-group`) and register a
+machine with `netbird up --setup-key <KEY>` — it is added to the group automatically.
 
 To list existing resources and their IDs (useful for `tofu import`):
 

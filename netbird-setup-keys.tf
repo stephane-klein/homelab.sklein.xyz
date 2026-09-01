@@ -27,3 +27,13 @@ resource "netbird_setup_key" "dummy1" {
   ephemeral              = false
   usage_limit            = 0 # unlimited
 }
+
+resource "netbird_setup_key" "incus" {
+  name                   = "incus"
+  expiry_seconds         = 0 # unlimited
+  type                   = "reusable"
+  allow_extra_dns_labels = true
+  auto_groups            = [netbird_group.incus.id]
+  ephemeral              = false
+  usage_limit            = 0 # unlimited
+}

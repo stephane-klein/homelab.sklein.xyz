@@ -22,6 +22,10 @@ resource "netbird_group" "dev_devices" {
   name = "dev-devices"
 }
 
+resource "netbird_group" "incus" {
+  name = "incus"
+}
+
 resource "netbird_group" "fp5_device" {
   name = "fp5-device"
   peers = [

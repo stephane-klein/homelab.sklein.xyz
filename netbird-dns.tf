@@ -3,7 +3,7 @@ resource "netbird_dns_zone" "nuc_i7_gen11" {
   domain               = "nuc-i7-gen11.homelab.stephane-klein.info"
   enabled              = true
   enable_search_domain = false
-  distribution_groups  = [
+  distribution_groups = [
     netbird_group.homelab_servers.id,
     netbird_group.user_devices.id,
   ]
@@ -22,7 +22,7 @@ resource "netbird_dns_zone" "sklein_internal" {
   domain               = "sklein.internal"
   enabled              = true
   enable_search_domain = false
-  distribution_groups  = [
+  distribution_groups = [
     netbird_group.homelab_servers.id,
     netbird_group.user_devices.id,
     netbird_group.dev_devices.id,
