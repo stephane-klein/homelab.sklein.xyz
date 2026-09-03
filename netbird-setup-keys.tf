@@ -37,3 +37,13 @@ resource "netbird_setup_key" "incus" {
   ephemeral              = false
   usage_limit            = 0 # unlimited
 }
+
+resource "netbird_setup_key" "homelab_servers" {
+  name                   = "homelab-servers"
+  expiry_seconds         = 0 # unlimited
+  type                   = "reusable"
+  allow_extra_dns_labels = true
+  auto_groups            = [netbird_group.homelab_servers.id]
+  ephemeral              = false
+  usage_limit            = 0 # unlimited
+}

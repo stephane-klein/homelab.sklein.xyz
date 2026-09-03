@@ -27,4 +27,10 @@ output "setup_key_incus" {
   description = "Netbird setup key for incus machines"
 }
 
+output "setup_key_homelab_servers" {
+  value       = netbird_setup_key.homelab_servers.key
+  sensitive   = true
+  description = "Netbird setup key for homelab servers"
+}
+
 
