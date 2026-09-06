@@ -26,7 +26,6 @@ Deployed services:
   - [external-dns](https://github.com/kubernetes-sigs/external-dns) (automatic AAAA in Cloudflare for public Ingress)
   - [Authelia](https://github.com/authelia/authelia) (SSO authentication)
   - [CrowdSec](https://github.com/crowdsecurity/crowdsec) (IP reputation / IPS for the public Traefik ingress)
-  - [registry:2](https://github.com/distribution/distribution) — private container registry (OCI distribution) at `https://registry.sklein.internal`, HTTP basic auth
   - [CloudNativePG](https://cloudnative-pg.io/) (PostgreSQL operator with backup to Scaleway Object Storage)
   - [External Secrets Operator](https://external-secrets.io/) (cross-namespace secret sharing)
 - **Environment monitoring**
@@ -39,6 +38,11 @@ Deployed services:
 - **AI / Agent memory**
   - [Hindsight](https://github.com/vectorize-io/hindsight) at `https://hindsight.sklein.internal`
     — agent memory system with pgvector + pg_search (ParadeDB)
+- **Software development**
+  - [Forgejo](https://forgejo.org/) at `https://forgejo.sklein.internal` — self-hosted
+    Git forge (repositories, issues, pull requests, wiki) with its own
+    CloudNativePG database, plus the **private container registry**
+    (`forgejo.sklein.internal/stephane-klein/...`
 - **Application dashboard**
   - [Homepage](https://gethomepage.dev/) at `https://homepage.sklein.internal`
     — central dashboard with Kubernetes resources, per-node CPU/RAM/disk metrics
@@ -59,8 +63,9 @@ Each application is a self-contained directory under
 
 - [`apps/toggl-pg-mirror/`](./apps/toggl-pg-mirror/) — mirrors Toggl time entries to PostgreSQL
 - [`apps/crowdsec/`](./apps/crowdsec/) — CrowdSec [LAPI](https://docs.crowdsec.net/docs/local_api/intro/) + agent (protects the public Traefik ingress), including the blocklist-import CronJob for external threat feeds
+- [`apps/forgejo/`](./apps/forgejo/) — self-hosted Git forge (Forgejo) + its private CloudNativePG database at `https://forgejo.sklein.internal`
 
-My databases:
+My databases (see [`databases/README.md`](databases/README.md)):
 
 - [`databases/memex/`](./databases/memex/) — Memex knowledge database
 
@@ -781,7 +786,9 @@ $ mise run destroy-zigbee
 
 ## Managed databases
 
-Databases deployed with CloudNativePG:
+Databases deployed with CloudNativePG. The overall index and conventions
+(shared DBs under `databases/<db>/`, app-private DBs colocated in the app)
+live in **[`databases/README.md`](databases/README.md)**.
 
 ### Memex
 
@@ -790,6 +797,15 @@ CloudNativePG cluster backing the Memex knowledge database
 
 See **[`databases/memex/README.md`](databases/memex/README.md)** for deployment,
 password, connect, and backup instructions.
+
+### Forgejo
+
+Forgejo's PostgreSQL is an **app-private** database: its CNPG cluster
+(`forgejo-cluster`) is declared inside [`apps/forgejo/`](apps/forgejo/)
+(namespace `forgejo`, node `nuc-i7-gen11`), not under `databases/`. Backup and
+ops scripts live in `apps/forgejo/scripts/`.
+
+See **[`apps/forgejo/README.md`](apps/forgejo/README.md)**.
 
 ### Hindsight
 

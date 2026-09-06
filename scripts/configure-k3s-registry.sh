@@ -6,8 +6,8 @@ cd "$(dirname "$0")/../"
 SERVER_HOST="nuc-i7-gen11.homelab.stephane-klein.info"
 AGENT_HOST="nuc-i3-gen5.homelab.stephane-klein.info"
 SSH_USER="${SSH_USER:-stephane}"
-REGISTRY_HOST="registry.sklein.internal"
-REGISTRY_USER="${REGISTRY_USER:-stephane}"
+REGISTRY_HOST="forgejo.sklein.internal"
+REGISTRY_USER="${REGISTRY_USER:-stephane-klein}"
 
 CA_SRC="certs/ca/ca.crt"
 CA_DST="/etc/rancher/k3s/registry-ca.crt"
@@ -18,9 +18,14 @@ if [ ! -f "$CA_SRC" ]; then
   exit 1
 fi
 
-REGISTRY_PASSWORD="$(gopass show -o "homelab/registry/${REGISTRY_USER}/password")"
+# Forgejo container-registry token (scopes: read:package,write:package).
+# Created for REGISTRY_USER with:
+#   kubectl exec -n forgejo deploy/forgejo -- forgejo admin user generate-access-token \
+#     -u "$REGISTRY_USER" -t container-registry --scopes "read:package,write:package" --raw
+REGISTRY_PASSWORD="$(gopass show -o "homelab/forgejo/container-registry-token")"
 if [ -z "$REGISTRY_PASSWORD" ]; then
-  echo "Error: empty gopass entry homelab/registry/${REGISTRY_USER}/password" >&2
+  echo "Error: empty gopass entry homelab/forgejo/container-registry-token" >&2
+  echo "Generate the token and store it first (see apps/forgejo/README.md, Container Registry section)." >&2
   exit 1
 fi
 
@@ -84,4 +89,4 @@ configure_node "$AGENT_HOST" "k3s-agent.service"
 echo ""
 echo "=== Done ==="
 echo "  containerd on both nodes can now pull from ${REGISTRY_HOST}"
-echo "  Test: podman pull registry.sklein.internal/<image>:<tag> (from a Netbird peer)"
+echo "  Test: podman pull forgejo.sklein.internal/stephane-klein/<image>:<tag> (from a Netbird peer)"

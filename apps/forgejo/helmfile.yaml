@@ -1,0 +1,24 @@
+repositories:
+  - name: cnpg
+    url: https://cloudnative-pg.github.io/charts
+
+releases:
+  # PostgreSQL cluster (CloudNativePG) backing Forgejo.
+  # Helm release name `forgejo-cluster` -> Cluster CR `forgejo-cluster`
+  # (the cnpg/cluster chart names the Cluster resource after the release).
+  - name: forgejo-cluster
+    namespace: forgejo
+    createNamespace: true
+    chart: cnpg/cluster
+    version: 0.7.0
+    values:
+      - values.yaml
+
+  # Forgejo itself. The OCI chart reference embeds the pinned version.
+  - name: forgejo
+    namespace: forgejo
+    createNamespace: true
+    chart: oci://code.forgejo.org/forgejo-helm/forgejo
+    version: 17.1.5
+    values:
+      - values.yaml

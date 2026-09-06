@@ -1,0 +1,35 @@
+[tasks.deploy]
+description = "Deploy Forgejo + its CNPG database (https://forgejo.sklein.internal)"
+run = "scripts/deploy.sh"
+
+[tasks.destroy]
+description = "Destroy Forgejo and its CNPG database"
+run = "scripts/destroy.sh"
+
+[tasks.diff]
+description = "Show the helm diff for Forgejo and report drift"
+run = "scripts/diff.sh"
+
+[tasks.list-backups]
+description = "List CNPG Forgejo backups"
+run = "scripts/list-backups.sh"
+
+[tasks.backup]
+description = "Trigger immediate CNPG Forgejo backup"
+run = "scripts/backup.sh"
+
+[tasks.backup-data]
+description = "Trigger a manual run of the forgejo-data-backup CronJob (PVC tar -> S3)"
+run = "scripts/backup-data.sh"
+
+[tasks.delete-backup]
+description = "Delete a CNPG Forgejo backup by name"
+run = "scripts/delete-backup.sh"
+
+[tasks.enter-in-postgres]
+description = "Enter an interactive psql session in the Forgejo database"
+run = "scripts/enter-in-postgres.sh"
+
+[tasks.container-registry-token]
+description = "Create/refresh the Forgejo container-registry token and store it in Gopass"
+run = "scripts/container-registry-token.sh"

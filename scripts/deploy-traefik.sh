@@ -47,11 +47,25 @@ kubectl delete svc traefik -n traefik --ignore-not-found=true > /dev/null 2>&1 |
 kubectl get secrets -n traefik -l "name=traefik,owner=helm" -o name 2>/dev/null | xargs -r kubectl delete -n traefik 2>/dev/null || true
 
 helm repo add traefik https://traefik.github.io/charts --force-update > /dev/null
+
+# additionalArguments[5]: TCP entrypoint `ssh` for git-over-SSH (Forgejo).
+# Bound on the Netbird IP only, so it is NOT reachable from the node's public
+# IPv6 address. Consumed by apps/forgejo/ssh/ingress-route-tcp.yaml.
+echo "  Enabling TCP 'ssh' entrypoint on ${NETBIRD_IP}:32222 (Forgejo git-over-SSH)..."
+
+# Recreate strategy is required: hostNetwork + replicas=1 means a RollingUpdate
+# would deadlock (the new pod cannot schedule while the old pod still holds the
+# host ports, and the old pod is only removed once the new one is Ready).
+# NOTE: the chart key is `updateStrategy` (not `deployment.strategy`).
+echo "  Using Recreate strategy (hostNetwork single-replica)..."
+
 helm upgrade --install traefik traefik/traefik \
   --namespace traefik --create-namespace \
+  --force-conflicts \
   --set hostNetwork=true \
   --set deployment.dnsPolicy=ClusterFirstWithHostNet \
   --set deployment.replicas=1 \
+  --set updateStrategy.type=Recreate \
   --set ports.web.port=80 \
   --set ports.web.hostPort=0 \
   --set ports.websecure.port=443 \
@@ -69,7 +83,8 @@ helm upgrade --install traefik traefik/traefik \
   --set-string "additionalArguments[1]=--entryPoints.web.address=${NETBIRD_IP}:80" \
   --set-string "additionalArguments[2]=--entryPoints.websecure.address=${NETBIRD_IP}:443" \
   --set-string "additionalArguments[3]=--entryPoints.web.http.redirections.entryPoint.to=websecure" \
-  --set-string "additionalArguments[4]=--entryPoints.web.http.redirections.entryPoint.scheme=https" > /dev/null
+  --set-string "additionalArguments[4]=--entryPoints.web.http.redirections.entryPoint.scheme=https" \
+  --set-string "additionalArguments[5]=--entryPoints.ssh.address=${NETBIRD_IP}:32222" > /dev/null
 
 echo "  Waiting for Traefik to be ready..."
 kubectl wait --for=condition=Available deployment \

@@ -8,18 +8,25 @@ for the rationale (ADR 001).
 
 Each application lives in its own directory `apps/<app>/`:
 
-- `helmfile.yaml` — the single Helm release for the app (chart, namespace, values)
+- `helmfile.yaml` — the Helm release(s) for the app (chart, namespace, values)
 - `values.yaml` — Helm values
 - `scripts/deploy.sh` — create namespace/secrets from Gopass, then `helmfile apply`
 - `scripts/destroy.sh` — `helmfile destroy`
 - `.mise.toml` — short-named tasks (`deploy`, `destroy`, `diff`, …)
 - `README.md` — deployment instructions and dependencies
 
-Managed databases (CloudNativePG clusters) follow the same self-contained
-pattern under `databases/<db>/` (e.g. `databases/memex/`), with tasks
-namespaced `//databases/<db>:<task>`. Secrets such as S3 backup credentials are
-created by `scripts/deploy.sh` with `kubectl create secret` after
-`helmfile apply` (so Helm does not delete them on upgrade).
+Most apps declare a single release, but an app may bundle several releases in
+one `helmfile.yaml` when they belong together (e.g. `apps/forgejo/` declares
+its own CloudNativePG cluster as the first release, then the Forgejo chart).
+
+Shared/autonomous databases (CloudNativePG clusters) follow the same
+self-contained pattern under `databases/<db>/` (e.g. `databases/memex/`), with
+tasks namespaced `//databases/<db>:<task>`. See
+[`databases/README.md`](../../databases/README.md): a database that is an
+internal detail of a single app is colocated in that app instead (Forgejo is
+the current example). Secrets such as S3 backup credentials are created by
+`scripts/deploy.sh` with `kubectl create secret` after `helmfile apply` (so
+Helm does not delete them on upgrade).
 
 ## Deploy workflow
 

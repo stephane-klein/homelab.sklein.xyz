@@ -1,0 +1,98 @@
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: forgejo-data-backup
+  namespace: forgejo
+spec:
+  # Weekly: Sunday 02:30 Europe/Paris.
+  schedule: "30 2 * * 0"
+  timeZone: "Europe/Paris"
+  concurrencyPolicy: Forbid
+  successfulJobsHistoryLimit: 3
+  failedJobsHistoryLimit: 1
+  jobTemplate:
+    spec:
+      ttlSecondsAfterFinished: 86400
+      backoffLimit: 2
+      template:
+        spec:
+          restartPolicy: Never
+          # Match the Forgejo chart's fsGroup so the backup pod can read the
+          # local-path PVC content.
+          securityContext:
+            fsGroup: 1000
+          # The forgejo-data PVC is local-path / ReadWriteOnce on
+          # nuc-i7-gen11: the backup pod must run on the same node to mount it.
+          nodeSelector:
+            kubernetes.io/hostname: nuc-i7-gen11.homelab.stephane-klein.info
+          initContainers:
+            - name: tar-data
+              # Same base image as Forgejo (has tar + the filesystem layout).
+              image: code.forgejo.org/forgejo/forgejo:15.0.7-rootless
+              command:
+                - sh
+                - -c
+                - tar czf /backup/forgejo-data.tar.gz -C /data .
+              volumeMounts:
+                - name: data
+                  mountPath: /data
+                - name: backup
+                  mountPath: /backup
+          containers:
+            - name: s3-upload
+              image: docker.io/amazon/aws-cli:latest
+              env:
+                - name: AWS_ACCESS_KEY_ID
+                  valueFrom:
+                    secretKeyRef:
+                      name: forgejo-cluster-backup-s3-creds
+                      key: ACCESS_KEY_ID
+                - name: AWS_SECRET_ACCESS_KEY
+                  valueFrom:
+                    secretKeyRef:
+                      name: forgejo-cluster-backup-s3-creds
+                      key: ACCESS_SECRET_KEY
+                - name: S3_ENDPOINT
+                  value: https://s3.fr-par.scw.cloud
+                - name: S3_REGION
+                  value: fr-par
+                - name: S3_BUCKET
+                  value: homelab-forgejo-backups
+                - name: S3_PREFIX
+                  value: forgejo-data
+              command:
+                - sh
+                - -c
+                - |
+                  set -euo pipefail
+
+                  TIMESTAMP=$(date -u +%Y%m%d-%H%M%S)
+                  DEST="s3://${S3_BUCKET}/${S3_PREFIX}/forgejo-data-${TIMESTAMP}.tar.gz"
+
+                  echo "Uploading backup to ${DEST}"
+                  aws s3 cp /backup/forgejo-data.tar.gz "${DEST}" \
+                    --endpoint-url "${S3_ENDPOINT}" --region "${S3_REGION}"
+
+                  echo "Purging backups older than 30 days"
+                  CUTOFF=$(date -d '30 days ago' +%s)
+                  aws s3 ls "s3://${S3_BUCKET}/${S3_PREFIX}/" \
+                    --endpoint-url "${S3_ENDPOINT}" --region "${S3_REGION}" \
+                    | while read -r DATE TIME SIZE KEY; do
+                        FILE_TS=$(date -d "${DATE} ${TIME}" +%s 2>/dev/null || true)
+                        if [ -n "${FILE_TS}" ] && [ "${FILE_TS}" -lt "${CUTOFF}" ]; then
+                          echo "  Deleting old backup: ${KEY}"
+                          aws s3 rm "s3://${S3_BUCKET}/${S3_PREFIX}/${KEY}" \
+                            --endpoint-url "${S3_ENDPOINT}" --region "${S3_REGION}"
+                        fi
+                      done
+
+                  echo "Done"
+              volumeMounts:
+                - name: backup
+                  mountPath: /backup
+          volumes:
+            - name: data
+              persistentVolumeClaim:
+                claimName: forgejo-data
+            - name: backup
+              emptyDir: {}
