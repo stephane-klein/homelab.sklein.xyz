@@ -21,6 +21,23 @@ disable:
 write-kubeconfig-mode: "0644"
 CONFIGEOF
 
+# Optional: private registry (registry.sklein.internal) pull config for
+# containerd. Written only when deploy-k3s.sh exported the credentials.
+{% if ENV.K3S_REGISTRY_PASSWORD and ENV.K3S_REGISTRY_CA %}
+sudo tee /etc/rancher/k3s/registry-ca.crt > /dev/null << 'CAEOF'
+{{ ENV.K3S_REGISTRY_CA }}
+CAEOF
+sudo tee /etc/rancher/k3s/registries.yaml > /dev/null << 'REGISTRYEOF'
+configs:
+  "registry.sklein.internal":
+    auth:
+      username: {{ ENV.K3S_REGISTRY_USER }}
+      password: "{{ ENV.K3S_REGISTRY_PASSWORD }}"
+    tls:
+      ca_file: /etc/rancher/k3s/registry-ca.crt
+REGISTRYEOF
+{% endif %}
+
 # Kubelet image GC thresholds via drop-in config
 sudo mkdir -p /var/lib/rancher/k3s/agent/etc/kubelet.conf.d
 sudo tee /var/lib/rancher/k3s/agent/etc/kubelet.conf.d/10-image-gc.conf > /dev/null << KUBELETEOF

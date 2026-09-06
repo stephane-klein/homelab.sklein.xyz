@@ -1,0 +1,48 @@
+# Helm values for the private container registry (registry:2 / OCI distribution).
+# Exposed on the internal (Netbird VPN) ingress only:
+#   https://registry.sklein.internal
+#
+# HTTP basic auth is enabled through secrets.htpasswd, injected at deploy time
+# (see helmfile.yaml.gotmpl, `set`). Authentication is intentionally NOT behind
+# Authelia: push/pull clients (podman, containerd) are programmatic.
+
+image:
+  repository: registry
+  # registry:3 dropped the environment-variable based configuration this chart
+  # relies on (REGISTRY_AUTH=htpasswd via _helpers.tpl). Keep the 2.8.x line.
+  tag: 2.8.3
+  pullPolicy: IfNotPresent
+
+service:
+  type: ClusterIP
+  port: 5000
+
+ingress:
+  enabled: true
+  className: traefik
+  path: /
+  hosts:
+    - registry.sklein.internal
+  annotations:
+    cert-manager.io/cluster-issuer: homelab-ca
+  tls:
+    - secretName: registry-tls
+      hosts:
+        - registry.sklein.internal
+
+persistence:
+  enabled: true
+  size: 10Gi
+  accessMode: ReadWriteOnce
+  storageClass: local-path
+
+nodeSelector:
+  kubernetes.io/hostname: nuc-i7-gen11.homelab.stephane-klein.info
+
+# Garbage collection is disabled on purpose: the chart's CronJob has no
+# nodeSelector, but the local-path PVC is bound to nuc-i7-gen11 — a job
+# scheduled on the other node would never mount it. Run GC manually instead:
+#   kubectl -n registry exec deploy/docker-registry -- \
+#     registry garbage-collect /etc/distribution/config.yml --delete-untagged
+garbageCollect:
+  enabled: false

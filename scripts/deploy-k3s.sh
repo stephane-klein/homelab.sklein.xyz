@@ -42,6 +42,22 @@ export K3S_SERVER_IP
 echo ""
 
 # ============================================================
+# Optional: containerd pull credentials for the private registry
+# (registry.sklein.internal, see apps/registry/). Only set when both the
+# homelab CA and the registry password exist, so a registry-less install is
+# unchanged. The payloads write /etc/rancher/k3s/registries.yaml accordingly.
+# ============================================================
+K3S_REGISTRY_USER="${K3S_REGISTRY_USER:-stephane}"
+K3S_REGISTRY_PASSWORD="$(gopass show -o homelab/registry/${K3S_REGISTRY_USER}/password 2>/dev/null || true)"
+if [ -f certs/ca/ca.crt ]; then
+  K3S_REGISTRY_CA="$(cat certs/ca/ca.crt)"
+else
+  K3S_REGISTRY_CA=""
+fi
+export K3S_REGISTRY_USER K3S_REGISTRY_PASSWORD K3S_REGISTRY_CA
+echo ""
+
+# ============================================================
 # Step 2: Deploy k3s server
 # ============================================================
 echo "--- Step 2: Deploying k3s server on $SERVER_HOST ---"

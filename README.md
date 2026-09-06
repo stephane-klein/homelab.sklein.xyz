@@ -26,6 +26,7 @@ Deployed services:
   - [external-dns](https://github.com/kubernetes-sigs/external-dns) (automatic AAAA in Cloudflare for public Ingress)
   - [Authelia](https://github.com/authelia/authelia) (SSO authentication)
   - [CrowdSec](https://github.com/crowdsecurity/crowdsec) (IP reputation / IPS for the public Traefik ingress)
+  - [registry:2](https://github.com/distribution/distribution) — private container registry (OCI distribution) at `https://registry.sklein.internal`, HTTP basic auth
   - [CloudNativePG](https://cloudnative-pg.io/) (PostgreSQL operator with backup to Scaleway Object Storage)
   - [External Secrets Operator](https://external-secrets.io/) (cross-namespace secret sharing)
 - **Environment monitoring**
