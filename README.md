@@ -42,7 +42,9 @@ Deployed services:
   - [Forgejo](https://forgejo.org/) at `https://forgejo.sklein.internal` — self-hosted
     Git forge (repositories, issues, pull requests, wiki) with its own
     CloudNativePG database, plus the **private container registry**
-    (`forgejo.sklein.internal/stephane-klein/...`
+    (`forgejo.sklein.internal/stephane-klein/...` and **Forgejo Actions** CI
+    executed by a runner LXC instance on incus-server1
+    ([`apps/forgejo/runner/`](apps/forgejo/runner/README.md))
 - **Application dashboard**
   - [Homepage](https://gethomepage.dev/) at `https://homepage.sklein.internal`
     — central dashboard with Kubernetes resources, per-node CPU/RAM/disk metrics
@@ -64,6 +66,7 @@ Each application is a self-contained directory under
 - [`apps/toggl-pg-mirror/`](./apps/toggl-pg-mirror/) — mirrors Toggl time entries to PostgreSQL
 - [`apps/crowdsec/`](./apps/crowdsec/) — CrowdSec [LAPI](https://docs.crowdsec.net/docs/local_api/intro/) + agent (protects the public Traefik ingress), including the blocklist-import CronJob for external threat feeds
 - [`apps/forgejo/`](./apps/forgejo/) — self-hosted Git forge (Forgejo) + its private CloudNativePG database at `https://forgejo.sklein.internal`
+  - [`apps/forgejo/runner/`](./apps/forgejo/runner/) — Forgejo Actions CI runner (LXC instance on incus-server1) + build of its Fedora image
 
 My databases (see [`databases/README.md`](databases/README.md)):
 

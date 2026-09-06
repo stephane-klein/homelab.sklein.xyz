@@ -1,0 +1,49 @@
+[tools]
+"github:stephane-klein/incus-apply" = { version = "v0.1.2-sklein-draft", bin = "incus-apply" }
+"go:github.com/lxc/distrobuilder/v3/distrobuilder" = { version = "v3.3.2-0.20260811001855-e2c0bcd03815" }
+"github:rclone/rclone" = { version = "v1.75.0" }
+
+[tool_alias]
+incus-simplestreams = "github:lxc/incus"
+
+[tools.incus-simplestreams]
+version = "6.23"
+matching = "incus-simplestreams"
+bin = "incus-simplestreams"
+
+[tasks.render]
+description = "Render instance.yaml from instance.yaml.j2, injecting secrets from gopass"
+run = "scripts/render.sh"
+
+[tasks.ensure-image]
+description = "Copy the forgejo-runner LXC image from the sklein remote onto incus1"
+run = "scripts/ensure-image.sh"
+
+[tasks.apply]
+description = "Apply the Forgejo Actions runner LXC instance on incus1 via incus-apply"
+depends = ["render", "ensure-image"]
+run = "scripts/apply.sh"
+
+[tasks.provision]
+description = "Provision forgejo-runner inside the LXC instance (binary, podman socket, registration, systemd)"
+run = "scripts/provision.sh"
+
+[tasks.delete]
+description = "Delete the Forgejo Actions runner LXC instance from incus1 (destructive)"
+run = "scripts/delete.sh"
+
+[tasks.ssh]
+description = "Open an interactive SSH session into the Forgejo runner LXC instance"
+run = "scripts/ssh.sh"
+
+[tasks.logs]
+description = "Tail the forgejo-runner systemd unit logs inside the LXC instance"
+run = "scripts/logs.sh"
+
+[tasks.build-image]
+description = "Build the forgejo-runner Fedora LXC image with distrobuilder and import it locally"
+run = "scripts/build-image.sh"
+
+[tasks.upload-image]
+description = "Generate the simplestreams index and publish the forgejo-runner LXC image to the Scaleway S3 incus-images bucket"
+run = "scripts/upload-image.sh"

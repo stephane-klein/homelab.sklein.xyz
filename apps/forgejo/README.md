@@ -13,7 +13,7 @@ internal (Netbird VPN) ingress only:
   `values.yaml`); its `local-path` PVCs (`forgejo-data`, CNPG volume) live on
   this node's disk.
 - Exposed features: git over HTTPS and SSH, plus Forgejo's integrated container
-  & package registries and Actions (runner to be added in a later phase).
+  & package registries and Actions (CI — see [the runner](runner/README.md)).
 
 ## Layout
 
@@ -34,6 +34,8 @@ exception to the `databases/<db>/` convention:
   SSH through the internal Traefik `ssh` entrypoint.
 - `scripts/container-registry-token.sh` — create/refresh the container-registry
   token (see the Container registry section).
+- `runner/` — the **Forgejo Actions runner** (CI), deployed as an LXC instance
+  on incus-server1 (see [`runner/README.md`](runner/README.md)).
 
 ## Dependencies
 
@@ -177,7 +179,12 @@ remove it manually if the data must go. Run this only after confirming the
 backups on S3. The Traefik `ssh` entrypoint itself is left in place (it is
 shared infrastructure managed by `scripts/deploy-traefik.sh`).
 
-## Phase 2 (planned)
+## CI (Forgejo Actions)
 
-- Forgejo Actions runner (`wrenix/forgejo-runner` chart, Docker-in-Docker
-  sidecar) on `nuc-i7-gen11`.
+Forgejo ships its own Actions CI (enabled by default). Jobs run on a **runner
+LXC instance** (`forgejo-runner1`) hosted on `incus-server1` — deliberately
+**outside** the k3s cluster to isolate CI builds. It uses **podman** to execute
+jobs and joins the Netbird `incus` group to reach `forgejo.sklein.internal`.
+
+See **[`runner/README.md`](runner/README.md)** for the full design, the image
+build, and the deployment/operations commands.

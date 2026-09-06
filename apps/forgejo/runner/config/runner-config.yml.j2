@@ -1,0 +1,37 @@
+# forgejo-runner configuration for the forgejo-runner1 LXC instance.
+#
+# Rendered by scripts/provision.sh (minijinja) from Gopass values, then pushed
+# to the instance as /home/runner/runner-config.yml. The forgejo-runner v13
+# runner is registered via *offline registration*: uuid + token live directly
+# in `server.connections` (no `forgejo-runner register` / .runner file).
+#
+# The container engine is podman, exposed through the docker-compatible socket
+# of the `runner` system user. The socket path (/run/user/<uid>/podman/...)
+# is only known once the user exists, so it is passed through the DOCKER_HOST
+# environment variable in the forgejo-runner systemd unit. `container.docker_host`
+# is set to "automount" so the runner honours DOCKER_HOST to launch job
+# containers AND mounts that socket into each job container at
+# /var/run/docker.sock, letting workflows use the docker CLI against the host
+# podman engine (docker build / docker push).
+
+log:
+  level: warning
+
+runner:
+  # Job labels this runner accepts (mapped to a container image run with
+  # podman through the docker-compatible socket).
+  labels:
+    - ubuntu-latest:docker://ghcr.io/catthehacker/ubuntu:act-22.04
+
+container:
+  # Honour the DOCKER_HOST set in the forgejo-runner systemd unit (rootless
+  # podman socket of the `runner` user) and mount it into job containers at
+  # /var/run/docker.sock so workflows can run the docker CLI (build/push).
+  docker_host: automount
+
+server:
+  connections:
+    forgejo:
+      url: {{ ENV.FORGEJO_URL }}
+      uuid: {{ ENV.RUNNER_UUID }}
+      token: {{ ENV.RUNNER_TOKEN }}

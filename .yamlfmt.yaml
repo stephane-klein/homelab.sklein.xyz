@@ -4,3 +4,8 @@ formatter:
   retain_line_breaks_single: true
   max_line_length: 0
   line_ending: lf
+exclude:
+  - "**/*.j2"
+  - "**/*.tmpl"
+  - "**/*.tpl"
+  - "**/*.bu.tmpl"

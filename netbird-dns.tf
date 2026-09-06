@@ -26,6 +26,9 @@ resource "netbird_dns_zone" "sklein_internal" {
     netbird_group.homelab_servers.id,
     netbird_group.user_devices.id,
     netbird_group.dev_devices.id,
+    # The Forgejo Actions runner LXC instance (on incus-server1) needs to
+    # resolve *.sklein.internal (forgejo.sklein.internal) over Netbird.
+    netbird_group.incus.id,
   ]
 }
 
