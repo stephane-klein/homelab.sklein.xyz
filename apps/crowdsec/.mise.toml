@@ -21,3 +21,11 @@ run = "scripts/blocklist-import-status.sh"
 [tasks.purge]
 description = "Purge expired decisions from the LAPI SQLite DB (prevents bloat and bouncer sync breakage)"
 run = "scripts/purge-decisions.sh"
+
+[tasks.test-ban]
+description = "End-to-end CrowdSec ban test (probe, detect, block, cleanup)"
+usage = '''
+arg "<host>" help="Hostname or URL to probe (e.g. example.com)"
+arg "[requests]" help="Number of probe requests" default="60"
+'''
+run = "scripts/test-crowdsec-ban.sh \"${usage_host?}\" \"${usage_requests?}\""

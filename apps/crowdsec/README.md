@@ -64,7 +64,17 @@ $ mise run deploy-traefik-public
 
 ## Test
 
-Ban an IP and check it is blocked, then unban:
+Automated end-to-end test: probes a set of distinct sensitive/404 paths
+(`.env`, `.git/HEAD`, …) in a loop, waits for detection (`http-probing` /
+`http-sensitive-files`) and for the stream bouncer to apply the ban, verifies
+the block (HTTP 403), then removes the decision. The hostname is a required
+argument (no hardcoded host):
+
+```sh
+$ mise run //apps/crowdsec:test-ban example.com
+```
+
+Ban an IP manually and check it is blocked, then unban:
 
 ```sh
 $ kubectl -n crowdsec exec deploy/crowdsec-lapi -- cscli decisions add --ip <ip> -d 5m
@@ -200,4 +210,10 @@ $ mise run //apps/crowdsec:destroy
   `crowdsec-bouncer-key` secret and the `crowdsec-dynamic` ConfigMap from
   `config/traefik-public/`).
 - Real client IPs are preserved because `traefik-public` binds directly on the
-  public IPv6 (`hostNetwork`, no NAT on the BBox) — no `forwardedHeaders` needed.
+  public IPv6 (`hostNetwork`, no NAT on the BBox) — no `forwardedHeaders` needed
+  for connections that reach the origin directly. For zones proxied through
+  Cloudflare, the origin only sees Cloudflare anycast IPs; `scripts/deploy-traefik-public.sh`
+  therefore injects the current Cloudflare ranges as trusted forwarded headers
+  at deploy time, both on the `websecure` entrypoint (`forwardedHeaders.trustedIPs`)
+  and in the CrowdSec bouncer middleware (`forwardedHeadersTrustedIPs`, same ranges),
+  so logs and the bouncer work with the real client IP again.

@@ -20,3 +20,10 @@ http:
           crowdsecLapiHost: crowdsec-service.crowdsec.svc.cluster.local:8080
           # key read from the mounted secret (never inline in the ConfigMap)
           crowdsecLapiKeyFile: /config/crowdsec-key
+          # Trusted Cloudflare proxy ranges. Injected at deploy time by
+          # scripts/deploy-traefik-public.sh (placeholder __CF_TRUSTED_IPS__).
+          # Official "behind a front proxy" pattern: the plugin scans the
+          # X-Forwarded-For chain from the right and keeps the first entry
+          # outside these ranges — the real client IP. Kept in sync with the
+          # entrypoint forwardedHeaders.trustedIPs (same ranges, see script).
+          forwardedHeadersTrustedIPs: __CF_TRUSTED_IPS__
