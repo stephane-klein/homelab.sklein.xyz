@@ -27,11 +27,11 @@ eso:
 
 resources:
   requests:
-    cpu: 50m
-    memory: 64Mi
-  limits:
     cpu: 200m
-    memory: 128Mi
+    memory: 256Mi
+  limits:
+    cpu: 800m
+    memory: 512Mi
 
 nodeSelector:
   kubernetes.io/hostname: nuc-i3-gen5.homelab.stephane-klein.info
