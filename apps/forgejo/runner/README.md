@@ -24,7 +24,8 @@ of that host.
 ## Architecture
 
 - **Host**: `forgejo-runner1` LXC instance on `incus1` (incus-server1), image
-  `forgejo-runner`, profile `default`, `security.nesting: "true"`.
+  `forgejo-runner`, profile `default`, `security.nesting: "true"`,
+  `security.privileged: "true"`.
 - **Node pinning**: none (CPU `limits.cpu: "4"` caps the runner so other
   services of incus-server1 keep theirs).
 - **Netbird**: the instance joins the `incus` Netbird group
@@ -36,8 +37,15 @@ of that host.
   trusts it (`/etc/pki/ca-trust/source/anchors/homelab-ca.crt`, written by
   cloud-init from `certs/ca/ca.crt`).
 - **Jobs**: forgejo-runner runs as the dedicated system user `runner` with
-  **podman** (rootless, docker-compatible socket via `podman.socket`) and starts
-  through a `forgejo-runner.service` systemd unit.
+  **podman** (rootful, system docker-compatible socket
+  `/run/podman/podman.sock`, exposed to the `runner` group) and starts through a
+  `forgejo-runner.service` systemd unit.
+- **Image builds**: `distrobuilder`-based LXC image builds need `mount`/`mknod`,
+  impossible in an unprivileged container or with rootless podman. Hence the
+  privileged instance and `container.privileged: true`; consequence: job
+  containers run `--privileged`, so a hostile workflow could reach the runner
+  LXC/host. Use case: `stephane-klein/sklein-devbox`
+  `.forgejo/workflows/build-lxc-image.yml`.
 
 ## Prerequisites
 

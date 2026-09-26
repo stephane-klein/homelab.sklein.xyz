@@ -5,14 +5,16 @@
 # runner is registered via *offline registration*: uuid + token live directly
 # in `server.connections` (no `forgejo-runner register` / .runner file).
 #
-# The container engine is podman, exposed through the docker-compatible socket
-# of the `runner` system user. The socket path (/run/user/<uid>/podman/...)
-# is only known once the user exists, so it is passed through the DOCKER_HOST
-# environment variable in the forgejo-runner systemd unit. `container.docker_host`
-# is set to "automount" so the runner honours DOCKER_HOST to launch job
-# containers AND mounts that socket into each job container at
-# /var/run/docker.sock, letting workflows use the docker CLI against the host
-# podman engine (docker build / docker push).
+# The container engine is podman, exposed through the system (rootful)
+# docker-compatible socket /run/podman/podman.sock. The socket is made
+# accessible to the `runner` group by a systemd drop-in, and its path is passed
+# through the DOCKER_HOST environment variable in the forgejo-runner systemd
+# unit. `container.docker_host` is set to "automount" so the runner honours
+# DOCKER_HOST to launch job containers AND mounts that socket into each job
+# container at /var/run/docker.sock, letting workflows use the docker CLI
+# against the host podman engine (docker build / docker push).
+# `privileged: true` launches job containers with --privileged, required by
+# distrobuilder-based image builds (mount/mknod).
 
 log:
   level: warning
@@ -24,10 +26,12 @@ runner:
     - ubuntu-latest:docker://ghcr.io/catthehacker/ubuntu:act-22.04
 
 container:
-  # Honour the DOCKER_HOST set in the forgejo-runner systemd unit (rootless
-  # podman socket of the `runner` user) and mount it into job containers at
+  # Honour the DOCKER_HOST set in the forgejo-runner systemd unit (rootful
+  # system podman socket) and mount it into job containers at
   # /var/run/docker.sock so workflows can run the docker CLI (build/push).
+  # `--privileged` is required by distrobuilder-based image builds.
   docker_host: automount
+  privileged: true
 
 server:
   connections:

@@ -23,6 +23,7 @@ config:
   limits.cpu: "4"
   limits.memory: 6GiB
   security.nesting: "true"
+  security.privileged: "true" # distrobuilder (LXC image build in CI) needs mount/mknod, impossible in an unprivileged container or with rootless podman
   cloud-init.user-data: |
     #cloud-config
     hostname: forgejo-runner1

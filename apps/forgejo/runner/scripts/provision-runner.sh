@@ -6,8 +6,8 @@ set -euo pipefail
 #
 # Sets up, following the official Forgejo docs (installation from binary +
 # Podman socket + systemd + offline registration):
-#   - a dedicated `runner` system user with linger enabled;
-#   - the user-level podman.socket (docker-compatible API) for the runner;
+#   - a dedicated `runner` system user;
+#   - the system (rootful) podman.socket, made accessible to the runner user;
 #   - the forgejo-runner binary;
 #   - the runner configuration pushed at /root/runner-config.yml (uuid + token
 #     come from the offline registration done by scripts/provision.sh);
@@ -29,10 +29,6 @@ fi
 
 echo "  Creating system user '${RUNNER_USER}'..."
 id "${RUNNER_USER}" >/dev/null 2>&1 || useradd --create-home "${RUNNER_USER}"
-RUNNER_UID="$(id -u "${RUNNER_USER}")"
-
-echo "  Enabling linger for '${RUNNER_USER}'..."
-loginctl enable-linger "${RUNNER_USER}"
 
 echo "  Installing forgejo-runner v${RUNNER_VERSION} (${ARCH})..."
 if [ ! -x /usr/local/bin/forgejo-runner ]; then
@@ -41,10 +37,29 @@ if [ ! -x /usr/local/bin/forgejo-runner ]; then
 fi
 /usr/local/bin/forgejo-runner --version
 
-echo "  Enabling podman.socket for '${RUNNER_USER}'..."
-systemctl --user -M "${RUNNER_USER}@" enable --now podman.socket
+# Rootful podman: distrobuilder (image build) needs mount/mknod, which are
+# impossible with the rootless per-user podman. Expose the system socket to the
+# runner user instead.
+echo "  Enabling the system podman.socket (rootful)..."
+mkdir -p /etc/systemd/system/podman.socket.d
+cat > /etc/systemd/system/podman.socket.d/override.conf <<EOF
+[Socket]
+SocketGroup=${RUNNER_USER}
+EOF
 
-SOCKET="/run/user/${RUNNER_UID}/podman/podman.sock"
+# /run/podman is created 0700 root:root by /usr/lib/tmpfiles.d/podman.conf,
+# which blocks the runner user from reaching the socket. This override runs
+# after (zzz- prefix) and makes the directory traversable by the runner group.
+cat > /etc/tmpfiles.d/zzz-podman-runner.conf <<EOF
+d /run/podman 0750 root ${RUNNER_USER} -
+EOF
+systemd-tmpfiles --create /etc/tmpfiles.d/zzz-podman-runner.conf
+
+systemctl daemon-reload
+systemctl enable podman.socket
+systemctl restart podman.socket
+
+SOCKET="/run/podman/podman.sock"
 echo "  Podman socket: ${SOCKET}"
 
 echo "  Installing runner configuration..."
@@ -56,7 +71,7 @@ echo "  Writing forgejo-runner systemd service..."
 cat > /etc/systemd/system/forgejo-runner.service <<EOF
 [Unit]
 Description=Forgejo Runner (forgejo-runner1)
-After=network-online.target
+After=network-online.target podman.socket
 Wants=network-online.target
 
 [Service]
@@ -68,7 +83,6 @@ WorkingDirectory=${RUNNER_HOME}
 Restart=always
 RestartSec=5
 Environment=HOME=${RUNNER_HOME}
-Environment=XDG_RUNTIME_DIR=/run/user/${RUNNER_UID}
 Environment=DOCKER_HOST=unix://${SOCKET}
 
 [Install]
