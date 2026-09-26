@@ -18,7 +18,8 @@ releases:
   - name: forgejo
     namespace: forgejo
     createNamespace: true
+    # https://artifacthub.io/packages/helm/forgejo-helm/forgejo
     chart: oci://code.forgejo.org/forgejo-helm/forgejo
-    version: 17.1.5
+    version: 17.1.7
     values:
       - values.yaml
