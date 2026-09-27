@@ -88,6 +88,22 @@ resource "netbird_policy" "incus_user_devices_access" {
   }
 }
 
+resource "netbird_policy" "incus_internal" {
+  name        = "Incus Internal"
+  description = "Allow all traffic between incus group devices"
+  enabled     = true
+
+  rule {
+    name          = "Allow All Traffic"
+    action        = "accept"
+    bidirectional = true
+    enabled       = true
+    protocol      = "all"
+    sources       = [netbird_group.incus.id]
+    destinations  = [netbird_group.incus.id]
+  }
+}
+
 resource "netbird_policy" "fp5_to_t14s" {
   name        = "FP5 to t14s Access"
   description = "Allow FP5 to access t14s"
