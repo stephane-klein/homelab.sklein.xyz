@@ -5,9 +5,10 @@ cd "$(dirname "$0")/../"
 
 echo "=== Deploying external-dns ==="
 
-if [ -z "${CLOUDFLARE_API_TOKEN:-}" ]; then
-  echo "Error: CLOUDFLARE_API_TOKEN is not set" >&2
-  echo "Load it via mise: mise x -- $0" >&2
+echo "  Reading Cloudflare API token from gopass (homelab/cloudflare/stephane-klein.info/api-token)..."
+CLOUDFLARE_API_TOKEN=$(gopass show -o homelab/cloudflare/stephane-klein.info/api-token)
+if [ -z "$CLOUDFLARE_API_TOKEN" ]; then
+  echo "Error: gopass secret homelab/cloudflare/stephane-klein.info/api-token is empty" >&2
   exit 1
 fi
 

@@ -508,8 +508,9 @@ everything else.
 
 ### Prerequisites
 
-`CLOUDFLARE_API_TOKEN` must be present in `.secret` (a Cloudflare API token
-with DNS edit permission for `stephane-klein.info`). This token is used by:
+The Cloudflare API token (with DNS edit permission for `stephane-klein.info`)
+is stored in gopass at `homelab/cloudflare/stephane-klein.info/api-token` and
+read directly by the deploy scripts. This token is used by:
 
 - **cert-manager** — DNS-01 challenge for Let's Encrypt
 - **external-dns** — automatic creation of AAAA records
