@@ -8,6 +8,8 @@ automated and unattended Fedora CoreOS installation, on the following homelab NU
 - [`NUC i3 gen 5`](https://notes.sklein.xyz/Serveur%20NUC%20i3%20gen%205/)
 - [`NUC i7 gen 11`](https://notes.sklein.xyz/Serveur%20NUC%20i7%20gen%2011/)
 
+<img src="homelab-picture.jpg" alt="Homelab overview" width="600">
+
 Installation characteristics:
 
 - Use Fedora CoreOS atomic distribution
