@@ -1,0 +1,140 @@
+image:
+  repository: searxng/searxng
+  # The chart default is `latest` and its appVersion is not the SearXNG
+  # release, so the image tag is pinned here explicitly.
+  tag: "2026.10.23-629368e40"
+  # The chart template reads `pullPolicy` while its values documentation and
+  # defaults use `imagePullPolicy`; only the former is rendered.
+  pullPolicy: IfNotPresent
+
+replicaCount: 1
+
+# Single replica pinned to the control-plane node.
+nodeSelector:
+  kubernetes.io/hostname: nuc-i7-gen11.homelab.stephane-klein.info
+
+service:
+  type: ClusterIP
+  port: 8080
+
+config:
+  settings:
+    enabled: true
+    # `server.secret_key` is intentionally absent: it is injected from the
+    # `searxng-secret` Secret via the SEARXNG_SECRET env var, so it never
+    # lands in this ConfigMap nor in the Helm release history.
+    data: |-
+      use_default_settings: true
+
+      general:
+        instance_name: SearXNG
+
+      server:
+        base_url: https://searxng.sklein.internal/
+        limiter: false
+        public_instance: false
+        image_proxy: true
+        port: 8080
+        bind_address: "0.0.0.0"
+
+      search:
+        safe_search: 0
+        autocomplete: ""
+        default_lang: fr
+        formats:
+          - html
+          - json
+
+      ui:
+        static_use_hash: true
+  # No Valkey in this homelab and a single replica: the limiter is disabled.
+  limiter:
+    enabled: false
+
+env:
+  - name: SEARXNG_SECRET
+    valueFrom:
+      secretKeyRef:
+        name: searxng-secret
+        key: secret-key
+
+podSecurityContext:
+  runAsNonRoot: true
+  runAsUser: 977
+  runAsGroup: 977
+  fsGroup: 977
+  seccompProfile:
+    type: RuntimeDefault
+
+securityContext:
+  runAsNonRoot: true
+  runAsUser: 977
+  runAsGroup: 977
+  allowPrivilegeEscalation: false
+  readOnlyRootFilesystem: true
+  capabilities:
+    drop:
+      - ALL
+  seccompProfile:
+    type: RuntimeDefault
+
+# The entrypoint only writes settings.yml when it is missing (it is mounted
+# here), so the root filesystem can stay read-only as long as the cache and
+# /tmp are writable.
+volumeMounts:
+  - name: cache
+    mountPath: /var/cache/searxng
+  - name: tmp
+    mountPath: /tmp
+
+volumes:
+  - name: cache
+    emptyDir: {}
+  - name: tmp
+    emptyDir: {}
+
+startupProbe:
+  httpGet:
+    path: /
+    port: http
+  failureThreshold: 30
+  periodSeconds: 5
+  timeoutSeconds: 2
+
+livenessProbe:
+  httpGet:
+    path: /
+    port: http
+  initialDelaySeconds: 10
+  periodSeconds: 20
+  timeoutSeconds: 2
+
+readinessProbe:
+  httpGet:
+    path: /
+    port: http
+  initialDelaySeconds: 5
+  periodSeconds: 10
+  timeoutSeconds: 2
+
+resources:
+  requests:
+    cpu: 100m
+    memory: 256Mi
+  limits:
+    memory: 512Mi
+
+ingress:
+  enabled: true
+  className: traefik
+  annotations:
+    cert-manager.io/cluster-issuer: homelab-ca
+  hosts:
+    - host: searxng.sklein.internal
+      paths:
+        - path: /
+          pathType: Prefix
+  tls:
+    - secretName: searxng-tls
+      hosts:
+        - searxng.sklein.internal

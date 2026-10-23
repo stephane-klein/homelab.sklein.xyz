@@ -1,0 +1,11 @@
+[tasks.deploy]
+description = "Deploy SearXNG (metasearch engine)"
+run = "scripts/deploy.sh"
+
+[tasks.destroy]
+description = "Destroy SearXNG"
+run = "scripts/destroy.sh"
+
+[tasks.diff]
+description = "Show the helm diff for SearXNG and report drift"
+run = "scripts/diff.sh"

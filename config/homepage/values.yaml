@@ -68,6 +68,10 @@ config:
         - Hindsight:
             href: https://hindsight.sklein.internal
             description: Agent Memory System
+        - SearXNG:
+            icon: si-searxng
+            href: https://searxng.sklein.internal
+            description: Private Metasearch Engine
         - Zigbee2MQTT:
             href: https://zigbee2mqtt.sklein.internal
             description: Zigbee Coordinator

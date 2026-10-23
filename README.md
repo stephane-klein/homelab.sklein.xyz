@@ -65,6 +65,7 @@ Each application is a self-contained directory under
 
 - [`apps/toggl-pg-mirror/`](./apps/toggl-pg-mirror/) — mirrors Toggl time entries to PostgreSQL
 - [`apps/crowdsec/`](./apps/crowdsec/) — CrowdSec [LAPI](https://docs.crowdsec.net/docs/local_api/intro/) + agent (protects the public Traefik ingress), including the blocklist-import CronJob for external threat feeds
+- [`apps/searxng/`](./apps/searxng/) — private metasearch engine (SearXNG) at `https://searxng.sklein.internal`
 - [`apps/forgejo/`](./apps/forgejo/) — self-hosted Git forge (Forgejo) + its private CloudNativePG database at `https://forgejo.sklein.internal`
   - [`apps/forgejo/runner/`](./apps/forgejo/runner/) — Forgejo Actions CI runner (LXC instance on incus-server1) + build of its Fedora image
 
@@ -98,7 +99,7 @@ Here are some service ideas I plan to deploy on my homelab.
 - [ ] **Home automation platform**: [Home Assistant](https://www.home-assistant.io/) [untested]
 - [ ] **Hike sharing**: [Wanderer](https://github.com/open-wanderer/wanderer) - self-hosted trail database to share hikes [untested]
 - [ ] **Photo management**: [Memories](https://memories.gallery/) or [Immich](https://immich.app/) or [PhotoPrism](https://photoprism.org/) [untested]
-- [ ] **Private metasearch engine**: [SearXNG](https://github.com/searxng/searxng)
+- [x] **Private metasearch engine**: [SearXNG](https://github.com/searxng/searxng) — [deployed](apps/searxng/) at `https://searxng.sklein.internal`
   - [ ] possibly complemented by [Hister](https://hister.org) [untested]
 - [ ] **File synchronization relay**: [syncthing](https://syncthing.net)
 - [ ] **Backup server**: [Borg](https://www.borgbackup.org/) - TimeMachine-like backups for workstations via [Pika Backup](https://apps.gnome.org/PikaBackup/)

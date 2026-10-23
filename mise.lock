@@ -94,6 +94,7 @@ url = "https://awscli.amazonaws.com/awscli-exe-linux-aarch64-2.35.9.zip"
 url = "https://awscli.amazonaws.com/awscli-exe-linux-aarch64-2.35.9.zip"
 
 [tools.awscli."platforms.linux-x64"]
+checksum = "blake3:41931f3092fe3d5b021394c65cb3cbc0059dc7b597bc93c75d955f3c8220abe0"
 url = "https://awscli.amazonaws.com/awscli-exe-linux-x86_64-2.35.9.zip"
 
 [tools.awscli."platforms.linux-x64-musl"]
@@ -119,6 +120,7 @@ url = "https://github.com/jetmore/swaks/releases/download/v20240103.0/swaks-2024
 url_api = "https://api.github.com/repos/jetmore/swaks/releases/assets/143651157"
 
 [tools."github:jetmore/swaks"."platforms.linux-x64"]
+checksum = "blake3:8260ddb8f82f14d2312ca977cb6aa3b85eee3f7dfecfeea0b8c5fbd20e4d63ef"
 url = "https://github.com/jetmore/swaks/releases/download/v20240103.0/swaks-20240103.0.tar.gz"
 url_api = "https://api.github.com/repos/jetmore/swaks/releases/assets/143651157"
 
