@@ -47,3 +47,13 @@ resource "netbird_setup_key" "homelab_servers" {
   ephemeral              = false
   usage_limit            = 0 # unlimited
 }
+
+resource "netbird_setup_key" "sarah_framework_12" {
+  name                   = "sarah-framework-12.homelab.stephane-klein.info"
+  expiry_seconds         = 0 # unlimited
+  type                   = "reusable"
+  allow_extra_dns_labels = true
+  auto_groups            = [netbird_group.user_devices.id]
+  ephemeral              = false
+  usage_limit            = 0 # unlimited
+}

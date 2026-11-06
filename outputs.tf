@@ -38,4 +38,8 @@ output "setup_key_homelab_servers" {
   description = "Netbird setup key for homelab servers"
 }
 
-
+output "setup_key_sarah_framework_12" {
+  value       = netbird_setup_key.sarah_framework_12.key
+  sensitive   = true
+  description = "Netbird setup key for sarah-framework-12"
+}
