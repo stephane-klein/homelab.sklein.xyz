@@ -1,0 +1,56 @@
+# Helm values for RustFS (release `rustfs`, chart `rustfs/rustfs` 1.0.4), the
+# S3-compatible store holding the pages The Artifact publishes.
+#
+# Standalone mode: one Deployment, one data PVC, one Service `rustfs-svc` on
+# port 9000. There is no replication: the whole bucket lives on the
+# `local-path` volume of `nuc-i3-gen5`. A node or disk loss loses every
+# published page. See README.md, section "Storage".
+#
+# The credentials secret `rustfs-credentials` is created by scripts/deploy.sh
+# from Gopass, with the keys the chart and the application both expected:
+# `RUSTFS_ACCESS_KEY` and `RUSTFS_SECRET_KEY`.
+#
+# The chart enables its own Ingress by default (class nginx, host
+# example.rustfs.com) and refuses the well-known default credentials, hence the
+# two explicit settings below.
+
+fullnameOverride: rustfs
+
+mode:
+  standalone:
+    enabled: true
+    # One pod with one volume: stop the old one before recreating it.
+    strategy:
+      type: Recreate
+  distributed:
+    enabled: false
+
+replicaCount: 1
+
+storageclass:
+  name: local-path
+  dataStorageSize: 20Gi
+  logStorageSize: 1Gi
+
+config:
+  rustfs:
+    region: us-east-1
+    # Empty drops the logs PVC: logs go to stdout, where kubectl reads them.
+    obs_log_directory: ""
+
+secret:
+  existingSecret: rustfs-credentials
+
+# Only the application reaches this store, inside the cluster.
+ingress:
+  enabled: false
+
+resources:
+  requests:
+    cpu: 100m
+    memory: 128Mi
+  limits:
+    memory: 512Mi
+
+nodeSelector:
+  kubernetes.io/hostname: nuc-i3-gen5.homelab.stephane-klein.info

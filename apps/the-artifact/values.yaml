@@ -1,0 +1,85 @@
+# Helm values for The Artifact (release `the-artifact`, chart
+# `oci://ghcr.io/andidev30/charts/the-artifact` 1.2.0).
+#
+# Public exposure: `traefik-public` (IPv6 ::1000), TLS from the
+# `letsencrypt-public` ClusterIssuer, AAAA records created by external-dns.
+#
+# Two host names, both served by the same pod and covered by the same
+# certificate:
+#   - artifact.stephane-klein.info          APP_URL, the application itself
+#   - artifact-content.stephane-klein.info  CONTENT_ORIGIN, only page files
+#
+# The second one keeps published, untrusted HTML off the origin that carries the
+# session cookie. It must be a different host than APP_URL; see
+# docs/security.md in the upstream project.
+
+appUrl: https://artifact.stephane-klein.info
+contentOrigin: https://artifact-content.stephane-klein.info
+
+# One reverse proxy between the visitor and the app: traefik-public. The
+# forwardAuth/forwarded-headers setup on the public Traefik makes the
+# X-Forwarded-For header trustworthy for rate limits.
+trustProxy: true
+
+ingress:
+  enabled: true
+  className: traefik-public
+  host: artifact.stephane-klein.info
+  annotations:
+    cert-manager.io/cluster-issuer: letsencrypt-public
+    external-dns.alpha.kubernetes.io/target: "2001:861:8b91:6620::1000"
+  tls:
+    enabled: true
+    secretName: the-artifact-tls
+
+# Database: the CNPG cluster of helmfile.yaml. Its generated secret
+# `the-artifact-cluster-app` carries the whole connection string under `uri`.
+postgresql:
+  enabled: false
+externalDatabase:
+  existingSecret: the-artifact-cluster-app
+  existingSecretUrlKey: uri
+
+# Object storage: RustFS in the same namespace. No `publicEndpoint`: agents
+# publish through the API only, never straight to the bucket.
+minio:
+  enabled: false
+externalS3:
+  endpoint: http://rustfs-svc:9000
+  region: us-east-1
+  bucket: artifact-content
+  existingSecret: rustfs-credentials
+  existingSecretAccessKeyIdKey: RUSTFS_ACCESS_KEY
+  existingSecretSecretAccessKeyKey: RUSTFS_SECRET_KEY
+
+# Email: sign-in links, invitations, comment notifications. The password comes
+# from `the-artifact-settings` (SMTP_PASS), not from this file.
+smtp:
+  host: smtp.fastmail.com
+  port: 465
+  secure: true
+  requireTls: true
+  user: stephane_klein@fastmail.com
+  from: "The Artifact <contact@stephane-klein.info>"
+
+# ENCRYPTION_KEY, SETUP_CODE and SMTP_PASS. Created by scripts/deploy.sh.
+existingSecret: the-artifact-settings
+
+# Gallery thumbnails, `inspect_artifact` and PDF export need Chromium with its
+# sandbox on, which needs the seccomp profile installed on the nodes by
+# scripts/install-seccomp-profile.sh. One render at a time suits a two-core node.
+thumbnails:
+  enabled: true
+  concurrency: 1
+
+# One worker: `resources.limits.cpu` is unset, so the chart runs a single
+# Node.js process (about 250 MiB) next to Chromium.
+resources:
+  requests:
+    cpu: 200m
+    memory: 512Mi
+  limits:
+    memory: 1536Mi
+
+nodeSelector:
+  kubernetes.io/hostname: nuc-i3-gen5.homelab.stephane-klein.info

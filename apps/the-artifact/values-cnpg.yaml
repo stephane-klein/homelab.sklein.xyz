@@ -1,0 +1,56 @@
+# Helm values for the CloudNativePG cluster backing The Artifact
+# (release `the-artifact-cluster`, chart `cnpg/cluster` 0.7.0).
+#
+# The chart names the Cluster resource after the release, so the operator
+# generates the application secret `the-artifact-cluster-app`. The app reads its
+# `uri` key as DATABASE_URL (see `externalDatabase` in values.yaml), and opens
+# the database and the owner named below through `initdb`.
+#
+# Backups go to the shared Scaleway bucket, under the `/the-artifact` prefix, on
+# the same model as `databases/memex`. The credentials secret
+# `the-artifact-cluster-backup-s3-creds` is created by scripts/deploy.sh from
+# Gopass (`homelab/scaleway/CNPG_BACKUPS_*`).
+
+type: postgresql
+mode: standalone
+version:
+  postgresql: "18"
+
+cluster:
+  instances: 1
+  storage:
+    size: 10Gi
+  # The vmagent `cnpg-cluster` scrape job picks up the pod labelled
+  # `cnpg.io/cluster`, on port 9187.
+  monitoring:
+    enabled: true
+    podMonitor:
+      enabled: false
+    prometheusRule:
+      enabled: false
+  # local-path binds the volume to the node, so pin the cluster to the same node
+  # as the application and RustFS.
+  affinity:
+    nodeSelector:
+      kubernetes.io/hostname: nuc-i3-gen5.homelab.stephane-klein.info
+  initdb:
+    database: artifact
+    owner: artifact
+
+backups:
+  enabled: true
+  provider: s3
+  destinationPath: "s3://homelab-cnpg-backups/the-artifact/"
+  endpointURL: "https://s3.fr-par.scw.cloud"
+  s3:
+    bucket: homelab-cnpg-backups
+    region: fr-par
+    path: /the-artifact
+  retentionPolicy: "30d"
+  scheduledBackups:
+    - name: nightly-backup
+      schedule: "0 30 2 * * *"
+      backupOwnerReference: self
+  secret:
+    create: false
+    name: the-artifact-cluster-backup-s3-creds

@@ -70,6 +70,7 @@ Each application is a self-contained directory under
 - [`apps/searxng/`](./apps/searxng/) — private metasearch engine (SearXNG) at `https://searxng.sklein.internal`
 - [`apps/forgejo/`](./apps/forgejo/) — self-hosted Git forge (Forgejo) + its private CloudNativePG database at `https://forgejo.sklein.internal`
   - [`apps/forgejo/runner/`](./apps/forgejo/runner/) — Forgejo Actions CI runner (LXC instance on incus-server1) + build of its Fedora image
+- [`apps/the-artifact/`](./apps/the-artifact/) — self-hosted hosting for the HTML pages coding agents publish over MCP, at `https://artifact.stephane-klein.info` (with its own CloudNativePG database and RustFS bucket)
 
 My databases (see [`databases/README.md`](databases/README.md)):
 
@@ -814,6 +815,17 @@ ops scripts live in `apps/forgejo/scripts/`.
 
 See **[`apps/forgejo/README.md`](apps/forgejo/README.md)**.
 
+### The Artifact
+
+The Artifact's PostgreSQL is an **app-private** database too: its CNPG cluster
+(`the-artifact-cluster`) is declared inside
+[`apps/the-artifact/`](apps/the-artifact/) (namespace `the-artifact`, node
+`nuc-i3-gen5`), with a nightly backup to `homelab-cnpg-backups/the-artifact/`.
+Page content lives in the RustFS bucket declared next to it in the same
+helmfile.
+
+See **[`apps/the-artifact/README.md`](apps/the-artifact/README.md)**.
+
 ### Hindsight
 
 [Hindsight](https://github.com/vectorize-io/hindsight) is an agent memory
@@ -907,6 +919,33 @@ $ mise run //apps/toggl-pg-mirror:deploy
 ```
 
 Config: [`apps/toggl-pg-mirror/values.yaml`](apps/toggl-pg-mirror/values.yaml)
+
+## The Artifact
+
+[The Artifact](https://github.com/andidev30/the-artifact) hosts the HTML pages
+coding agents publish over MCP, and gives each page a link you choose how to
+share.
+
+It runs on the **public** ingress (`traefik-public`, IPv6 only):
+
+- app: `https://artifact.stephane-klein.info`
+- page content: `https://artifact-content.stephane-klein.info` (`CONTENT_ORIGIN`,
+  so published HTML never shares an origin with the session cookie)
+
+Its PostgreSQL database is a CloudNativePG cluster with a nightly S3 backup,
+and page content sits in a RustFS bucket on `nuc-i3-gen5`. Gallery thumbnails,
+`inspect_artifact` and PDF export need Chromium with its sandbox on, so the
+Chromium seccomp profile is installed on both nodes.
+
+```sh
+$ mise run //apps/the-artifact:install-seccomp
+$ mise run //apps/the-artifact:deploy
+$ mise run //apps/the-artifact:status
+```
+
+See [`apps/the-artifact/README.md`](apps/the-artifact/README.md) for the Gopass
+secrets to create first, the first-account steps, and the storage caveat (the
+RustFS volume is not backed up yet).
 
 ## Documentation
 

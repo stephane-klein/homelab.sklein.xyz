@@ -1,0 +1,49 @@
+# Helmfile for The Artifact: its CloudNativePG database, the RustFS bucket it
+# stores page content in, and the application itself.
+#
+# Three releases, applied in order:
+#   1. `the-artifact-cluster` — CNPG PostgreSQL 18 cluster (chart `cnpg/cluster`).
+#      The release name gives the Cluster resource its name, so the generated
+#      app secret is `the-artifact-cluster-app`.
+#   2. `rustfs` — S3-compatible object storage in standalone mode (one pod, one
+#      PVC). Service `rustfs-svc`, port 9000.
+#   3. `the-artifact` — the application (OCI chart published with each release).
+#
+# One values file per release, because the three charts use the same keys
+# (`ingress`, `resources`, `nodeSelector`, `secret`) with different meanings.
+#
+# Secrets are created by scripts/deploy.sh from Gopass, never by Helm:
+#   - rustfs-credentials                         (RUSTFS_ACCESS_KEY, RUSTFS_SECRET_KEY)
+#   - the-artifact-settings                      (ENCRYPTION_KEY, SETUP_CODE, SMTP_PASS)
+#   - the-artifact-cluster-backup-s3-creds       (ACCESS_KEY_ID, ACCESS_SECRET_KEY)
+
+repositories:
+  - name: cnpg
+    url: https://cloudnative-pg.github.io/charts
+  - name: rustfs
+    url: https://charts.rustfs.com
+
+releases:
+  - name: the-artifact-cluster
+    namespace: the-artifact
+    createNamespace: true
+    chart: cnpg/cluster
+    version: 0.7.0
+    values:
+      - values-cnpg.yaml
+
+  - name: rustfs
+    namespace: the-artifact
+    createNamespace: true
+    chart: rustfs/rustfs
+    version: 1.0.4
+    values:
+      - values-rustfs.yaml
+
+  - name: the-artifact
+    namespace: the-artifact
+    createNamespace: true
+    chart: oci://ghcr.io/andidev30/charts/the-artifact
+    version: 1.2.0
+    values:
+      - values.yaml

@@ -1,0 +1,23 @@
+[tasks.deploy]
+description = "Deploy The Artifact + its CNPG database + RustFS (https://artifact.stephane-klein.info)"
+run = "scripts/deploy.sh"
+
+[tasks.destroy]
+description = "Destroy The Artifact, its RustFS storage and its CNPG database (destructive)"
+run = "scripts/destroy.sh"
+
+[tasks.diff]
+description = "Show the helm diff for The Artifact and report drift"
+run = "scripts/diff.sh"
+
+[tasks.status]
+description = "Show The Artifact status (pods, TLS, DNS, database, backups, readiness)"
+run = "scripts/status.sh"
+
+[tasks.install-seccomp]
+description = "Install the Chromium seccomp profile on both nodes (needed by the thumbnails)"
+run = "scripts/install-seccomp-profile.sh"
+
+[tasks.make-admin]
+description = "Make an account an instance admin (creates a password link)"
+run = "scripts/make-admin.sh"
